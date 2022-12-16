@@ -427,6 +427,7 @@ void EnHintnuts_Leave(EnHintnuts* this, PlayState* play) {
         if (this->actor.child != NULL) {
             Actor_ChangeCategory(play, &play->actorCtx, this->actor.child, ACTORCAT_PROP);
         }
+        Player_GainExperience(play, 7);
         Actor_Kill(&this->actor);
         gSaveContext.sohStats.count[COUNT_ENEMIES_DEFEATED_DEKU_SCRUB]++;
     }

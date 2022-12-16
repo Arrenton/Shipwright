@@ -533,7 +533,9 @@ void EnFhgFire_EnergyBall(EnFhgFire* this, PlayState* play) {
                     if ((bossGnd->flyMode >= GND_FLY_VOLLEY) && (this->work[FHGFIRE_RETURN_COUNT] >= 2)) {
                         Audio_PlayActorSound2(&this->actor, NA_SE_EN_FANTOM_LAUGH);
                     }
-                    func_8002F698(play, &this->actor, 3.0f, this->actor.world.rot.y, 0.0f, 3, 0x10);
+                    u16 dmg = Leveled_DamageModify(ACTORCAT_PLAYER, 16,
+                                             this->actor.power, GET_PLAYER(play)->actor.courage);
+                    func_8002F698(play, &this->actor, 3.0f, this->actor.world.rot.y, 0.0f, 3, dmg);
                 }
                 break;
             case FHGFIRE_LIGHT_BLUE:

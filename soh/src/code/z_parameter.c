@@ -3093,6 +3093,10 @@ s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
         }
     }
 
+    if (healthChange < 0) {
+        ActorDamageNumber_New(GET_PLAYER(play), -healthChange);
+    }
+
     gSaveContext.health += healthChange;
 
     if (gSaveContext.health > gSaveContext.healthCapacity) {
@@ -5198,6 +5202,49 @@ void Interface_Draw(PlayState* play) {
 
         if ((R_PAUSE_MENU_MODE != 2) && (R_PAUSE_MENU_MODE != 3)) {
             func_8002C124(&play->actorCtx.targetCtx, play); // Draw Z-Target
+            
+            // Draw Damage
+             Actor* currAct = play->actorCtx.actorLists[ACTORCAT_ENEMY].head;
+            if (currAct != NULL) {
+                while (currAct != NULL) {
+                    ActorDamageNumber_Draw(play, currAct);
+                    currAct = currAct->next;
+                }
+            }
+
+            currAct = play->actorCtx.actorLists[ACTORCAT_MISC].head;
+            if (currAct != NULL) {
+                while (currAct != NULL) {
+                    if (currAct->id == ACTOR_EN_REEBA)
+                        ActorDamageNumber_Draw(play, currAct);
+                    currAct = currAct->next;
+                }
+            }
+
+            currAct = play->actorCtx.actorLists[ACTORCAT_NPC].head;
+            if (currAct != NULL) {
+                while (currAct != NULL) {
+                    ActorDamageNumber_Draw(play, currAct);
+                    currAct = currAct->next;
+                }
+            }
+
+            currAct = play->actorCtx.actorLists[ACTORCAT_BOSS].head;
+            if (currAct != NULL) {
+                while (currAct != NULL) {
+                    ActorDamageNumber_Draw(play, currAct);
+                    currAct = currAct->next;
+                }
+            }
+
+            ActorDamageNumber_Draw(play, GET_PLAYER(play));
+
+            // Draw Experience Gain
+
+            ActorExperienceNumber_Draw(play, GET_PLAYER(play));
+
+            // Draw Level Up
+            Actor_LevelUpDraw(play, GET_PLAYER(play));
         }
 
         Gfx_SetupDL_39Overlay(play->state.gfxCtx);

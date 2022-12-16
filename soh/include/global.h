@@ -4,6 +4,9 @@
 #define GLOBAL_H
 
 #include "functions.h"
+#include "leveled_overlays.h"
+#include "leveled_stat_math.h"
+#include "leveled_actor_level_table.h"
 #include "variables.h"
 #include "macros.h"
 #include "soh/OTRGlobals.h"

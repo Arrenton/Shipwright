@@ -150,12 +150,14 @@ s32 EnFw_CheckCollider(EnFw* this, PlayState* play) {
             this->lastDmgHook = false;
         }
         this->collider.base.acFlags &= ~AC_HIT;
-        if (Actor_ApplyDamage(&this->actor) <= 0) {
+            if (this->actor.parent->colChkInfo.health <=
+                GetActorStat_EnemyMaxHealth(8 * HEALTH_ATTACK_MULTIPLIER, this->actor.level)) {
             if (this->actor.parent->colChkInfo.health <= 8) {
                 Enemy_StartFinishingBlow(play, &this->actor);
                 this->actor.parent->colChkInfo.health = 0;
             } else {
-                this->actor.parent->colChkInfo.health -= 8;
+                this->actor.parent->colChkInfo.health -=
+                    GetActorStat_EnemyMaxHealth(8 * HEALTH_ATTACK_MULTIPLIER, this->actor.level);
             }
             this->returnToParentTimer = 0;
         }

@@ -402,6 +402,7 @@ void SaveManager::InitFileNormal() {
     for (int i = 0; i < ARRAY_COUNT(gSaveContext.playerName); i++) {
         gSaveContext.playerName[i] = 0x3E;
     }
+    gSaveContext.experience = 0;
     gSaveContext.n64ddFlag = 0;
     gSaveContext.healthCapacity = 0x30;
     gSaveContext.health = 0x30;
@@ -558,6 +559,7 @@ void SaveManager::InitFileDebug() {
     for (int i = 0; i < ARRAY_COUNT(gSaveContext.playerName); i++) {
         gSaveContext.playerName[i] = sPlayerName[i];
     }
+    gSaveContext.experience = 0;
     gSaveContext.n64ddFlag = 0;
     gSaveContext.healthCapacity = 0xE0;
     gSaveContext.health = 0xE0;
@@ -818,6 +820,7 @@ void SaveManager::LoadBaseVersion1() {
     SaveManager::Instance->LoadArray("playerName", ARRAY_COUNT(gSaveContext.playerName), [](size_t i) {
         SaveManager::Instance->LoadData("", gSaveContext.playerName[i]);
     });
+    SaveManager::Instance->LoadData("experience", gSaveContext.experience);
     SaveManager::Instance->LoadData("n64ddFlag", gSaveContext.n64ddFlag);
     SaveManager::Instance->LoadData("healthCapacity", gSaveContext.healthCapacity);
     SaveManager::Instance->LoadData("health", gSaveContext.health);
@@ -959,6 +962,7 @@ void SaveManager::LoadBaseVersion2() {
     SaveManager::Instance->LoadArray("playerName", ARRAY_COUNT(gSaveContext.playerName), [](size_t i) {
         SaveManager::Instance->LoadData("", gSaveContext.playerName[i]);
     });
+    SaveManager::Instance->LoadData("experience", gSaveContext.experience);
     SaveManager::Instance->LoadData("n64ddFlag", gSaveContext.n64ddFlag);
     SaveManager::Instance->LoadData("healthCapacity", gSaveContext.healthCapacity);
     SaveManager::Instance->LoadData("health", gSaveContext.health);
@@ -1165,6 +1169,7 @@ void SaveManager::LoadBaseVersion3() {
     SaveManager::Instance->LoadArray("playerName", ARRAY_COUNT(gSaveContext.playerName), [](size_t i) {
         SaveManager::Instance->LoadData("", gSaveContext.playerName[i]);
     });
+    SaveManager::Instance->LoadData("experience", gSaveContext.experience);
     SaveManager::Instance->LoadData("n64ddFlag", gSaveContext.n64ddFlag);
     SaveManager::Instance->LoadData("healthCapacity", gSaveContext.healthCapacity);
     SaveManager::Instance->LoadData("health", gSaveContext.health);
@@ -1344,6 +1349,7 @@ void SaveManager::SaveBase() {
     SaveManager::Instance->SaveArray("playerName", ARRAY_COUNT(gSaveContext.playerName), [](size_t i) {
         SaveManager::Instance->SaveData("", gSaveContext.playerName[i]);
     });
+    SaveManager::Instance->SaveData("experience", gSaveContext.experience);
     SaveManager::Instance->SaveData("n64ddFlag", gSaveContext.n64ddFlag);
     SaveManager::Instance->SaveData("healthCapacity", gSaveContext.healthCapacity);
     SaveManager::Instance->SaveData("health", gSaveContext.health);

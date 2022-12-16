@@ -3008,6 +3008,16 @@ void CollisionCheck_ApplyDamage(PlayState* play, CollisionCheckContext* colChkCt
         collider->actor->colChkInfo.damageEffect = tbl->table[i] >> 4 & 0xF;
     }
     if (!(collider->acFlags & AC_HARD)) {
+        u8 power = collider->ac->power;
+
+        if (collider->actor->category != ACTORCAT_PLAYER)
+                damage *= HEALTH_ATTACK_MULTIPLIER;
+
+        if (info->acHit->atFlags & AT_TYPE_PLAYER)
+            power = GET_PLAYER(play)->actor.power;
+
+        damage = (u16)Leveled_DamageModify(collider->actor->category, damage, power, collider->actor->courage);
+
         collider->actor->colChkInfo.damage += damage;
     }
 }

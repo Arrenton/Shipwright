@@ -864,6 +864,7 @@ void EnTite_CheckDamage(Actor* thisx, PlayState* play) {
                 }
                 if (thisx->colChkInfo.health == 0) {
                     EnTite_SetupDeathCry(this);
+                    Player_GainExperience(play, this->actor.exp);
                 } else {
                     // Flip tektite back up if it's on its back
                     Audio_PlayActorSound2(thisx, NA_SE_EN_TEKU_DAMAGE);

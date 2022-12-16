@@ -744,5 +744,10 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
 
     if (gUpgradeMasks[0]) {}
 
+    if (pauseCtx->pageIndex == PAUSE_EQUIP && (pauseCtx->unk_1E4 == 0 || sEquipTimer > 0) &&
+        pauseCtx->alpha == 255) {
+        Leveled_KaleidoEquip_Stats(play);
+    }
+
     CLOSE_DISPS(play->state.gfxCtx);
 }

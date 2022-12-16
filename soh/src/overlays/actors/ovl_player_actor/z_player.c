@@ -9560,6 +9560,7 @@ void Player_InitCommon(Player* this, PlayState* play, FlexSkeletonHeader* skelHe
     this->meleeWeaponEffectIndex = TOTAL_EFFECT_COUNT;
     this->currentYaw = this->actor.world.rot.y;
     func_80834644(play, this);
+    Player_GainExperience(play, 0);
 
     SkelAnime_InitLink(play, &this->skelAnime, skelHeader, D_80853914[PLAYER_ANIMGROUP_0][this->modelAnimType], 9,
                        this->jointTable, this->morphTable, PLAYER_LIMB_MAX);

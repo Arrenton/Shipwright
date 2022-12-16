@@ -498,6 +498,37 @@ s32 Player_GetStrength(void) {
     }
 }
 
+void Player_GainExperience(PlayState* play, u16 experience) {
+    Player* player = GET_PLAYER(play);
+    bool levelUp = false;
+    u8 prevPower = player->actor.power;
+    u8 prevCourage = player->actor.courage;
+
+    if (player->actor.level == 99)
+        return;
+
+    if (gSaveContext.experience < 999999) {
+        gSaveContext.experience += experience;
+        ActorExperienceNumber_New(&player->actor, experience);
+        if (gSaveContext.experience > 999999)
+            gSaveContext.experience = 999999;
+    }
+
+    while (GetActorStat_NextLevelExp(player->actor.level, gSaveContext.experience) <= 0 && player->actor.level < 99) {
+        player->actor.level += 1;
+        if (experience > 0) {
+            levelUp = true;
+        }
+    }
+
+    Actor_RefreshLeveledStats(player);
+
+    if (levelUp) {
+        ActorLevelUp_New(&player->actor, player->actor.power - prevPower, player->actor.courage - prevCourage);
+        Audio_PlayFanfare(NA_BGM_ITEM_GET);
+    }
+}
+
 u8 Player_GetMask(PlayState* play) {
     Player* this = GET_PLAYER(play);
 
