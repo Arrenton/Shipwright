@@ -274,6 +274,8 @@ typedef struct {
     /*        */ u16 randomizerInf[9];
     /*        */ u16 adultTradeItems;
     u32 experience;
+    s16 heartContainers;
+    s16 healthCapacity2; // Modified max health
     // #endregion
 } SaveContext; // size = 0x1428
 

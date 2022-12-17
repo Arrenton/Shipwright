@@ -1306,5 +1306,29 @@ namespace GameMenuBar {
 
             ImGui::EndMenu();
         }
+
+        if (ImGui::BeginMenu("Leveled"))
+        {
+            if (ImGui::BeginMenu("Heart Capacity in Units")) {
+                UIWidgets::EnhancementRadioButton("4", "gLeveledHeartUnits", 1);
+                UIWidgets::EnhancementRadioButton("8", "gLeveledHeartUnits", 2);
+                UIWidgets::EnhancementRadioButton("12 (Default)", "gLeveledHeartUnits", 3);
+                UIWidgets::EnhancementRadioButton("16 (Vanilla)", "gLeveledHeartUnits", 4);
+                UIWidgets::EnhancementRadioButton("20", "gLeveledHeartUnits", 5);
+                UIWidgets::EnhancementRadioButton("24", "gLeveledHeartUnits", 6);
+                UIWidgets::EnhancementRadioButton("28", "gLeveledHeartUnits", 7);
+                UIWidgets::EnhancementRadioButton("32", "gLeveledHeartUnits", 8);
+                UIWidgets::EnhancementRadioButton("36", "gLeveledHeartUnits", 9);
+                UIWidgets::EnhancementRadioButton("40", "gLeveledHeartUnits", 10);
+                UIWidgets::EnhancementRadioButton("44", "gLeveledHeartUnits", 11);
+                UIWidgets::EnhancementRadioButton("48", "gLeveledHeartUnits", 12);
+                ImGui::EndMenu();
+            }
+            UIWidgets::Tooltip(
+                    "Sets how much health units a heart is worth."
+                );
+
+            ImGui::EndMenu();
+        }
     }
 }

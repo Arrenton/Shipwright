@@ -809,6 +809,7 @@ void SaveManager::CreateDefaultGlobal() {
 }
 
 void SaveManager::LoadBaseVersion1() {
+    gSaveContext.healthCapacity2 = 9999;
     SaveManager::Instance->LoadData("entranceIndex", gSaveContext.entranceIndex);
     SaveManager::Instance->LoadData("linkAge", gSaveContext.linkAge);
     SaveManager::Instance->LoadData("cutsceneIndex", gSaveContext.cutsceneIndex);
@@ -951,6 +952,7 @@ void SaveManager::LoadBaseVersion1() {
 }
 
 void SaveManager::LoadBaseVersion2() {
+    gSaveContext.healthCapacity2 = 9999;
     SaveManager::Instance->LoadData("entranceIndex", gSaveContext.entranceIndex);
     SaveManager::Instance->LoadData("linkAge", gSaveContext.linkAge);
     SaveManager::Instance->LoadData("cutsceneIndex", gSaveContext.cutsceneIndex);
@@ -1158,6 +1160,7 @@ void SaveManager::LoadBaseVersion2() {
 }
 
 void SaveManager::LoadBaseVersion3() {
+    gSaveContext.healthCapacity2 = 9999;
     SaveManager::Instance->LoadData("entranceIndex", gSaveContext.entranceIndex);
     SaveManager::Instance->LoadData("linkAge", gSaveContext.linkAge);
     SaveManager::Instance->LoadData("cutsceneIndex", gSaveContext.cutsceneIndex);

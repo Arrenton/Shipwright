@@ -198,7 +198,7 @@ void BgDyYoseizo_CheckMagicAcquired(BgDyYoseizo* this, PlayState* play) {
         play->msgCtx.ocarinaMode = OCARINA_MODE_04;
 
         if(gSaveContext.n64ddFlag) {
-            gSaveContext.healthAccumulator = 0x140;
+            gSaveContext.healthAccumulator = gSaveContext.healthCapacity2;
             Magic_Fill(play);
             if(Flags_GetTreasure(play, this->fountainType + 1)) {
                 Actor_Kill(&this->actor);
@@ -490,12 +490,12 @@ void BgDyYoseizo_HealPlayer_NoReward(BgDyYoseizo* this, PlayState* play) {
     }
 
     if (this->healingTimer == 110) {
-        gSaveContext.healthAccumulator = 0x140;
+        gSaveContext.healthAccumulator = gSaveContext.healthCapacity2;
         Magic_Fill(play);
         this->refillTimer = 200;
     }
 
-    if (((gSaveContext.healthCapacity == gSaveContext.health) && (gSaveContext.magic == gSaveContext.magicCapacity)) ||
+    if (((gSaveContext.healthCapacity2 == gSaveContext.health) && (gSaveContext.magic == gSaveContext.magicCapacity)) ||
         (this->refillTimer == 1)) {
         this->healingTimer--;
         if (this->healingTimer == 90) {
@@ -758,7 +758,7 @@ void BgDyYoseizo_Give_Reward(BgDyYoseizo* this, PlayState* play) {
         }
 
         if (!this->healing) {
-            gSaveContext.healthAccumulator = 0x140;
+            gSaveContext.healthAccumulator = gSaveContext.healthCapacity2;
             this->healing = true;
             if (actionIndex == 2) {
                 Magic_Fill(play);
@@ -787,7 +787,7 @@ void BgDyYoseizo_Give_Reward(BgDyYoseizo* this, PlayState* play) {
                 }
 
                 this->itemSpawned = true;
-                gSaveContext.healthAccumulator = 0x140;
+                gSaveContext.healthAccumulator = gSaveContext.healthCapacity2;
                 Interface_ChangeAlpha(9);
                 gSaveContext.itemGetInf[1] |= sItemGetFlags[actionIndex];
                 Item_Give(play, sItemIds[actionIndex]);

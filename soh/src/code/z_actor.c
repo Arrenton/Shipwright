@@ -1200,6 +1200,7 @@ void Actor_RefreshLeveledStats(Actor* actor) {
     if (actor->category == ACTORCAT_PLAYER) {
         actor->power = GetActorStat_PlayerPower(actor->level);
         actor->courage = GetActorStat_PlayerCourage(actor->level);
+        gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, actor->level);
     } else {
         actor->power = GetActorStat_Power(actor->level);
         actor->courage = GetActorStat_Courage(actor->level);

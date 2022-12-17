@@ -541,7 +541,7 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
         Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 11, 114, statY - 2, 8, 16, 255, 255, 255);
     }
     Leveled_ValueNumberDraw(play, 100, statY, gSaveContext.health, 255, 255, 255);
-    Leveled_ValueNumberDraw(play, 121, statY, gSaveContext.healthCapacity, 120, 255, 0);
+    Leveled_ValueNumberDraw(play, 121, statY, gSaveContext.healthCapacity2, 120, 255, 0);
     statY += 8;
     // Attack
         Leveled_DrawTex32(play, (u8*)gKokiriSwordIconTex, 10, 12, 90, statY - 1, 10, 8);

@@ -331,12 +331,12 @@ void DrawInfoTab() {
         gSaveContext.healthCapacity = healthIntermediary;
     }
     UIWidgets::InsertHelpHoverText("Maximum health. 16 units per full heart");
-    if (gSaveContext.health > gSaveContext.healthCapacity) {
-        gSaveContext.health = gSaveContext.healthCapacity; // Clamp health to new max
+    if (gSaveContext.health > gSaveContext.healthCapacity2) {
+        gSaveContext.health = gSaveContext.healthCapacity2; // Clamp health to new max
     }
 
     const uint16_t healthMin = 0;
-    const uint16_t healthMax = gSaveContext.healthCapacity;
+    const uint16_t healthMax = gSaveContext.healthCapacity2;
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
     ImGui::SliderScalar("Health", ImGuiDataType_S16, &gSaveContext.health, &healthMin, &healthMax);
     UIWidgets::InsertHelpHoverText("Current health. 16 units per full heart");

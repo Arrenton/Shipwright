@@ -26,7 +26,7 @@ u16 GetActorStat_DisplayAttack(u8 attack, u8 power) {
 u16 GetActorStat_Attack(u8 attack, u8 power) {
     //return attack * (1 + power / (10.0f / (1.0f + ((float)power / 15.0f)))); old
 
-    return (float)attack * (1 + (power - 2) * (0.12f + (power - 2) * 0.0005f));
+    return (float)attack * (1 + (power - 2) * (0.14f + (power - 2) * 0.0006f));
 }
 
 u8 GetActorStat_Power(u8 level) {
@@ -48,6 +48,16 @@ u8 GetActorStat_PlayerCourage(u8 level) {
 u16 GetActorStat_EnemyMaxHealth(u16 baseHealth, u8 level){ 
     //return (u16)Leveled_DamageFormula(baseHealth, GetActorStat_Power(level), GetActorStat_Courage(level)); old
     return GetActorStat_Attack(baseHealth, GetActorStat_Power(level));
+}
+
+u8 GetPlayerStat_BonusHearts(u8 level){
+    return (level + 1) / 5;
+}
+
+u16 GetPlayerStat_GetModifiedHealthCapacity(u16 baseHealth, u8 level){
+    s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+    u16 baseHearts = baseHealth / 16;
+    return (baseHearts + GetPlayerStat_BonusHearts(level)) * heartUnits;
 }
 
 u16 GetPlayerStat_NextLevelExpAtLevel(u8 level) {
@@ -74,11 +84,11 @@ f32 Leveled_DamageFormula(f32 attack, u8 power, u8 courage) {
     f32 damage = GetActorStat_Attack(attack, power);
     if (power >= courage) {
         for (u8 i = 0; i < power - courage; i++) {
-            damage *= 1.03f;
+            damage *= 1.01f;
         }
     } else {
         for (u8 i = 0; i < courage - power; i++) {
-            damage *= 0.95f;
+            damage *= 0.97f;
         }
     }
     return damage;
@@ -89,11 +99,11 @@ f32 Leveled_DamageFormulaOnPlayer(f32 attack, u8 power, u8 courage) {
     f32 damage = attack;
     if (power >= courage) {
         for (u8 i = 0; i < power - courage; i++) {
-            damage *= 1.06f + CLAMP_MIN(0.05f - (f32)i / 100.0f, 0);
+            damage *= 1.05f + CLAMP_MIN(0.05f - (f32)i / 100.0f, 0);
         }
     } else {
         for (u8 i = 0; i < courage - power; i++) {
-            damage *= 0.95f;
+            damage *= 0.96f;
         }
     }
     return damage;

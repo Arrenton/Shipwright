@@ -341,8 +341,8 @@ void GameState_Update(GameState* gameState) {
 
     // Inf Health
     if (CVar_GetS32("gInfiniteHealth", 0) != 0) {
-        if (gSaveContext.health < gSaveContext.healthCapacity) {
-            gSaveContext.health = gSaveContext.healthCapacity;
+        if (gSaveContext.health < gSaveContext.healthCapacity2) {
+            gSaveContext.health = gSaveContext.healthCapacity2;
         }
     }
 
