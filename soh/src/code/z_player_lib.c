@@ -503,6 +503,8 @@ void Player_GainExperience(PlayState* play, u16 experience) {
     bool levelUp = false;
     u8 prevPower = player->actor.power;
     u8 prevCourage = player->actor.courage;
+    u16 prevHealthCapacity = gSaveContext.healthCapacity2;
+    u16 prevMagicUnits = gSaveContext.magicUnits;
 
     if (player->actor.level == 99)
         return;
@@ -522,9 +524,14 @@ void Player_GainExperience(PlayState* play, u16 experience) {
     }
 
     Actor_RefreshLeveledStats(player);
+    
+    if (gSaveContext.magicLevel == 0){
+        prevMagicUnits = gSaveContext.magicUnits;
+    }
 
     if (levelUp) {
-        ActorLevelUp_New(&player->actor, player->actor.power - prevPower, player->actor.courage - prevCourage);
+        gSaveContext.magicCapacity = gSaveContext.magicLevel * gSaveContext.magicUnits;
+        ActorLevelUp_New(&player->actor, player->actor.power - prevPower, player->actor.courage - prevCourage, gSaveContext.healthCapacity2 - prevHealthCapacity, gSaveContext.magicUnits - prevMagicUnits);
         Audio_PlayFanfare(NA_BGM_ITEM_GET);
     }
 }

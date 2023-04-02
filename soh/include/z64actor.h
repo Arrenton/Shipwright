@@ -194,10 +194,10 @@ typedef struct Actor {
     u8 level;
     u8 power; // e.g. Strength
     u8 courage; // e.g. Defense
-    u16 floatingNumber[5];
-    u8 floatingNumberLife[5];
-    Vec2f floatingNumberPosition[5];
-    Vec2f floatingNumberVelocity[5];
+    u16 floatingNumber[7];
+    u8 floatingNumberLife[7];
+    Vec2f floatingNumberPosition[7];
+    Vec2f floatingNumberVelocity[7];
     bool ignoreExpReward; // Actor handles exp reward differently
 } Actor; // size = 0x14C
 

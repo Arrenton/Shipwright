@@ -276,6 +276,7 @@ typedef struct {
     u32 experience;
     s16 heartContainers;
     s16 healthCapacity2; // Modified max health
+    u8 magicUnits; // Modified magic units per magic level
     // #endregion
 } SaveContext; // size = 0x1428
 

@@ -378,7 +378,7 @@ void DrawInfoTab() {
         ImGui::EndCombo();
     }
     UIWidgets::InsertHelpHoverText("Current magic level");
-    gSaveContext.magicCapacity = gSaveContext.magicLevel * 0x30; // Set to get the bar drawn in the UI
+    gSaveContext.magicCapacity = gSaveContext.magicLevel * gSaveContext.magicUnits; // Set to get the bar drawn in the UI
     if (gSaveContext.magic > gSaveContext.magicCapacity) {
         gSaveContext.magic = gSaveContext.magicCapacity; // Clamp magic to new max
     }

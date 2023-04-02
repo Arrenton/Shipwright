@@ -12,6 +12,7 @@ u8 GetActorStat_PlayerPower(u8 level);
 u8 GetActorStat_PlayerCourage(u8 level);
 u16 GetActorStat_EnemyMaxHealth(u16 baseHealth, u8 level);
 u8 GetPlayerStat_BonusHearts(u8 level);
+u8 GetPlayerStat_MagicUnits(u8 level);
 u16 GetPlayerStat_GetModifiedHealthCapacity(u16 baseHealth, u8 level);
 u16 GetPlayerStat_NextLevelExpAtLevel(u8 level);
 u16 GetActorStat_NextLevelExp(u8 level, u32 currentExp);

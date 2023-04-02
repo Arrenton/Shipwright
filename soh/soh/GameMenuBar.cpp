@@ -1309,6 +1309,8 @@ namespace GameMenuBar {
 
         if (ImGui::BeginMenu("Leveled"))
         {
+            UIWidgets::EnhancementCheckbox("Level Gives Bonus Hearts", "gLeveledHeartsWithLevelUp", false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
+            UIWidgets::EnhancementCheckbox("Level Affects Magic Capacity", "gLeveledMagicWithLevelUp", false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
             if (ImGui::BeginMenu("Heart Capacity in Units")) {
                 UIWidgets::EnhancementRadioButton("4", "gLeveledHeartUnits", 1);
                 UIWidgets::EnhancementRadioButton("8", "gLeveledHeartUnits", 2);
@@ -1327,6 +1329,10 @@ namespace GameMenuBar {
             UIWidgets::Tooltip(
                     "Sets how much health units a heart is worth."
                 );
+
+            //if (ImGui::Button("Add 2000 EXP")){
+            //    gSaveContext.experience += 2000;
+            //}
 
             ImGui::EndMenu();
         }

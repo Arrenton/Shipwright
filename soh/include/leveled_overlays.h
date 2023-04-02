@@ -5,7 +5,7 @@
 
 void ActorDamageNumber_New(Actor* actor, u16 damage);
 void ActorExperienceNumber_New(Actor* actor, u16 experience);
-void ActorLevelUp_New(Actor* actor, u8 powerDiff, u8 courageDiff);
+void ActorLevelUp_New(Actor* actor, u8 powerDiff, u8 courageDiff, u16 healthDiff, u8 magicDiff);
 void ActorDamageNumber_Draw(PlayState* play, Actor* actor);
 void ActorExperienceNumber_Draw(PlayState* play, Actor* actor);
 void Actor_LevelUpDraw(PlayState* play, Actor* actor);

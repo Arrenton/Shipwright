@@ -3,6 +3,7 @@
 #include "textures/icon_item_static/icon_item_static.h"
 #include "textures/parameter_static/parameter_static.h"
 #include "textures/do_action_static/do_action_static.h"
+#include "textures/icon_item_24_static/icon_item_24_static.h"
 #include "textures/message_static/message_static.h"
 #include "textures/nes_font_static/nes_font_static.h"
 
@@ -115,7 +116,7 @@ void ActorExperienceNumber_New(Actor* actor, u16 experience) {
     actor->floatingNumberVelocity[1] = velocity;
 }
 
-void ActorLevelUp_New(Actor* actor, u8 powerDiff, u8 courageDiff) {
+void ActorLevelUp_New(Actor* actor, u8 powerDiff, u8 courageDiff, u16 healthDiff, u8 magicDiff) {
 
     Vec2f position = { 0, 0 };
     Vec2f velocity = { 0, -6 };
@@ -125,6 +126,11 @@ void ActorLevelUp_New(Actor* actor, u8 powerDiff, u8 courageDiff) {
         actor->floatingNumberLife[3] = 100;
     if (courageDiff > 0)
         actor->floatingNumberLife[4] = 100;
+    if (healthDiff > 0)
+        actor->floatingNumberLife[5] = 100;
+    if (magicDiff > 0)
+        actor->floatingNumberLife[6] = 100;
+
     actor->floatingNumberPosition[2] = position;
     actor->floatingNumberVelocity[2] = velocity;
     position.x = 16;
@@ -139,6 +145,18 @@ void ActorLevelUp_New(Actor* actor, u8 powerDiff, u8 courageDiff) {
     velocity.y = -5;
     actor->floatingNumberPosition[4] = position;
     actor->floatingNumberVelocity[4] = velocity;
+    position.x = 16;
+    position.y = 0;
+    velocity.x = -2;
+    velocity.y = -5;
+    actor->floatingNumberPosition[5] = position;
+    actor->floatingNumberVelocity[5] = velocity;
+    position.x = 16;
+    position.y = 0;
+    velocity.x = 2;
+    velocity.y = -5;
+    actor->floatingNumberPosition[6] = position;
+    actor->floatingNumberVelocity[6] = velocity;
 }
 
 void ActorExperienceNumber_Draw(PlayState* play, Actor* actor) {
@@ -328,7 +346,7 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
     Vec3f spBC;
     f32 spB4;
     s32 j;
-    for (s8 i = 2; i < 5; i++) {
+    for (s8 i = 2; i < 7; i++) {
         if (actor->floatingNumberLife[i] <= 0)
             continue;
 
@@ -420,6 +438,27 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
             OVERLAY_DISP =
                 Gfx_Texture32(OVERLAY_DISP, (u8*)gHylianShieldIconTex, 8, 8, spBC.x, spBC.y, 8, 8,
                                          1 << 10, 1 << 10);
+        }
+        if (i == 5) {
+
+            gDPPipeSync(OVERLAY_DISP++);
+            gDPSetTextureFilter(OVERLAY_DISP++, G_TF_AVERAGE);
+            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 70, 0, 255);
+
+            OVERLAY_DISP =
+                Gfx_TextureIA8(OVERLAY_DISP, (u8*)gHeartFullTex, 16, 16, -99, -99, 16, 16, 1 << 10, 1 << 10);
+
+            OVERLAY_DISP =
+                Gfx_TextureIA8(OVERLAY_DISP, (u8*)gHeartFullTex, 8, 8, spBC.x, spBC.y, 8, 8,
+                                         1 << 10, 1 << 10);
+        }
+
+        if (i == 6) {
+            OVERLAY_DISP =
+                Gfx_Texture32(OVERLAY_DISP, (u8*)gBigMagicJarIconTex, 24, 24, -99, -99, 24, 24, 1 << 10, 1 << 10);
+
+            OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, (u8*)gBigMagicJarIconTex, 8, 8, spBC.x, spBC.y, 24, 24,
+                                         1 << 10, 1 << 10); 
         }
 
         CLOSE_DISPS(play->state.gfxCtx);
@@ -523,6 +562,7 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     Leveled_DrawTex32(play, (u8*)gSilverGauntletsIconTex, 32, 32, -192, -268, 32, 32);
     Leveled_DrawTex32(play, (u8*)gHylianShieldIconTex, 32, 32, -192, -268, 32, 32);
     Leveled_DrawTexIA8(play, (u8*)gHeartFullTex, 16, 16, -114, -222, 16, 16, 255, 255, 255);
+    Leveled_DrawTex32(play, (u8*)gBigMagicJarIconTex, 24, 24, -114, -222, 24, 24, 255, 255, 255);
     Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 16, -114, -222, 8, 16, 255, 255, 255);
     Leveled_DrawTex32(play, gGoronsBraceletIconTex, 32, 32, -192, -268, 32, 32);
     Leveled_DrawTex4b(play, gNextDoActionENGTex, 48, 16, -192, -268, 48, 16);
@@ -536,13 +576,19 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     Leveled_ValueNumberDraw(play, 100, statY, player->actor.level, 255, 255, 255);
     statY += 8;
     // Health
-     {
-        Leveled_DrawTexIA8(play, (u8*)gHeartFullTex, 8, 8, 92, statY, 16, 16, 255, 70, 0);
-        Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 11, 114, statY - 2, 8, 16, 255, 255, 255);
-    }
+    Leveled_DrawTexIA8(play, (u8*)gHeartFullTex, 8, 8, 92, statY, 16, 16, 255, 70, 0);
+    Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 11, 114, statY - 2, 8, 16, 255, 255, 255);
     Leveled_ValueNumberDraw(play, 100, statY, gSaveContext.health, 255, 255, 255);
     Leveled_ValueNumberDraw(play, 121, statY, gSaveContext.healthCapacity2, 120, 255, 0);
     statY += 8;
+    // Magic
+    if (gSaveContext.magicCapacity > 0) {
+        Leveled_DrawTex32(play, (u8*)gBigMagicJarIconTex, 8, 8, 92, statY, 24, 24, 255, 255, 255);
+        Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 11, 114, statY - 2, 8, 16, 255, 255, 255);
+        Leveled_ValueNumberDraw(play, 100, statY, gSaveContext.magic, 255, 255, 255);
+        Leveled_ValueNumberDraw(play, 121, statY, gSaveContext.magicCapacity, 120, 255, 0);
+        statY += 8;
+    }
     // Attack
         Leveled_DrawTex32(play, (u8*)gKokiriSwordIconTex, 10, 12, 90, statY - 1, 10, 8);
     Leveled_ValueNumberDraw(play, 100, statY, GetActorStat_Attack(attack, player->actor.power), 255, 255, 255);
@@ -555,6 +601,9 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
         Leveled_DrawTex32(play, (u8*)gHylianShieldIconTex, 8, 7, 92, statY, 8, 7);
     Leveled_ValueNumberDraw(play, 100, statY, player->actor.courage, 255, 255, 255);
     statY += 70;
+    if (gSaveContext.magicCapacity > 0) {
+        statY -= 8;
+    }
     // EXP
     Leveled_DrawTex32(play, gGoronsBraceletIconTex, 8, 7, 92, statY, 10, 7);
     Leveled_ValueNumberDraw(play, 100, statY, gSaveContext.experience, 255, 255, 255);

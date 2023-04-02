@@ -51,7 +51,27 @@ u16 GetActorStat_EnemyMaxHealth(u16 baseHealth, u8 level){
 }
 
 u8 GetPlayerStat_BonusHearts(u8 level){
-    return (level + 1) / 5;
+    if (CVar_GetS32("gLeveledHeartsWithLevelUp", 1) == 0){
+        return 0;
+    }
+
+    u8 bonusHearts = (level + 1) / 7;
+    if (bonusHearts > 10){
+        bonusHearts = 10;
+    }
+    return bonusHearts;
+}
+
+u8 GetPlayerStat_MagicUnits(u8 level){
+    if (CVar_GetS32("gLeveledMagicWithLevelUp", 1) == 0){
+        return 48;
+    }
+
+    u8 maximumMagic = 16 + (u8)(level / 3) * 2;
+    if (maximumMagic > 72){
+        maximumMagic = 72;
+    }
+    return maximumMagic;
 }
 
 u16 GetPlayerStat_GetModifiedHealthCapacity(u16 baseHealth, u8 level){

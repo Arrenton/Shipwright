@@ -3384,7 +3384,7 @@ void Interface_UpdateMagicBar(PlayState* play) {
 
     switch (gSaveContext.magicState) {
         case 8:
-            temp = gSaveContext.magicLevel * 0x30;
+            temp = gSaveContext.magicLevel * gSaveContext.magicUnits;
             if (gSaveContext.magicCapacity != temp) {
                 if (gSaveContext.magicCapacity < temp) {
                     gSaveContext.magicCapacity += 8;

@@ -1256,7 +1256,7 @@ void BossGanondrof_CollisionCheck(BossGanondrof* this, PlayState* play) {
         this->colliderBody.base.acFlags &= ~AC_HIT;
     } else {
         acHit = this->colliderBody.base.acFlags & AC_HIT;
-        if ((acHit && ((s8)this->actor.colChkInfo.health > 0)) || (this->returnCount != 0)) {
+        if ((acHit && (this->actor.colChkInfo.health > 0)) || (this->returnCount != 0)) {
             if (acHit) {
                 this->colliderBody.base.acFlags &= ~AC_HIT;
                 hurtbox = this->colliderBody.info.acHitInfo;

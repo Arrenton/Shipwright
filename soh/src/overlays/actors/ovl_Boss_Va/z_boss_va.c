@@ -1386,8 +1386,16 @@ void BossVa_BodyPhase4(BossVa* this, PlayState* play) {
                     this->actor.world.rot.y = this->actor.yawTowardsPlayer;
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_BALINADE_DAMAGE);
                     Actor_SetColorFilter(&this->actor, 0x4000, 255, 0, 12);
-                    sPhase4HP -= this->actor.colChkInfo.damage;
-                    ActorDamageNumber_New(&this->actor, this->actor.colChkInfo.damage);
+                    u16 dmg = this->actor.colChkInfo.damage;
+
+                    if (dmg > sPhase4HP){
+                        sPhase4HP = 0;
+                    } else {
+                        sPhase4HP -= dmg;
+                    }
+
+                    ActorDamageNumber_New(&this->actor, dmg);
+                    
                     if (sPhase4HP <= 0) {
                         this->timer = 0;
                         sFightPhase++;
