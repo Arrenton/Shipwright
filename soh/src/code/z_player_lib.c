@@ -510,6 +510,9 @@ void Player_GainExperience(PlayState* play, u16 experience) {
         return;
 
     if (gSaveContext.experience < 999999) {
+        if (experience > 0)
+            gSaveContext.showNeededExpTimer = 60;
+            
         gSaveContext.experience += experience;
         ActorExperienceNumber_New(&player->actor, experience);
         if (gSaveContext.experience > 999999)

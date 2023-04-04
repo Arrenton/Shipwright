@@ -11,3 +11,4 @@ void ActorExperienceNumber_Draw(PlayState* play, Actor* actor);
 void Actor_LevelUpDraw(PlayState* play, Actor* actor);
 void Leveled_ValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, u8 g, u8 b);
 void Leveled_KaleidoEquip_Stats(PlayState* play);
+void Leveled_Interface_DrawNextLevel(PlayState* play);

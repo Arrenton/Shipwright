@@ -277,6 +277,7 @@ typedef struct {
     s16 heartContainers;
     s16 healthCapacity2; // Modified max health
     u8 magicUnits; // Modified magic units per magic level
+    s16 showNeededExpTimer; // Shows EXP required in the hud when greater than 0
     // #endregion
 } SaveContext; // size = 0x1428
 

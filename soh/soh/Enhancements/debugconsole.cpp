@@ -133,7 +133,7 @@ static bool SetPlayerHealthHandler(std::shared_ptr<Ship::Console> Console, const
         return CMD_SUCCESS;
     }
 
-    gSaveContext.health = health * 0x10;
+    gSaveContext.health = health * CVar_GetS32("gLeveledHeartUnits", 3) << 2;
 
     SohImGui::GetConsole()->SendInfoMessage("[SOH] Player health updated to %d", health);
     return CMD_SUCCESS;

@@ -89,6 +89,20 @@ void Leveled_DrawTex4b(PlayState* play, void* texture, s16 textureWidth, s16 tex
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
+void Leveled_OverlayDrawTex4b(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft,
+                       s16 rectTop, s16 rectWidth, s16 rectHeight, u16 alpha) {
+
+    OPEN_DISPS(play->state.gfxCtx);
+    gDPPipeSync(OVERLAY_DISP++);
+    gDPSetTextureFilter(OVERLAY_DISP++, G_TF_AVERAGE);
+    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, alpha);
+
+    OVERLAY_DISP = Gfx_Texture4b(OVERLAY_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, rectWidth,
+                                  rectHeight, 1 << 10, 1 << 10);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
 void ActorDamageNumber_New(Actor* actor, u16 damage) {
     if (damage == 0)
         return;
@@ -235,13 +249,6 @@ void ActorExperienceNumber_Draw(PlayState* play, Actor* actor) {
     }
 
     spBC.z = spBC.z * 1.0f;
-
-    // EXP Icon
-    /* gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, 255);
-    gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0, PRIMITIVE,
-                      ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
-    OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, (u8*)gGoronsBraceletIconTex, 32, 32, -99, -99, 32, 32, 1 << 10, 1 << 10);
-    OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, (u8*)gGoronsBraceletIconTex, 8, 8, spBC.x - 8 - 8 * (digits - 1), spBC.y + 4, 32, 8, 1 << 10, 1 << 10);*/
 
     // Color
     gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 190, 190, 0, 255);
@@ -535,6 +542,76 @@ void Leveled_ValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, u8 
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
+void Leveled_OverlayValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, u8 g, u8 b, u8 a) {
+    s32 val;
+    u8 digit[] = { 0, 0, 0, 0, 0, 0 };
+    s16 separation = 5;
+
+    u8 digits;
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    val = value;
+
+        if (val > 999999)
+            val = 999999;
+
+    if (val < 0)
+        val = 0;
+
+    gDPPipeSync(OVERLAY_DISP++);
+    gDPSetTextureFilter(OVERLAY_DISP++, G_TF_AVERAGE);
+
+    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, r, g, b, a);
+
+    digits = 1;
+
+    if (val >= 100000)
+        digits += 1;
+    if (val >= 10000)
+        digits += 1;
+    if (val >= 1000)
+        digits += 1;
+    if (val >= 100)
+        digits += 1;
+    if (val >= 10)
+        digits += 1;
+
+    s8 j;
+
+    for (j = 0; val >= 100000; j++) {
+        val -= 100000;
+        digit[5] += 1;
+    }
+    for (j = 0; val >= 10000; j++) {
+        val -= 10000;
+        digit[4] += 1;
+    }
+    for (j = 0; val >= 1000; j++) {
+        val -= 1000;
+        digit[3] += 1;
+    }
+    for (j = 0; val >= 100; j++) {
+        val -= 100;
+        digit[2] += 1;
+    }
+    for (j = 0; val >= 10; j++) {
+        val -= 10;
+        digit[1] += 1;
+    }
+    digit[0] = val;
+
+    gDPPipeSync(OVERLAY_DISP++);
+
+    for (s8 i = 0; i < digits; i++) {
+        OVERLAY_DISP =
+            Gfx_TextureIA8(OVERLAY_DISP, (u8*)_gAmmoDigit0Tex[digit[i]], 8, 8, x - i * 6 + 6 * (digits - 1), y, 8,
+                                     8, 1 << 10, 1 << 10);
+    }
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
 void Leveled_KaleidoEquip_Stats(PlayState* play) {
     extern const char* digitTextures[];
     Player* player = GET_PLAYER(play);
@@ -608,4 +685,88 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     Leveled_DrawTex4b(play, (u8*)gNextDoActionENGTex, 24, 10, 84, statY, 24, 7);
     Leveled_ValueNumberDraw(play, 112, statY,
                             GetActorStat_NextLevelExp(player->actor.level, gSaveContext.experience), 255, 255, 255);
+}
+
+void Leveled_Interface_DrawNextLevel(PlayState* play) {
+    if (gSaveContext.showNeededExpTimer > 0){
+        gSaveContext.showNeededExpTimer--;
+    } else {
+        return;
+    }
+
+    Player* player = GET_PLAYER(play);
+    u16 posX = OTRGetRectDimensionFromLeftEdge(10);
+    u16 posY = 58;
+    extern const char* digitTextures[];
+    s32 val = GetActorStat_NextLevelExp(player->actor.level, gSaveContext.experience);
+    u8 digit[] = { 0, 0, 0, 0, 0, 0 };
+    u8 digits = 1;
+    u8 width = 8;
+    s32 j;
+
+    Leveled_OverlayDrawTex4b(play, (u8*)gNextDoActionENGTex, 48, 16, -192, -268, 48, 16, 255 - play->pauseCtx.alpha); // Load texture
+    Leveled_OverlayDrawTex4b(play, (u8*)gNextDoActionENGTex, 48, 16, posX, posY, 48, 16, 255 - play->pauseCtx.alpha); // Draw texture
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    // Digits
+    if (val < 0)
+        val = 0;
+
+    if (val > 999999)
+        val = 999999;
+
+    if (val >= 100000)
+        digits += 1;
+    if (val >= 10000)
+        digits += 1;
+    if (val >= 1000)
+        digits += 1;
+    if (val >= 100)
+        digits += 1;
+    if (val >= 10)
+        digits += 1;
+
+    for (j = 0; val >= 100000; j++) {
+        val -= 100000;
+        digit[5] += 1;
+    }
+    for (j = 0; val >= 10000; j++) {
+        val -= 10000;
+        digit[4] += 1;
+    }
+    for (j = 0; val >= 1000; j++) {
+        val -= 1000;
+        digit[3] += 1;
+    }
+    for (j = 0; val >= 100; j++) {
+        val -= 100;
+        digit[2] += 1;
+    }
+    for (j = 0; val >= 10; j++) {
+        val -= 10;
+        digit[1] += 1;
+    }
+    digit[0] = (u8)val;
+
+    // Color
+
+    // Draw
+    gDPSetCombineLERP(OVERLAY_DISP++, 0, 0, 0, PRIMITIVE, TEXEL0, 0, PRIMITIVE, 0, 0, 0, 0, PRIMITIVE, TEXEL0, 0,
+                      PRIMITIVE, 0);
+
+    s16 numbersPosX = 38;
+
+    for (u8 i = 0; i < digits; i++) {
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, 255 - play->pauseCtx.alpha);
+
+        for (j = 0; j < 4; j++) {
+            OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16, posX - i * width + width * (digits - 1) + numbersPosX + (j % 2) * 2 - 1, posY + (j / 2) * 2 - 1, 8, 16, 1 << 10, 1 << 10);
+        }
+
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, 255 - play->pauseCtx.alpha);
+        OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16, posX - i * width + width * (digits - 1) + numbersPosX, posY, 8, 16, 1 << 10, 1 << 10);
+    }
+
+    CLOSE_DISPS(play->state.gfxCtx);
 }
