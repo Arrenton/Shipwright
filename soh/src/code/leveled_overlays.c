@@ -179,8 +179,8 @@ void ActorExperienceNumber_Draw(PlayState* play, Actor* actor) {
     if (val < 0)
         val = 0;
 
-    if (val > 99999)
-        val = 99999;
+    if (val > 32000)
+        val = 32000;
 
     if (val >= 10000)
         digits += 1;
@@ -207,7 +207,7 @@ void ActorExperienceNumber_Draw(PlayState* play, Actor* actor) {
         val -= 10;
         digit[1] += 1;
     }
-    digit[0] = val;
+    digit[0] = (u8)val;
 
     // Velocity
     actor->floatingNumberPosition[1].x += actor->floatingNumberVelocity[1].x;
@@ -221,7 +221,7 @@ void ActorExperienceNumber_Draw(PlayState* play, Actor* actor) {
     actor->floatingNumberLife[1]--;
 
     // Position
-    func_8002BE04(play, &actor->world, &spBC, &spB4);
+    func_8002BE04(play, &actor->world.pos, &spBC, &spB4);
 
     spBC.x = (160 * (spBC.x * spB4)) * 1.0f + 157 + actor->floatingNumberPosition[1].x + (digits - 1) * width / 2;
     spBC.x = CLAMP(spBC.x, -320.0f, 320.0f);
@@ -234,7 +234,7 @@ void ActorExperienceNumber_Draw(PlayState* play, Actor* actor) {
         spBC.y = 200 + actor->floatingNumberPosition[1].y;
     }
 
-    spBC.z = spBC.z * 1.0;
+    spBC.z = spBC.z * 1.0f;
 
     // EXP Icon
     /* gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, 255);
@@ -250,7 +250,7 @@ void ActorExperienceNumber_Draw(PlayState* play, Actor* actor) {
 
     // Draw
     for (u8 i = 0; i < digits; i++) {
-            OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16, spBC.x - i * width, spBC.y,
+            OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16, (s16)spBC.x - i * width, (s16)spBC.y,
                                          8, 16, 1 << 10, 1 << 10);
     }
 
@@ -293,7 +293,7 @@ void ActorDamageNumber_Draw(PlayState* play, Actor* actor) {
         val -= 10;
         digit[1] += 1;
     }
-    digit[0] = val;
+    digit[0] = (u8)val;
 
     // Velocity
     actor->floatingNumberPosition[0].x += actor->floatingNumberVelocity[0].x;
@@ -302,7 +302,7 @@ void ActorDamageNumber_Draw(PlayState* play, Actor* actor) {
     actor->floatingNumberVelocity[0].y += 2.0f;
     if (actor->floatingNumberPosition[0].y >= 0) {
         actor->floatingNumberPosition[0].y = 0;
-        actor->floatingNumberVelocity[0].y = -actor->floatingNumberVelocity[0].y * 0.5;
+        actor->floatingNumberVelocity[0].y = -actor->floatingNumberVelocity[0].y * 0.5f;
         if (actor->floatingNumberVelocity[0].y >= -4.0f)
             actor->floatingNumberVelocity[0].y = 0;
     }
@@ -311,7 +311,7 @@ void ActorDamageNumber_Draw(PlayState* play, Actor* actor) {
     actor->floatingNumberLife[0]--;
 
     // Position
-    func_8002BE04(play, &actor->world, &spBC, &spB4);
+    func_8002BE04(play, &actor->world.pos, &spBC, &spB4);
 
     spBC.x = (160 * (spBC.x * spB4)) * 1.0f + 157 + actor->floatingNumberPosition[0].x + (digits - 1) * width / 2;
     spBC.x = CLAMP(spBC.x, -320.0f, 320.0f);
@@ -319,7 +319,7 @@ void ActorDamageNumber_Draw(PlayState* play, Actor* actor) {
     spBC.y = (120 * (spBC.y * spB4)) * -1.0f + 90 + actor->floatingNumberPosition[0].y;
     spBC.y = CLAMP(spBC.y, -240.0f, 240.0f);
 
-    spBC.z = spBC.z * 1.0;
+    spBC.z = spBC.z * 1.0f;
 
     // Color
     if (actor->category == ACTORCAT_PLAYER) {
@@ -334,7 +334,7 @@ void ActorDamageNumber_Draw(PlayState* play, Actor* actor) {
 
     for (u8 i = 0; i < 3; i++) {
         if (i == 0 || i == 1 && (digit[1] > 0 || digit[2] > 0) || (i == 2 && digit[2] > 0))
-            OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16, spBC.x - i * width, spBC.y,
+            OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16, (s16)spBC.x - i * width, (s16)spBC.y,
                                          8, 16, 1 << 10, 1 << 10);
     }
 
@@ -345,7 +345,6 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
     u8 width = 8;
     Vec3f spBC;
     f32 spB4;
-    s32 j;
     for (s8 i = 2; i < 7; i++) {
         if (actor->floatingNumberLife[i] <= 0)
             continue;
@@ -376,7 +375,7 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
         actor->floatingNumberLife[i]--;
 
         // Position
-        func_8002BE04(play, &actor->world, &spBC, &spB4);
+        func_8002BE04(play, &actor->world.pos, &spBC, &spB4);
 
         spBC.x = (160 * (spBC.x * spB4)) * 1.0f + 165 + actor->floatingNumberPosition[i].x - 24;
         spBC.x = CLAMP(spBC.x, -320.0f, 320.0f);
@@ -384,7 +383,7 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
         spBC.y = (120 * (spBC.y * spB4)) * -1.0f + 90 + actor->floatingNumberPosition[i].y;
         spBC.y = CLAMP(spBC.y, -240.0f, 240.0f);
 
-        spBC.z = spBC.z * 1.0;
+        spBC.z = spBC.z * 1.0f;
 
         if (spBC.z < 0) {
             spBC.x = 160 + actor->floatingNumberPosition[i].x - 24;
@@ -407,20 +406,20 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
                                          1 << 10, 1 << 10);
 
             for (u8 j = 0; j < 6; j++) {
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 8, spBC.x, spBC.y,
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 8, (s16)spBC.x, (s16)spBC.y,
                                              8, 8, 1 << 10, 1 << 10);
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar45LatinCapitalLetterETex, 8, 8, spBC.x + 5,
-                                             spBC.y, 8, 8, 1 << 10, 1 << 10);
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar56LatinCapitalLetterVTex, 8, 8, spBC.x + 10,
-                                             spBC.y, 8, 8, 1 << 10, 1 << 10);
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar45LatinCapitalLetterETex, 8, 8, spBC.x + 15,
-                                             spBC.y, 8, 8, 1 << 10, 1 << 10);
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 8, spBC.x + 20,
-                                             spBC.y, 8, 8, 1 << 10, 1 << 10);
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar55LatinCapitalLetterUTex, 8, 8, spBC.x + 30,
-                                             spBC.y, 8, 8, 1 << 10, 1 << 10);
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar50LatinCapitalLetterPTex, 8, 8, spBC.x + 35,
-                                             spBC.y, 8, 8, 1 << 10, 1 << 10);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar45LatinCapitalLetterETex, 8, 8, (s16)spBC.x + 5,
+                                             (s16)spBC.y, 8, 8, 1 << 10, 1 << 10);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar56LatinCapitalLetterVTex, 8, 8, (s16)spBC.x + 10,
+                                             (s16)spBC.y, 8, 8, 1 << 10, 1 << 10);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar45LatinCapitalLetterETex, 8, 8, (s16)spBC.x + 15,
+                                             (s16)spBC.y, 8, 8, 1 << 10, 1 << 10);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 8, (s16)spBC.x + 20,
+                                             (s16)spBC.y, 8, 8, 1 << 10, 1 << 10);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar55LatinCapitalLetterUTex, 8, 8, (s16)spBC.x + 30,
+                                             (s16)spBC.y, 8, 8, 1 << 10, 1 << 10);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar50LatinCapitalLetterPTex, 8, 8, (s16)spBC.x + 35,
+                                             (s16)spBC.y, 8, 8, 1 << 10, 1 << 10);
             }
         }
 
@@ -428,7 +427,7 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
             OVERLAY_DISP =
                 Gfx_Texture32(OVERLAY_DISP, (u8*)gSilverGauntletsIconTex, 32, 32, -99, -99, 32, 32, 1 << 10, 1 << 10);
 
-            OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, (u8*)gSilverGauntletsIconTex, 8, 8, spBC.x, spBC.y, 8, 8,
+            OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, (u8*)gSilverGauntletsIconTex, 8, 8, (s16)spBC.x, (s16)spBC.y, 8, 8,
                                          1 << 10, 1 << 10);
         }
         if (i == 4) {
@@ -436,7 +435,7 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
                 Gfx_Texture32(OVERLAY_DISP, (u8*)gHylianShieldIconTex, 32, 32, -99, -99, 32, 32, 1 << 10, 1 << 10);
 
             OVERLAY_DISP =
-                Gfx_Texture32(OVERLAY_DISP, (u8*)gHylianShieldIconTex, 8, 8, spBC.x, spBC.y, 8, 8,
+                Gfx_Texture32(OVERLAY_DISP, (u8*)gHylianShieldIconTex, 8, 8, (s16)spBC.x, (s16)spBC.y, 8, 8,
                                          1 << 10, 1 << 10);
         }
         if (i == 5) {
@@ -449,7 +448,7 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
                 Gfx_TextureIA8(OVERLAY_DISP, (u8*)gHeartFullTex, 16, 16, -99, -99, 16, 16, 1 << 10, 1 << 10);
 
             OVERLAY_DISP =
-                Gfx_TextureIA8(OVERLAY_DISP, (u8*)gHeartFullTex, 8, 8, spBC.x, spBC.y, 8, 8,
+                Gfx_TextureIA8(OVERLAY_DISP, (u8*)gHeartFullTex, 8, 8, (s16)spBC.x, (s16)spBC.y, 8, 8,
                                          1 << 10, 1 << 10);
         }
 
@@ -457,7 +456,7 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
             OVERLAY_DISP =
                 Gfx_Texture32(OVERLAY_DISP, (u8*)gBigMagicJarIconTex, 24, 24, -99, -99, 24, 24, 1 << 10, 1 << 10);
 
-            OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, (u8*)gBigMagicJarIconTex, 8, 8, spBC.x, spBC.y, 24, 24,
+            OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, (u8*)gBigMagicJarIconTex, 8, 8, (s16)spBC.x, (s16)spBC.y, 24, 24,
                                          1 << 10, 1 << 10); 
         }
 
@@ -470,9 +469,6 @@ void Leveled_ValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, u8 
     s32 val;
     u8 digit[] = { 0, 0, 0, 0, 0, 0 };
     s16 separation = 5;
-
-    s16 xDiff;
-    s16 yDiff;
 
     u8 digits;
 
@@ -532,7 +528,7 @@ void Leveled_ValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, u8 
 
     for (s8 i = 0; i < digits; i++) {
         POLY_KAL_DISP =
-            Gfx_TextureIA8(POLY_KAL_DISP, (u8*)_gAmmoDigit0Tex[digit[i]], 8, 8, x - i * 5 + 5 * (digits - 1), y, 8,
+            Gfx_TextureIA8(POLY_KAL_DISP, (u8*)_gAmmoDigit0Tex[digit[i]], 8, 8, x - i * 6 + 6 * (digits - 1), y, 8,
                                      8, 1 << 10, 1 << 10);
     }
 
@@ -562,10 +558,10 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     Leveled_DrawTex32(play, (u8*)gSilverGauntletsIconTex, 32, 32, -192, -268, 32, 32);
     Leveled_DrawTex32(play, (u8*)gHylianShieldIconTex, 32, 32, -192, -268, 32, 32);
     Leveled_DrawTexIA8(play, (u8*)gHeartFullTex, 16, 16, -114, -222, 16, 16, 255, 255, 255);
-    Leveled_DrawTex32(play, (u8*)gBigMagicJarIconTex, 24, 24, -114, -222, 24, 24, 255, 255, 255);
+    Leveled_DrawTex32(play, (u8*)gBigMagicJarIconTex, 24, 24, -114, -222, 24, 24);
     Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 16, -114, -222, 8, 16, 255, 255, 255);
-    Leveled_DrawTex32(play, gGoronsBraceletIconTex, 32, 32, -192, -268, 32, 32);
-    Leveled_DrawTex4b(play, gNextDoActionENGTex, 48, 16, -192, -268, 48, 16);
+    Leveled_DrawTex32(play, (u8*)gGoronsBraceletIconTex, 32, 32, -192, -268, 32, 32);
+    Leveled_DrawTex4b(play, (u8*)gNextDoActionENGTex, 48, 16, -192, -268, 48, 16);
 
     // Values and Icons
     // Level
@@ -577,16 +573,16 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     statY += 8;
     // Health
     Leveled_DrawTexIA8(play, (u8*)gHeartFullTex, 8, 8, 92, statY, 16, 16, 255, 70, 0);
-    Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 11, 114, statY - 2, 8, 16, 255, 255, 255);
+    Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 11, 116, statY - 2, 8, 16, 255, 255, 255);
     Leveled_ValueNumberDraw(play, 100, statY, gSaveContext.health, 255, 255, 255);
-    Leveled_ValueNumberDraw(play, 121, statY, gSaveContext.healthCapacity2, 120, 255, 0);
+    Leveled_ValueNumberDraw(play, 123, statY, gSaveContext.healthCapacity2, 120, 255, 0);
     statY += 8;
     // Magic
     if (gSaveContext.magicCapacity > 0) {
-        Leveled_DrawTex32(play, (u8*)gBigMagicJarIconTex, 8, 8, 92, statY, 24, 24, 255, 255, 255);
-        Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 11, 114, statY - 2, 8, 16, 255, 255, 255);
+        Leveled_DrawTex32(play, (u8*)gBigMagicJarIconTex, 8, 8, 92, statY, 24, 24);
+        Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 11, 116, statY - 2, 8, 16, 255, 255, 255);
         Leveled_ValueNumberDraw(play, 100, statY, gSaveContext.magic, 255, 255, 255);
-        Leveled_ValueNumberDraw(play, 121, statY, gSaveContext.magicCapacity, 120, 255, 0);
+        Leveled_ValueNumberDraw(play, 123, statY, gSaveContext.magicCapacity, 120, 255, 0);
         statY += 8;
     }
     // Attack
@@ -605,11 +601,11 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
         statY -= 8;
     }
     // EXP
-    Leveled_DrawTex32(play, gGoronsBraceletIconTex, 8, 7, 92, statY, 10, 7);
+    Leveled_DrawTex32(play, (u8*)gGoronsBraceletIconTex, 8, 7, 92, statY, 10, 7);
     Leveled_ValueNumberDraw(play, 100, statY, gSaveContext.experience, 255, 255, 255);
     statY += 8;
     // Next LV
-    Leveled_DrawTex4b(play, gNextDoActionENGTex, 24, 10, 83, statY, 24, 7);
-    Leveled_ValueNumberDraw(play, 110, statY,
+    Leveled_DrawTex4b(play, (u8*)gNextDoActionENGTex, 24, 10, 84, statY, 24, 7);
+    Leveled_ValueNumberDraw(play, 112, statY,
                             GetActorStat_NextLevelExp(player->actor.level, gSaveContext.experience), 255, 255, 255);
 }

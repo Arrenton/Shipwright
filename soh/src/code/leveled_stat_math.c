@@ -55,7 +55,7 @@ u8 GetPlayerStat_BonusHearts(u8 level){
         return 0;
     }
 
-    u8 bonusHearts = (level + 1) / 7;
+    u8 bonusHearts = (level + 1) / 8;
     if (bonusHearts > 10){
         bonusHearts = 10;
     }
