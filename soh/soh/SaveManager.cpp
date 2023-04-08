@@ -405,8 +405,8 @@ void SaveManager::InitFileNormal() {
     gSaveContext.experience = 0;
     gSaveContext.showNeededExpTimer = 0;
     gSaveContext.n64ddFlag = 0;
-    gSaveContext.healthCapacity = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
-    gSaveContext.health = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+    gSaveContext.healthCapacity = 0x30;
+    gSaveContext.health = 3 * CVar_GetS32("gLeveledHeartUnits", 3) << 2;
     gSaveContext.magicLevel = 0;
     gSaveContext.magic = 0x30;
     gSaveContext.rupees = 0;

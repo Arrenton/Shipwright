@@ -632,11 +632,7 @@ void EnFirefly_UpdateDamage(EnFirefly* this, PlayState* play) {
         this->collider.base.acFlags &= ~AC_HIT;
         Actor_SetDropFlag(&this->actor, &this->collider.elements[0].info, 1);
 
-        if ((this->actor.colChkInfo.damageEffect != 0) || (this->actor.colChkInfo.damage != 0)) {
-            if (Actor_ApplyDamage(&this->actor) == 0) {
-                Enemy_StartFinishingBlow(play, &this->actor);
-                this->actor.flags &= ~ACTOR_FLAG_0;
-            }
+        if ((this->actor.colChkInfo.damageEffect != 0 || this->actor.colChkInfo.damage != 0) && ((this->actor.colorFilterTimer == 0) || ((this->actor.colorFilterParams & 0x4000) == 0))) {
 
             damageEffect = this->actor.colChkInfo.damageEffect;
 
@@ -667,14 +663,12 @@ void EnFirefly_UpdateDamage(EnFirefly* this, PlayState* play) {
                 if (this->actionFunc != EnFirefly_Stunned) {
                     EnFirefly_SetupStunned(this);
                 }
-            } else { // Fire Arrows
-                if ((damageEffect == 0xF) && (this->actor.params == KEESE_ICE_FLY)) {
-                    if (Actor_ApplyDamage(&this->actor) == 0) {
-                        Enemy_StartFinishingBlow(play, &this->actor);
-                        EnFirefly_Combust(this, play);
-                    }
+            } else if ((damageEffect == 0xF) && (this->actor.params == KEESE_ICE_FLY)) { // Fire Arrows
+                if (Actor_ApplyDamage(&this->actor) == 0) {
+                    Enemy_StartFinishingBlow(play, &this->actor);
+                    EnFirefly_Combust(this, play);
                 }
-
+            } else {
                 if (Actor_ApplyDamage(&this->actor) == 0) {
                     Enemy_StartFinishingBlow(play, &this->actor);
                     this->actor.flags &= ~ACTOR_FLAG_0;
@@ -688,7 +682,7 @@ void EnFirefly_UpdateDamage(EnFirefly* this, PlayState* play) {
                 }
                 Audio_PlayActorSound2(&this->actor, NA_SE_EN_FFLY_DEAD);
                 this->actor.flags |= ACTOR_FLAG_4;
-                Actor_SetColorFilter(&this->actor, 0x4000, 0xFF, 0, 40);
+                Actor_SetColorFilter(&this->actor, 0x4000, 0xFF, 0, 6);
             }
         }
     }

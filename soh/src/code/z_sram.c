@@ -206,8 +206,8 @@ void Sram_OpenSave() {
     osSyncPrintf("scene_no = %d\n", gSaveContext.entranceIndex);
     osSyncPrintf(VT_RST);
 
-    if (gSaveContext.health < CVar_GetS32("gLeveledHeartUnits", 3) << 2) {
-        gSaveContext.health = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+    if (gSaveContext.health < 3 * CVar_GetS32("gLeveledHeartUnits", 3) << 2) {
+        gSaveContext.health = 3 * CVar_GetS32("gLeveledHeartUnits", 3) << 2;
     }
 
     if (gSaveContext.scarecrowLongSongSet) {
