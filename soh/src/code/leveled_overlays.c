@@ -542,10 +542,13 @@ void Leveled_ValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, u8 
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
-void Leveled_OverlayValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, u8 g, u8 b, u8 a) {
+void Leveled_BigValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, u8 g, u8 b, u8 a) {
     s32 val;
     u8 digit[] = { 0, 0, 0, 0, 0, 0 };
     s16 separation = 5;
+    u8 width = 7;
+
+    extern const char* digitTextures[];
 
     u8 digits;
 
@@ -559,10 +562,10 @@ void Leveled_OverlayValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8
     if (val < 0)
         val = 0;
 
-    gDPPipeSync(OVERLAY_DISP++);
-    gDPSetTextureFilter(OVERLAY_DISP++, G_TF_AVERAGE);
+    gDPPipeSync(POLY_KAL_DISP++);
+    gDPSetTextureFilter(POLY_KAL_DISP++, G_TF_AVERAGE);
 
-    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, r, g, b, a);
+    gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, r, g, b, a);
 
     digits = 1;
 
@@ -601,12 +604,17 @@ void Leveled_OverlayValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8
     }
     digit[0] = val;
 
-    gDPPipeSync(OVERLAY_DISP++);
+    gDPPipeSync(POLY_KAL_DISP++);
 
-    for (s8 i = 0; i < digits; i++) {
-        OVERLAY_DISP =
-            Gfx_TextureIA8(OVERLAY_DISP, (u8*)_gAmmoDigit0Tex[digit[i]], 8, 8, x - i * 6 + 6 * (digits - 1), y, 8,
-                                     8, 1 << 10, 1 << 10);
+    for (u8 i = 0; i < digits; i++) {
+        gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, 0, 0, 0, 255);
+
+        for (j = 0; j < 4; j++) {
+            POLY_KAL_DISP = Gfx_TextureI8(POLY_KAL_DISP, (u8*)digitTextures[digit[i]], 8, 16, x - i * width + width * (digits - 1) + (j % 2) * 2 - 1, y + (j / 2) * 2 - 1, 8, 16, 1 << 10, 1 << 10);
+        }
+
+        gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, 255, 255, 255, 255);
+        POLY_KAL_DISP = Gfx_TextureI8(POLY_KAL_DISP, (u8*)digitTextures[digit[i]], 8, 16, x - i * width + width * (digits - 1), y, 8, 16, 1 << 10, 1 << 10);
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
@@ -615,7 +623,7 @@ void Leveled_OverlayValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8
 void Leveled_KaleidoEquip_Stats(PlayState* play) {
     extern const char* digitTextures[];
     Player* player = GET_PLAYER(play);
-    u16 statY = 68;
+    u16 statY = 70;
     u8 attack = 1;
     if (CUR_EQUIP_VALUE(EQUIP_SWORD) == 1)
         attack = HEALTH_ATTACK_MULTIPLIER;
@@ -646,8 +654,8 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
         Leveled_DrawTexIA8(play, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 8, 92, statY, 8, 16, 255, 255, 255);
         Leveled_DrawTexIA8(play, (u8*)gMsgChar76LatinSmallLetterVTex, 8, 8, 95, statY, 8, 16, 255, 255, 255);
     }
-    Leveled_ValueNumberDraw(play, 100, statY, player->actor.level, 255, 255, 255);
-    statY += 8;
+    Leveled_BigValueNumberDraw(play, 100, statY - 6, player->actor.level, 255, 255, 255, 255);
+    statY += 10;
     // Health
     Leveled_DrawTexIA8(play, (u8*)gHeartFullTex, 8, 8, 92, statY, 16, 16, 255, 70, 0);
     Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 11, 116, statY - 2, 8, 16, 255, 255, 255);

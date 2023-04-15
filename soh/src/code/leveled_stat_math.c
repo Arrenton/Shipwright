@@ -67,7 +67,7 @@ u8 GetPlayerStat_MagicUnits(u8 level){
         return 48;
     }
 
-    u8 maximumMagic = 12 + (u8)((f32)level / 2.9f) * 2;
+    u8 maximumMagic = 12 + (u8)((f32)level / 2.8f) * 2;
     if (maximumMagic > 72){
         maximumMagic = 72;
     }
