@@ -2221,17 +2221,17 @@ u8 Item_Give(PlayState* play, u8 item) {
         PerformAutosave(play, item);
         return ITEM_NONE;
     } else if (item == ITEM_HEART_CONTAINER) {
-        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
         gSaveContext.healthCapacity += 0x10;
         gSaveContext.health += heartUnits;
         gSaveContext.sohStats.heartContainers++;
-        Actor_RefreshLeveledStats(GET_PLAYER(play));
+        Actor_RefreshLeveledStats(&GET_PLAYER(play)->actor, GET_PLAYER(play));
         PerformAutosave(play, item);
         return ITEM_NONE;
     } else if (item == ITEM_HEART) {
         osSyncPrintf("回復ハート回復ハート回復ハート\n"); // "Recovery Heart"
         if (play != NULL) {
-            s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+            s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
             Health_ChangeBy(play, heartUnits);
         }
         PerformAutosave(play, item);
@@ -3131,11 +3131,11 @@ s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
 }
 
 void Health_GiveHearts(s16 hearts) {
-    gSaveContext.healthCapacity += hearts * CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+    gSaveContext.healthCapacity += hearts * CVar_GetS32("gLeveledHeartUnits", 4) << 2;
 }
 
 void Health_RemoveHearts(s16 hearts) {
-    gSaveContext.healthCapacity -= hearts * CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+    gSaveContext.healthCapacity -= hearts * CVar_GetS32("gLeveledHeartUnits", 4) << 2;
 }
 
 void Rupees_ChangeBy(s16 rupeeChange) {
@@ -3661,7 +3661,7 @@ void Interface_DrawMagicBar(PlayState* play) {
                 rMagicFillX = -9999;
             } else if (CVar_GetS32("gMagicBarPosType", 0) == 5) {//Anchor To life meter
                 magicBarY = R_MAGIC_BAR_SMALL_Y-2 +
-                            magicDrop*(lineLength == 0 ? 0 : (gSaveContext.healthCapacity2-1)/((CVar_GetS32("gLeveledHeartUnits", 3) << 2)*lineLength)) +
+                            magicDrop*(lineLength == 0 ? 0 : (gSaveContext.healthCapacity2-1)/((CVar_GetS32("gLeveledHeartUnits", 4) << 2)*lineLength)) +
                             CVar_GetS32("gMagicBarPosY", 0) + getHealthMeterYOffset();
                 s16 xPushover = CVar_GetS32("gMagicBarPosX", 0) + getHealthMeterXOffset() + R_MAGIC_BAR_X-1;
                 PosX_Start = xPushover;
@@ -3670,9 +3670,9 @@ void Interface_DrawMagicBar(PlayState* play) {
                 rMagicFillX = CVar_GetS32("gMagicBarPosX", 0) + getHealthMeterXOffset() + R_MAGIC_FILL_X-1;
             }
         } else {
-            if ((gSaveContext.healthCapacity2-1)/(CVar_GetS32("gLeveledHeartUnits", 3) << 2) >= lineLength && lineLength != 0) {
+            if ((gSaveContext.healthCapacity2-1)/(CVar_GetS32("gLeveledHeartUnits", 4) << 2) >= lineLength && lineLength != 0) {
                 magicBarY = magicBarY_original_l +
-                            magicDrop*(lineLength == 0 ? 0 : ((gSaveContext.healthCapacity2-1)/((CVar_GetS32("gLeveledHeartUnits", 3) << 2)*lineLength) - 1));
+                            magicDrop*(lineLength == 0 ? 0 : ((gSaveContext.healthCapacity2-1)/((CVar_GetS32("gLeveledHeartUnits", 4) << 2)*lineLength) - 1));
             } else {
                 magicBarY = magicBarY_original_s;
             }
@@ -6287,7 +6287,7 @@ void Interface_Update(PlayState* play) {
     Map_Update(play);
 
     if (gSaveContext.healthAccumulator != 0) {
-        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
         gSaveContext.healthAccumulator -= heartUnits * 0.25f;
         gSaveContext.health += heartUnits * 0.25f;
 

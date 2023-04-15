@@ -24,9 +24,11 @@ u16 GetActorStat_DisplayAttack(u8 attack, u8 power) {
 }
 
 u16 GetActorStat_Attack(u8 attack, u8 power) {
-    //return attack * (1 + power / (10.0f / (1.0f + ((float)power / 15.0f)))); old
-
     return (float)attack * (1 + (power - 2) * (0.14f + (power - 2) * 0.0006f));
+}
+
+u16 GetActorStat_EnemyAttack(u8 attack, u8 power) {
+    return (float)attack * (1 + (power - 2) * (0.016f + (power - 2) * 0.0002f));
 }
 
 u8 GetActorStat_Power(u8 level) {
@@ -46,7 +48,6 @@ u8 GetActorStat_PlayerCourage(u8 level) {
 }
 
 u16 GetActorStat_EnemyMaxHealth(u16 baseHealth, u8 level){ 
-    //return (u16)Leveled_DamageFormula(baseHealth, GetActorStat_Power(level), GetActorStat_Courage(level)); old
     return GetActorStat_Attack(baseHealth, GetActorStat_Power(level));
 }
 
@@ -75,7 +76,7 @@ u8 GetPlayerStat_MagicUnits(u8 level){
 }
 
 u16 GetPlayerStat_GetModifiedHealthCapacity(u16 baseHealth, u8 level){
-    s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+    s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
     u16 baseHearts = baseHealth / 16;
     return (baseHearts + GetPlayerStat_BonusHearts(level)) * heartUnits;
 }
@@ -99,8 +100,6 @@ u16 GetActorStat_NextLevelExp(u8 level, u32 currentExp) {
 }
 
 f32 Leveled_DamageFormula(f32 attack, u8 power, u8 courage) {
-    //return (float)GetActorStat_Attack(attack, power) / (1.0f + (float)courage / 16.0f);
-
     f32 damage = GetActorStat_Attack(attack, power);
     if (power >= courage) {
         for (u8 i = 0; i < power - courage; i++) {
@@ -115,8 +114,11 @@ f32 Leveled_DamageFormula(f32 attack, u8 power, u8 courage) {
 }
 
 f32 Leveled_DamageFormulaOnPlayer(f32 attack, u8 power, u8 courage) {
-    //return (float)GetActorStat_Attack(attack, power) / (1.0f + (float)courage / (10.0f / (1.0f + ((float)power / (16.0f - (float)courage / 35.0f))))); old
     f32 damage = attack;
+    
+    if (CVar_GetS32("gLeveledEnemyAttackScalesWithLevel", 1) == 1){
+        damage = GetActorStat_EnemyAttack(attack, power);
+    }
     if (power >= courage) {
         for (u8 i = 0; i < power - courage; i++) {
             damage *= 1.05f + CLAMP_MIN(0.05f - (f32)i / 100.0f, 0);
@@ -129,12 +131,12 @@ f32 Leveled_DamageFormulaOnPlayer(f32 attack, u8 power, u8 courage) {
     return damage;
 }
 
-f32 Leveled_DamageModify(u8 actorCat, f32 attack, u8 power, u8 courage) {
+f32 Leveled_DamageModify(Actor* actor, Actor* attackingActor, f32 attack) {
     f32 damage;
-    if (actorCat == ACTORCAT_PLAYER) {
-        damage = Leveled_DamageFormulaOnPlayer(attack, power, courage);
+    if (actor->category == ACTORCAT_PLAYER) {
+        damage = Leveled_DamageFormulaOnPlayer(attack, CLAMP(attackingActor->power + attackingActor->powerModifier, 0, 255), CLAMP(actor->courage + actor->courageModifier, 0, 255));
     } else {
-        damage = Leveled_DamageFormula(attack, power, courage);
+        damage = Leveled_DamageFormula(attack, CLAMP(attackingActor->power + attackingActor->powerModifier, 0, 255), CLAMP(actor->courage + actor->courageModifier, 0, 255));
     }
 
         
@@ -160,4 +162,80 @@ u16 Leveled_GoldSkulltulaExperience(u8 tokens) {
         experience += 5 + 5 * (u16)((f32)i / 10.0);
     }
     return experience;
+}
+
+void Leveled_SetPlayerModifiedStats(Player* player) {
+    s8 powerModifier = 0;
+    s8 courageModifier = 0;
+
+    if (CVar_GetS32("gLeveledEquipmentStats", 1) == 1){
+        switch (CUR_EQUIP_VALUE(EQUIP_SWORD)){
+            case PLAYER_SWORD_MASTER:
+                courageModifier += 1;
+                break;
+
+            case PLAYER_SWORD_BGS:
+                if (gBitFlags[3] & gSaveContext.inventory.equipment){
+                    powerModifier -= 7;
+                    courageModifier -= 12;
+                } else {
+                    powerModifier += 2;
+                    courageModifier -= 8;
+                }
+                break;
+
+            default:
+                break;
+        }
+        
+        switch (CUR_EQUIP_VALUE(EQUIP_TUNIC) - 1){
+            case PLAYER_TUNIC_GORON:
+                powerModifier += 3;
+                courageModifier -= 3;
+                break;
+            
+            case PLAYER_TUNIC_ZORA:
+                powerModifier -= 3;
+                courageModifier += 3;
+                break;
+
+            default:
+                break;
+        }
+        
+        switch (CUR_EQUIP_VALUE(EQUIP_SHIELD)){
+            case PLAYER_SHIELD_DEKU:
+                courageModifier += 1;
+                break;
+
+            case PLAYER_SHIELD_HYLIAN:
+                courageModifier += 2;
+                break;
+            
+            case PLAYER_SHIELD_MIRROR:
+                powerModifier -= 2;
+                courageModifier += 3;
+                break;
+
+            default:
+                break;
+        }
+        
+        switch (CUR_EQUIP_VALUE(EQUIP_BOOTS) - 1){
+            case PLAYER_BOOTS_IRON:
+                powerModifier += 2;
+                courageModifier += 1;
+                break;
+            
+            case PLAYER_BOOTS_HOVER:
+                courageModifier -= 1;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    player->actor.powerModifier = powerModifier;
+    player->actor.courageModifier = courageModifier;
 }

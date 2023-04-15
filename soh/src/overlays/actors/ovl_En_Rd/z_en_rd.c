@@ -488,7 +488,7 @@ void func_80AE3454(EnRd* this, PlayState* play) {
         case 1:
             Animation_PlayLoop(&this->skelAnime, &gGibdoRedeadGrabAttackAnim);
             this->unk_304++;
-            u16 damage = Leveled_DamageModify(player->actor.category, 8, this->actor.power, player->actor.courage);
+            u16 damage = Leveled_DamageModify(&player->actor, &this->actor, 8);
             play->damagePlayer(play, -damage);
             func_800AA000(this->actor.xzDistToPlayer, 0xFF, 1, 0xC);
             this->unk_319 = 20;
@@ -523,7 +523,7 @@ void func_80AE3454(EnRd* this, PlayState* play) {
             this->unk_319--;
 
             if (this->unk_319 == 0) {
-                u16 damage = Leveled_DamageModify(player->actor.category, 8, this->actor.power, player->actor.courage);
+                u16 damage = Leveled_DamageModify(&player->actor, &this->actor, 8);
                 play->damagePlayer(play, -damage);
                 func_800AA000(this->actor.xzDistToPlayer, 0xF0, 1, 0xC);
                 this->unk_319 = 20;

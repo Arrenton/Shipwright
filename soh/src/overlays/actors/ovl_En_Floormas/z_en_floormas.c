@@ -824,8 +824,7 @@ void EnFloormas_GrabLink(EnFloormas* this, PlayState* play) {
             } else {
                 func_8002F7DC(&player->actor, NA_SE_VO_LI_DAMAGE_S);
             }
-            u16 damage =
-                (u16)Leveled_DamageModify(player->actor.category, 8, this->actor.power, player->actor.courage);
+            u16 damage = (u16)Leveled_DamageModify(&player->actor, &this->actor, 8);
             play->damagePlayer(play, -damage);
         }
     }

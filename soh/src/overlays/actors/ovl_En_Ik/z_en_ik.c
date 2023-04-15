@@ -772,7 +772,7 @@ void func_80A75FA0(Actor* thisx, PlayState* play) {
                     player->invincibilityTimer = 0;
                 } else {
                     player->invincibilityTimer = 0;
-                    u16 damage = (u16)Leveled_DamageModify(player->actor.category, 64, this->actor.power, player->actor.courage);
+                    u16 damage = (u16)Leveled_DamageModify(&player->actor, &this->actor, 64);
                     play->damagePlayer(play, -damage);
                     this->unk_2FE = 0;
                 }

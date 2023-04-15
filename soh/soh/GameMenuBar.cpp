@@ -1311,10 +1311,17 @@ namespace GameMenuBar {
         {
             UIWidgets::EnhancementCheckbox("Level Gives Bonus Hearts", "gLeveledHeartsWithLevelUp", false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
             UIWidgets::EnhancementCheckbox("Level Affects Magic Capacity", "gLeveledMagicWithLevelUp", false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
+            UIWidgets::EnhancementCheckbox("Enemy Level Affects Base Attack", "gLeveledEnemyAttackScalesWithLevel", false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
+            UIWidgets::Tooltip(
+                    "Enemies have a fixed attack value. This option scales this up the higher the enemy's Power(Strength) stat. \nThis will increase difficulty a bit."
+                );
+            UIWidgets::EnhancementCheckbox("Equipment Affects Stats", "gLeveledEquipmentStats", false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
+
             if (ImGui::BeginMenu("Heart Capacity in Units")) {
+                CVar_GetS32("gLeveledHeartUnits", 4);
                 UIWidgets::EnhancementRadioButton("4", "gLeveledHeartUnits", 1);
                 UIWidgets::EnhancementRadioButton("8", "gLeveledHeartUnits", 2);
-                UIWidgets::EnhancementRadioButton("12 (Default)", "gLeveledHeartUnits", 3);
+                UIWidgets::EnhancementRadioButton("12", "gLeveledHeartUnits", 3);
                 UIWidgets::EnhancementRadioButton("16 (Vanilla)", "gLeveledHeartUnits", 4);
                 UIWidgets::EnhancementRadioButton("20", "gLeveledHeartUnits", 5);
                 UIWidgets::EnhancementRadioButton("24", "gLeveledHeartUnits", 6);

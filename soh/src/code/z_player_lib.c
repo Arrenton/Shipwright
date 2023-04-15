@@ -421,6 +421,7 @@ void Player_SetEquipmentData(PlayState* play, Player* this) {
         this->currentSwordItemId = B_BTN_ITEM;
         Player_SetModelGroup(this, Player_ActionToModelGroup(this, this->heldItemAction));
         Player_SetBootData(play, this);
+        Leveled_SetPlayerModifiedStats(this);
     }
 }
 
@@ -526,7 +527,7 @@ void Player_GainExperience(PlayState* play, u16 experience) {
         }
     }
 
-    Actor_RefreshLeveledStats(player);
+    Actor_RefreshLeveledStats(&player->actor, player);
     
     if (gSaveContext.magicLevel == 0){
         prevMagicUnits = gSaveContext.magicUnits;

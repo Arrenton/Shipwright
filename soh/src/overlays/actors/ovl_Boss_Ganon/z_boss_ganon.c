@@ -2736,7 +2736,7 @@ void BossGanon_UpdateDamage(BossGanon* this, PlayState* play) {
                     hitWithSword = true;
                 }
 
-                damage = Leveled_DamageModify(this->actor.category, damage * HEALTH_ATTACK_MULTIPLIER, GET_PLAYER(play)->actor.power, this->actor.courage);
+                damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, damage * HEALTH_ATTACK_MULTIPLIER);
                 ActorDamageNumber_New(&this->actor, damage);
 
                 if (hitWithSword) {

@@ -1196,15 +1196,18 @@ void Actor_SetObjectDependency(PlayState* play, Actor* actor) {
     gSegments[6] = VIRTUAL_TO_PHYSICAL(play->objectCtx.status[actor->objBankIndex].segment);
 }
 
-void Actor_RefreshLeveledStats(Actor* actor) {
+void Actor_RefreshLeveledStats(Actor* actor, Player* player) {
     if (actor->category == ACTORCAT_PLAYER) {
         actor->power = GetActorStat_PlayerPower(actor->level);
         actor->courage = GetActorStat_PlayerCourage(actor->level);
         gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, actor->level);
         gSaveContext.magicUnits = GetPlayerStat_MagicUnits(actor->level);
+        Leveled_SetPlayerModifiedStats(player);
     } else {
         actor->power = GetActorStat_Power(actor->level);
+        actor->powerModifier = 1;
         actor->courage = GetActorStat_Courage(actor->level);
+        actor->courageModifier = 0;
     }
 }
 
@@ -1253,7 +1256,7 @@ void Actor_Init(Actor* actor, PlayState* play) {
                 GetActorStat_EnemyMaxHealth(actor->colChkInfo.health * HEALTH_ATTACK_MULTIPLIER, actor->level);
         }
 
-        Actor_RefreshLeveledStats(actor);
+        Actor_RefreshLeveledStats(actor, GET_PLAYER(play));
     }
 }
 
@@ -2185,7 +2188,7 @@ void func_8002F698(PlayState* play, Actor* actor, f32 arg2, s16 arg3, f32 arg4, 
     
     u16 damage = arg6;
     if (actor != NULL && damage != 0) {
-        damage = Leveled_DamageModify(player->actor.category, arg6, actor->power, player->actor.courage);
+        damage = Leveled_DamageModify(&player->actor, actor, arg6);
     }
 
     player->unk_8A0 = damage;

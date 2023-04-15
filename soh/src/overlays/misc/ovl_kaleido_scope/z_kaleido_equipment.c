@@ -575,6 +575,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                     }
 
                     Audio_PlaySoundGeneral(NA_SE_SY_DECIDE, &D_801333D4, 4, &D_801333E0, &D_801333E0, &D_801333E8);
+                    Leveled_SetPlayerModifiedStats(GET_PLAYER(play));
                     pauseCtx->unk_1E4 = 7;
                     sEquipTimer = 10;
                 } else if (CVar_GetS32("gAssignableTunicsAndBoots", 0) != 0) {

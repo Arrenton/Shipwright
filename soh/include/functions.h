@@ -398,7 +398,7 @@ void TitleCard_InitBossName(PlayState* play, TitleCardContext* titleCtx, void* t
 void TitleCard_InitPlaceName(PlayState* play, TitleCardContext* titleCtx, void* texture, s32 x, s32 y,
                              s32 width, s32 height, s32 delay);
 s32 func_8002D53C(PlayState* play, TitleCardContext* titleCtx);
-void Actor_RefreshLeveledStats(Actor* actor);
+void Actor_RefreshLeveledStats(Actor* actor, Player* player);
 void Actor_Kill(Actor* actor);
 void Actor_SetFocus(Actor* actor, f32 offset);
 void Actor_SetScale(Actor* actor, f32 scale);

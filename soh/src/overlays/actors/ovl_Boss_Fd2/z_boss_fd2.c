@@ -839,7 +839,7 @@ void BossFd2_CollisionCheck(BossFd2* this, PlayState* play) {
         hurtbox = this->collider.elements[0].info.acHitInfo;
         if (!bossFd->faceExposed) {
             if (hurtbox->toucher.dmgFlags & 0x40000040) {
-                u16 damage = Leveled_DamageModify(this->actor.category, 2 * HEALTH_ATTACK_MULTIPLIER, GET_PLAYER(play)->actor.power, this->actor.courage);
+                u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, 2 * HEALTH_ATTACK_MULTIPLIER);
 
                 ActorDamageNumber_New(&this->actor, damage);
                 if (this->actor.colChkInfo.health > damage) {
@@ -881,8 +881,7 @@ void BossFd2_CollisionCheck(BossFd2* this, PlayState* play) {
             if (hurtbox->toucher.dmgFlags & 0x80) {
                 damage = 0;
             }
-            damage = Leveled_DamageModify(this->actor.category, damage * HEALTH_ATTACK_MULTIPLIER, GET_PLAYER(play)->actor.power,
-                                          this->actor.courage);
+            damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, damage * HEALTH_ATTACK_MULTIPLIER);
             if ((bossFd->actor.colChkInfo.health > 1) || canKill) {
                 if (bossFd->actor.colChkInfo.health >= damage) {
                     ActorDamageNumber_New(&this->actor, damage);

@@ -453,8 +453,7 @@ void EnBa_Update(Actor* thisx, PlayState* play) {
 
     if ((this->actor.params < EN_BA_DEAD_BLOB) && (this->collider.base.acFlags & 2)) {
         this->collider.base.acFlags &= ~2;
-        u16 damage = Leveled_DamageModify(this->actor.category, HEALTH_ATTACK_MULTIPLIER,
-                                          GET_PLAYER(play)->actor.power, this->actor.courage);
+        u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, HEALTH_ATTACK_MULTIPLIER);
         ActorDamageNumber_New(&this->actor, damage);
 
         if (damage > this->actor.colChkInfo.health) {

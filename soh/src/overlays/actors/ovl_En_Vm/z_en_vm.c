@@ -394,8 +394,7 @@ void EnVm_CheckHealth(EnVm* this, PlayState* play) {
     EnBom* bomb;
 
     if (Actor_GetCollidedExplosive(play, &this->colliderCylinder.base) != NULL) {
-        u16 damage = Leveled_DamageModify(this->actor.category, HEALTH_ATTACK_MULTIPLIER, this->actor.power,
-                                          this->actor.courage);
+        u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, HEALTH_ATTACK_MULTIPLIER);
         this->actor.colChkInfo.damage += damage;
         ActorDamageNumber_New(&this->actor, damage);
         Actor_ApplyDamage(&this->actor);

@@ -3342,11 +3342,11 @@ void Message_Update(PlayState* play) {
                 msgCtx->textboxEndType = TEXTBOX_ENDTYPE_DEFAULT;
             }
             if ((s32)(gSaveContext.inventory.questItems & 0xF0000000) == 0x40000000) {
-                s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                 gSaveContext.inventory.questItems ^= 0x40000000;
                 gSaveContext.healthCapacity += 0x10;
                 gSaveContext.health += heartUnits;
-                Actor_RefreshLeveledStats(GET_PLAYER(play));
+                Actor_RefreshLeveledStats(&GET_PLAYER(play)->actor, GET_PLAYER(play));
             }
             if (msgCtx->ocarinaAction != OCARINA_ACTION_CHECK_NOWARP_DONE) {
                 if (sLastPlayedSong == OCARINA_SONG_SARIAS) {

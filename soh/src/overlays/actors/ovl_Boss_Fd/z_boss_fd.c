@@ -1287,7 +1287,7 @@ void BossFd_CollisionCheck(BossFd* this, PlayState* play) {
     if (headCollider->info.bumperFlags & BUMP_HIT) {
         headCollider->info.bumperFlags &= ~BUMP_HIT;
         hurtbox = headCollider->info.acHitInfo;
-        u16 damage = Leveled_DamageModify(this->actor.category, 2 * HEALTH_ATTACK_MULTIPLIER, GET_PLAYER(play)->actor.power, this->actor.courage);
+        u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, 2 * HEALTH_ATTACK_MULTIPLIER);
         if (hurtbox->toucher.dmgFlags & 0x1000)
             damage *= 2;
         ActorDamageNumber_New(&this->actor, damage);

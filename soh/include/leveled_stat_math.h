@@ -17,5 +17,6 @@ u16 GetPlayerStat_GetModifiedHealthCapacity(u16 baseHealth, u8 level);
 u16 GetPlayerStat_NextLevelExpAtLevel(u8 level);
 u16 GetActorStat_NextLevelExp(u8 level, u32 currentExp);
 f32 Leveled_DamageFormula(f32 attack, u8 power, u8 courage);
-f32 Leveled_DamageModify(u8 actorCat, f32 attack, u8 power, u8 courage);
+f32 Leveled_DamageModify(Actor* actor, Actor* attackingActor, f32 attack);
 u16 Leveled_GoldSkulltulaExperience(u8 tokens);
+void Leveled_SetPlayerModifiedStats(Player* player);

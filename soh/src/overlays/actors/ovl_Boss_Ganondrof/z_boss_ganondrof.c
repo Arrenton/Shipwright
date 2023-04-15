@@ -676,7 +676,7 @@ void BossGanondrof_Throw(BossGanondrof* this, PlayState* play) {
         Actor* fireTemp = Actor_SpawnAsChild(&play->actorCtx, &this->actor, play, ACTOR_EN_FHG_FIRE, this->spearTip.x,
                            this->spearTip.y, this->spearTip.z, this->work[GND_ACTION_STATE], 0, 0, FHGFIRE_ENERGY_BALL);
         fireTemp->level = this->actor.level;
-        Actor_RefreshLeveledStats(fireTemp);
+        Actor_RefreshLeveledStats(fireTemp, GET_PLAYER(play));
         this->actor.child = &horseTemp->actor;
     }
 
@@ -1276,8 +1276,7 @@ void BossGanondrof_CollisionCheck(BossGanondrof* this, PlayState* play) {
                         }
                         dmg = CollisionCheck_GetSwordDamage(dmgFlags);
                         (dmg == 0) ? (dmg = 2) : (canKill = true);
-                        dmg = Leveled_DamageModify(this->actor.category, dmg * HEALTH_ATTACK_MULTIPLIER,
-                                                   GET_PLAYER(play)->actor.power, this->actor.courage);
+                        dmg = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, dmg * HEALTH_ATTACK_MULTIPLIER);
                         ActorDamageNumber_New(&this->actor, dmg);
                         if ((this->actor.colChkInfo.health > 2) || canKill) {
                             if (dmg < this->actor.colChkInfo.health) {
@@ -1308,8 +1307,7 @@ void BossGanondrof_CollisionCheck(BossGanondrof* this, PlayState* play) {
                 }
             } else if (acHit && (hurtbox->toucher.dmgFlags & 0x0001F8A4)) {
                 this->work[GND_INVINC_TIMER] = 10;
-                u16 dmg = Leveled_DamageModify(this->actor.category, 2 * HEALTH_ATTACK_MULTIPLIER,
-                                               GET_PLAYER(play)->actor.power, this->actor.courage);
+                u16 dmg = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, 2 * HEALTH_ATTACK_MULTIPLIER);
                 ActorDamageNumber_New(&this->actor, dmg);
                 if (dmg < this->actor.colChkInfo.health) {
                     this->actor.colChkInfo.health -= dmg;

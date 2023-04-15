@@ -8348,11 +8348,11 @@ void func_80843AE8(PlayState* play, Player* this) {
                 }
                 if (CVar_GetS32("gFairyReviveEffect", 0)) {
                     if (CVar_GetS32("gFairyRevivePercentRestore", 0)) {
-                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                         gSaveContext.healthAccumulator =
                             heartUnits + ((gSaveContext.healthCapacity2 - heartUnits) * CVar_GetS32("gFairyReviveHealth", 100) / 100);
                     } else {
-                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                         gSaveContext.healthAccumulator = CVar_GetS32("gFairyReviveHealth", 20) * heartUnits;
                     }
                 } else {
@@ -12937,7 +12937,7 @@ void func_8084EAC0(Player* this, PlayState* play) {
         if (this->unk_850 == 0) {
             if (this->itemAction == PLAYER_IA_BOTTLE_POE) {
                 s32 rand = Rand_S16Offset(-1, 3);
-                s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
 
                 if (rand == 0) {
                     rand = 3;
@@ -12957,22 +12957,22 @@ void func_8084EAC0(Player* this, PlayState* play) {
 
                 if (CVar_GetS32("gRedPotionEffect", 0) && this->itemAction == PLAYER_IA_BOTTLE_POTION_RED) {
                     if (CVar_GetS32("gRedPercentRestore", 0)) {
-                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                         
                         gSaveContext.healthAccumulator =
                             (gSaveContext.healthCapacity2 - heartUnits) * CVar_GetS32("gRedPotionHealth", 100) / 100;
                     } else {
-                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                         gSaveContext.healthAccumulator = CVar_GetS32("gRedPotionHealth", 20) * heartUnits;
                     }
                 } else if (CVar_GetS32("gBluePotionEffects", 0) &&
                            this->itemAction == PLAYER_IA_BOTTLE_POTION_BLUE) {
                     if (CVar_GetS32("gBlueHealthPercentRestore", 0)) {
-                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                         gSaveContext.healthAccumulator =
                             (gSaveContext.healthCapacity2 - heartUnits) * CVar_GetS32("gBluePotionHealth", 100) / 100;
                     } else {
-                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                         gSaveContext.healthAccumulator = CVar_GetS32("gBluePotionHealth", 20) * heartUnits;
                     }
 
@@ -13015,7 +13015,7 @@ void func_8084EAC0(Player* this, PlayState* play) {
                 } else if (CVar_GetS32("gMilkEffect", 0) && (this->itemAction == PLAYER_IA_BOTTLE_MILK ||
                                                              this->itemAction == PLAYER_IA_BOTTLE_MILK_HALF)) {
                     if (CVar_GetS32("gMilkPercentRestore", 0)) {
-                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                         gSaveContext.healthAccumulator = 
                             (gSaveContext.healthCapacity2 - heartUnits) * CVar_GetS32("gMilkHealth", 100) / 100;
                     } else {
@@ -13024,11 +13024,11 @@ void func_8084EAC0(Player* this, PlayState* play) {
                     if (CVar_GetS32("gSeparateHalfMilkEffect", 0) &&
                         this->itemAction == PLAYER_IA_BOTTLE_MILK_HALF) {
                         if (CVar_GetS32("gHalfMilkPercentRestore", 0)) {
-                            s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                            s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                             gSaveContext.healthAccumulator =
                                 (gSaveContext.healthCapacity2 - heartUnits) * CVar_GetS32("gHalfMilkHealth", 100) / 100;
                         } else {
-                            s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                            s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                             gSaveContext.healthAccumulator = CVar_GetS32("gHalfMilkHealth", 5) * heartUnits;
                         }
                     }
@@ -13042,7 +13042,7 @@ void func_8084EAC0(Player* this, PlayState* play) {
                     }
 
                     if (sp28 & 4) {
-                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                        s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                         gSaveContext.healthAccumulator = heartUnits * 5;
                     }
                 }
@@ -13159,11 +13159,11 @@ void func_8084EED8(Player* this, PlayState* play) {
     } else if (LinkAnimation_OnFrame(&this->skelAnime, 47.0f)) {
         if (CVar_GetS32("gFairyEffect", 0)) {
             if (CVar_GetS32("gFairyPercentRestore", 0)) {
-                s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                 gSaveContext.healthAccumulator =
                     (gSaveContext.healthCapacity2 - heartUnits) * CVar_GetS32("gFairyHealth", 100) / 100;
             } else {
-                s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+                s32 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
                 gSaveContext.healthAccumulator = CVar_GetS32("gFairyHealth", 8) * heartUnits;
             }
         } else {

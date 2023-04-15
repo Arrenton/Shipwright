@@ -385,7 +385,7 @@ void HealthMeter_Draw(PlayState* play) {
     f32 temp2;
     f32 temp3;
     f32 temp4;
-    u8 heartUnits = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+    u8 heartUnits = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
     if (heartUnits < 4){
         heartUnits = 4;
         CVar_SetS32("gLeveledHeartUnits", 1);
@@ -656,7 +656,7 @@ void HealthMeter_HandleCriticalAlarm(PlayState* play) {
 
 u32 HealthMeter_IsCritical(void) {
     s32 var;
-    s32 heartValue = CVar_GetS32("gLeveledHeartUnits", 3) << 2;
+    s32 heartValue = CVar_GetS32("gLeveledHeartUnits", 4) << 2;
 
     /*if (gSaveContext.healthCapacity <= 0x50) {
         var = 0x10;

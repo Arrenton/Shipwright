@@ -652,7 +652,7 @@ void EnGoma_UpdateHit(EnGoma* this, PlayState* play) {
                         swordDamage = 1;
                     }
 
-                    swordDamage = Leveled_DamageModify(this->actor.category, swordDamage * HEALTH_ATTACK_MULTIPLIER, player->actor.power, this->actor.courage);
+                    swordDamage = Leveled_DamageModify(&this->actor, &player->actor, swordDamage * HEALTH_ATTACK_MULTIPLIER);
                     this->actor.colChkInfo.health -= swordDamage;
                     ActorDamageNumber_New(&this->actor, swordDamage);
                     EnGoma_SetupHurt(this, play);
