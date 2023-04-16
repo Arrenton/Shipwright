@@ -567,6 +567,7 @@ void SaveManager::InitFileDebug() {
     gSaveContext.magicLevel = 0;
     gSaveContext.magic = 0x30;
     gSaveContext.rupees = 150;
+    gSaveContext.experience = 50000;
     gSaveContext.swordHealth = 8;
     gSaveContext.naviTimer = 0;
     gSaveContext.isMagicAcquired = 1;

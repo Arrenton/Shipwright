@@ -176,8 +176,6 @@ void EnBigokuta_Init(Actor* thisx, PlayState* play) {
     CollisionCheck_SetInfo(&this->actor.colChkInfo, &sDamageTable, sColChkInfoInit);
     
     Actor_GetLevelAndExperience(play, &this->actor, ACTOR_EN_BIGOKUTA);
-    this->actor.colChkInfo.health =
-        GetActorStat_EnemyMaxHealth(this->actor.colChkInfo.health * HEALTH_ATTACK_MULTIPLIER, this->actor.level);
 
     this->unk_194 = 1;
 

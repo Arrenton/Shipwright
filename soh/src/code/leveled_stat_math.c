@@ -118,14 +118,25 @@ f32 Leveled_DamageFormulaOnPlayer(f32 attack, u8 power, u8 courage) {
     
     if (CVar_GetS32("gLeveledEnemyAttackScalesWithLevel", 1) == 1){
         damage = GetActorStat_EnemyAttack(attack, power);
-    }
-    if (power >= courage) {
-        for (u8 i = 0; i < power - courage; i++) {
-            damage *= 1.05f + CLAMP_MIN(0.05f - (f32)i / 100.0f, 0);
+
+        if (power >= courage) {
+            for (u8 i = 0; i < power - courage; i++) {
+                damage *= 1.03f + CLAMP_MIN(0.07f - (f32)i / 100.0f, 0);
+            }
+        } else {
+            for (u8 i = 0; i < courage - power; i++) {
+                damage *= 0.96f;
+            }
         }
     } else {
-        for (u8 i = 0; i < courage - power; i++) {
-            damage *= 0.96f;
+        if (power >= courage) {
+            for (u8 i = 0; i < power - courage; i++) {
+                damage *= 1.05f + CLAMP_MIN(0.05f - (f32)i / 100.0f, 0);
+            }
+        } else {
+            for (u8 i = 0; i < courage - power; i++) {
+                damage *= 0.96f;
+            }
         }
     }
     return damage;
