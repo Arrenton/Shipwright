@@ -263,7 +263,7 @@ void Leveled_Keese(PlayState* play, Actor*actor) {
             actor->exp = 38;
         }
         if (play->sceneNum == SCENE_MEN) {
-            actor->level = 70;
+            actor->level = 55;
             actor->exp = 44;
         }
     }
@@ -365,7 +365,7 @@ void Leveled_Beamos(PlayState* play, Actor*actor) {
             actor->level = 50;
             actor->exp = 90;
         } else if (play->sceneNum == SCENE_MEN) {
-            actor->level = 70;
+            actor->level = 55;
             actor->exp = 120;
         }
     }
@@ -394,7 +394,7 @@ void Leveled_Wolfos(PlayState* play, Actor* actor) {
         actor->exp = 126;
     }
     if (play->sceneNum == SCENE_MEN) {
-        actor->level = 70;
+        actor->level = 55;
         actor->exp = 270;
     }
 }
@@ -412,7 +412,7 @@ void Leveled_Lizalfos(PlayState* play, Actor*actor) {
         actor->ignoreExpReward = true;
     }
     if (play->sceneNum == SCENE_MEN) {
-        actor->level = 70;
+        actor->level = 55;
         actor->exp = 320;
     }
 }
@@ -463,7 +463,7 @@ void Leveled_Bubble(PlayState* play, Actor*actor) {
         }
     }
     if (play->sceneNum == SCENE_MEN) {
-        actor->level = 70;
+        actor->level = 55;
         actor->exp = 100;
     }
 }
@@ -487,7 +487,7 @@ void Leveled_Stalfos(PlayState* play, Actor*actor) {
         actor->level = 50;
         actor->exp = 260;
     } else if (play->sceneNum == SCENE_MEN) {
-        actor->level = 70;
+        actor->level = 55;
         actor->exp = 345;
     }
 }
@@ -544,7 +544,7 @@ void Leveled_LikeLike(PlayState* play, Actor* actor) {
         actor->level = 50;
         actor->exp = 190;
     } else    if (play->sceneNum == SCENE_MEN) {
-        actor->level = 70;
+        actor->level = 55;
         actor->exp = 260;
     }
 }
@@ -559,7 +559,7 @@ void Leveled_TorchSlug(PlayState* play, Actor* actor) {
         actor->level = 50;
         actor->exp = 170;
     } else if (play->sceneNum == SCENE_MEN) {
-        actor->level = 70;
+        actor->level = 55;
         actor->exp = 240;
     }
 }
@@ -576,7 +576,7 @@ void Leveled_ShellBlade(PlayState* play, Actor* actor) {
     actor->level = 38;
     actor->exp = 129;
     if (play->sceneNum == SCENE_MEN) {
-        actor->level = 70;
+        actor->level = 55;
         actor->exp = 220;
     }
 }
@@ -585,7 +585,7 @@ void Leveled_RollingSpike(PlayState* play, Actor* actor) {
     actor->level = 37;
     actor->exp = 100;
     if (play->sceneNum == SCENE_MEN) {
-        actor->level = 70;
+        actor->level = 55;
         actor->exp = 200;
     }
 }
