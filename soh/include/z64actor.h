@@ -196,6 +196,7 @@ typedef struct Actor {
     u8 courage; // e.g. Defense
     s8 powerModifier; // Modifies Power
     s8 courageModifier; // Modifies Courage
+    u16 maximumHealth; // Health after Leveled math for enemies (Some don't use this)
     u16 floatingNumber[7];
     u8 floatingNumberLife[7];
     Vec2f floatingNumberPosition[7];

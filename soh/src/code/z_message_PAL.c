@@ -1642,6 +1642,9 @@ void Message_OpenText(PlayState* play, u16 textId) {
                 textId == 0x4D)) {
         Message_FindMessage(play, textId);
         msgCtx->msgLength = font->msgLength = GetEquipNowMessage(font->msgBuf, font->msgOffset, sizeof(font->msgBuf));
+    } else if ((CVar_GetS32("gLeveledNaviLevel", 1) || CVar_GetS32("gLeveledNaviMaxHP", 1)) && (textId > 0x0600 && textId < 0x06FF)) {
+        Message_FindMessage(play, textId);
+        msgCtx->msgLength = font->msgLength = GetLeveledNaviEnemyInfo(font->msgBuf, font->msgOffset, sizeof(font->msgBuf), play->actorCtx.targetCtx.targetedActor);
     } else {
         Message_FindMessage(play, textId);
         msgCtx->msgLength = font->msgLength;

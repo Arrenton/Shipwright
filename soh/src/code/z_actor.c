@@ -1254,6 +1254,7 @@ void Actor_Init(Actor* actor, PlayState* play) {
             Actor_GetLevelAndExperience(play, actor, 0);
             actor->colChkInfo.health =
                 GetActorStat_EnemyMaxHealth(actor->colChkInfo.health * HEALTH_ATTACK_MULTIPLIER, actor->level);
+            actor->maximumHealth = actor->colChkInfo.health;
         }
 
         Actor_RefreshLeveledStats(actor, GET_PLAYER(play));

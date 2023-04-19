@@ -1312,6 +1312,8 @@ namespace GameMenuBar {
             UIWidgets::EnhancementCheckbox("Level Gives Bonus Hearts", "gLeveledHeartsWithLevelUp", false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
             UIWidgets::EnhancementCheckbox("Level Affects Magic Capacity", "gLeveledMagicWithLevelUp", false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
             UIWidgets::EnhancementCheckbox("Enemy Level Affects Base Attack", "gLeveledEnemyAttackScalesWithLevel", false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
+            UIWidgets::EnhancementCheckbox("Navi tells enemy level", "gLeveledNaviLevel", false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
+            UIWidgets::EnhancementCheckbox("Navi tells enemy max HP", "gLeveledNaviMaxHP", false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
             UIWidgets::Tooltip(
                     "Enemies have a fixed attack value. This option scales this up the higher the enemy's Power(Strength) stat. \nThis will increase difficulty a bit."
                 );
