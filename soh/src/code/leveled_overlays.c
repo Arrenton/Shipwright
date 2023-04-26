@@ -417,7 +417,7 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
             OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar50LatinCapitalLetterPTex, 8, 16, -99, -99, 8, 16,
                                          1 << 10, 1 << 10);
 
-            for (u8 j = 0; j < 6; j++) {
+            for (u8 j = 0; j < 3; j++) {
                 OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 8, (s16)spBC.x, (s16)spBC.y,
                                              8, 8, 1 << 10, 1 << 10);
                 OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)gMsgChar45LatinCapitalLetterETex, 8, 8, (s16)spBC.x + 5,
@@ -679,7 +679,7 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     }
     // Attack
     Leveled_DrawTex32(play, (u8*)gKokiriSwordIconTex, 10, 12, 90, statY - 1, 10, 8);
-    Leveled_ValueNumberDraw(play, 100, statY, GetActorStat_Attack(attack, player->actor.power + player->actor.powerModifier), 255, 255, 255);
+    Leveled_ValueNumberDraw(play, 100, statY, GetActorStat_Attack(attack, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255)), 255, 255, 255);
     statY += 8;
     // Power
     Leveled_DrawTex32(play, (u8*)gSilverGauntletsIconTex, 8, 7, 92, statY, 8, 7);
@@ -730,6 +730,8 @@ void Leveled_Interface_DrawNextLevel(PlayState* play) {
     } else {
         return;
     }
+    if (play->pauseCtx.state != 0)
+        return;
 
     Player* player = GET_PLAYER(play);
     u16 posX = OTRGetRectDimensionFromLeftEdge(10);

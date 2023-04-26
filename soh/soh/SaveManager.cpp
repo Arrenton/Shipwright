@@ -605,7 +605,7 @@ void SaveManager::InitFileDebug() {
     for (int i = 0; i < ARRAY_COUNT(gSaveContext.playerName); i++) {
         gSaveContext.playerName[i] = sPlayerName[i];
     }
-    gSaveContext.experience = 18000;
+    gSaveContext.experience = 80000;
     gSaveContext.n64ddFlag = 0;
     gSaveContext.healthCapacity = 0xE0;
     gSaveContext.health = 0xE0;
