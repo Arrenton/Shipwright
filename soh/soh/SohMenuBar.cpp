@@ -419,7 +419,7 @@ void DrawSettingsMenu() {
             }
 
             if (LUS::Context::GetInstance()->GetWindow()->GetGui()->SupportsViewports()) {
-                UIWidgets::PaddedEnhancementCheckbox("Allow multi-windows", "gEnableMultiViewports", true, false, false, "", UIWidgets::CheckboxGraphics::Cross, true);
+                PaddedEnhancementCheckbox("Allow multi-windows", "gEnableMultiViewports", true, false, false, "", UIWidgets::CheckboxGraphics::Cross, true);
                 UIWidgets::Tooltip("Allows windows to be able to be dragged off of the main game window. Requires a reload to take effect.");
             }
 
@@ -531,8 +531,8 @@ void DrawEnhancementsMenu() {
                 static const char* forceSkipScarecrowText =
                     "This setting is forcefully enabled because a savefile\nwith \"Skip Scarecrow Song\" is loaded";
                 UIWidgets::Tooltip("Skip the part where the Ocarina playback is called when you play a song");
-                UIWidgets::PaddedEnhancementCheckbox("Skip Scarecrow Song", "gSkipScarecrow", true, false,
-                                                        forceSkipScarecrow, forceSkipScarecrowText, UIWidgets::CheckboxGraphics::Checkmark);
+                PaddedEnhancementCheckbox("Skip Scarecrow Song", "gSkipScarecrow", true, false,
+                                          forceSkipScarecrow, forceSkipScarecrowText, UIWidgets::CheckboxGraphics::Checkmark);
                 UIWidgets::Tooltip("Pierre appears when Ocarina is pulled out. Requires learning scarecrow song.");
                 UIWidgets::PaddedEnhancementCheckbox("Remember Save Location", "gRememberSaveLocation", true, false);
                 UIWidgets::Tooltip("When loading a save, places Link at the last entrance he went through.\n"
@@ -648,8 +648,8 @@ void DrawEnhancementsMenu() {
                     OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_ENABLE_BOMBCHU_DROPS) == 1;
                 static const char* forceEnableBombchuDropsText =
                     "This setting is forcefully enabled because a savefile\nwith \"Enable Bombchu Drops\" is loaded.";
-                UIWidgets::PaddedEnhancementCheckbox("Enable Bombchu Drops", "gBombchuDrops", true, false,
-                                                        forceEnableBombchuDrops, forceEnableBombchuDropsText, UIWidgets::CheckboxGraphics::Checkmark);
+                PaddedEnhancementCheckbox("Enable Bombchu Drops", "gBombchuDrops", true, false,
+                                          forceEnableBombchuDrops, forceEnableBombchuDropsText, UIWidgets::CheckboxGraphics::Checkmark);
                 UIWidgets::Tooltip("Bombchus will sometimes drop in place of bombs");
                 UIWidgets::PaddedEnhancementCheckbox("No Heart Drops", "gNoHeartDrops", true, false);
                 UIWidgets::Tooltip("Disables heart drops, but not heart placements, like from a Deku Scrub running off\nThis simulates Hero Mode from other games in the series");
@@ -659,8 +659,8 @@ void DrawEnhancementsMenu() {
                 UIWidgets::Tooltip("All regular enemies and mini-bosses move and act twice as fast.");
                 UIWidgets::PaddedEnhancementCheckbox("Always Win Goron Pot", "gGoronPot", true, false);
                 UIWidgets::Tooltip("Always get the heart piece/purple rupee from the spinning Goron pot");
-                UIWidgets::PaddedEnhancementCheckbox("Always Win Dampe Digging Game", "gDampeWin", true, false, SaveManager::Instance->IsRandoFile(),
-                                                        "This setting is always enabled in randomizer files", UIWidgets::CheckboxGraphics::Checkmark);
+                PaddedEnhancementCheckbox("Always Win Dampe Digging Game", "gDampeWin", true, false, SaveManager::Instance->IsRandoFile(),
+                                          "This setting is always enabled in randomizer files", UIWidgets::CheckboxGraphics::Checkmark);
                 UIWidgets::Tooltip("Always win the heart piece/purple rupee on the first dig in Dampe's grave digging game, just like in rando\nIn a rando file, this is unconditionally enabled");
                 UIWidgets::Spacer(0);
 
@@ -850,8 +850,8 @@ void DrawEnhancementsMenu() {
                 OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_BLUE_FIRE_ARROWS);
             static const char* forceEnableBlueFireArrowsText =
                 "This setting is forcefully enabled because a savefile\nwith \"Blue Fire Arrows\" is loaded.";
-            UIWidgets::PaddedEnhancementCheckbox("Blue Fire Arrows", "gBlueFireArrows", true, false, 
-                forceEnableBlueFireArrows, forceEnableBlueFireArrowsText, UIWidgets::CheckboxGraphics::Checkmark);
+            PaddedEnhancementCheckbox("Blue Fire Arrows", "gBlueFireArrows", true, false, 
+                                      forceEnableBlueFireArrows, forceEnableBlueFireArrowsText, UIWidgets::CheckboxGraphics::Checkmark);
             UIWidgets::Tooltip("Allows Ice Arrows to melt red ice.\nMay require a room reload if toggled during gameplay.");
 
             // Sunlight Arrows
@@ -859,8 +859,8 @@ void DrawEnhancementsMenu() {
                 OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_SUNLIGHT_ARROWS);
             static const char* forceEnableSunLightArrowsText =
                 "This setting is forcefully enabled because a savefile\nwith \"Sunlight Arrows\" is loaded.";
-            UIWidgets::PaddedEnhancementCheckbox("Sunlight Arrows", "gSunlightArrows", true, false, 
-                forceEnableSunLightArrows, forceEnableSunLightArrowsText, UIWidgets::CheckboxGraphics::Checkmark);
+            PaddedEnhancementCheckbox("Sunlight Arrows", "gSunlightArrows", true, false, 
+                                      forceEnableSunLightArrows, forceEnableSunLightArrowsText, UIWidgets::CheckboxGraphics::Checkmark);
             UIWidgets::Tooltip("Allows Light Arrows to activate sun switches.\nMay require a room reload if toggled during gameplay.");
 
             UIWidgets::PaddedEnhancementCheckbox("Disable Crit wiggle", "gDisableCritWiggle", true, false);
@@ -1285,7 +1285,7 @@ void DrawDeveloperToolsMenu() {
         };
         UIWidgets::PaddedEnhancementCheckbox("Better Debug Warp Screen", "gBetterDebugWarpScreen", true, false);
         UIWidgets::Tooltip("Optimized debug warp screen, with the added ability to chose entrances and time of day");
-        UIWidgets::PaddedEnhancementCheckbox("Debug Warp Screen Translation", "gDebugWarpScreenTranslation", true, false, false, "", UIWidgets::CheckboxGraphics::Cross, true);
+        PaddedEnhancementCheckbox("Debug Warp Screen Translation", "gDebugWarpScreenTranslation", true, false, false, "", UIWidgets::CheckboxGraphics::Cross, true);
         UIWidgets::Tooltip("Translate the Debug Warp Screen based on the game language");
         UIWidgets::PaddedSeparator();
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(12.0f, 6.0f));
@@ -1399,11 +1399,11 @@ void DrawRandomizerMenu() {
 
         if (ImGui::BeginMenu("Rando Enhancements"))
         {
-            UIWidgets::EnhancementCheckbox("Rando-Relevant Navi Hints", "gRandoRelevantNavi", false, "", UIWidgets::CheckboxGraphics::Cross, true);
+            EnhancementCheckbox("Rando-Relevant Navi Hints", "gRandoRelevantNavi", false, "", UIWidgets::CheckboxGraphics::Cross, true);
             UIWidgets::Tooltip(
                 "Replace Navi's overworld quest hints with rando-related gameplay hints."
             );
-            UIWidgets::PaddedEnhancementCheckbox("Random Rupee Names", "gRandomizeRupeeNames", true, false, false, "", UIWidgets::CheckboxGraphics::Cross, true);
+            PaddedEnhancementCheckbox("Random Rupee Names", "gRandomizeRupeeNames", true, false, false, "", UIWidgets::CheckboxGraphics::Cross, true);
             UIWidgets::Tooltip(
                 "When obtaining rupees, randomize what the rupee is called in the textbox."
             );
@@ -1429,8 +1429,8 @@ void DrawRandomizerMenu() {
                 "This setting is disabled because a savefile is loaded without any key\n"
                 "shuffle settings set to \"Any Dungeon\", \"Overworld\" or \"Anywhere\"";
 
-            UIWidgets::PaddedEnhancementCheckbox("Key Colors Match Dungeon", "gRandoMatchKeyColors", true, false,
-                                                  disableKeyColors, disableKeyColorsText, UIWidgets::CheckboxGraphics::Cross, true);
+            PaddedEnhancementCheckbox("Key Colors Match Dungeon", "gRandoMatchKeyColors", true, false,
+                                      disableKeyColors, disableKeyColorsText, UIWidgets::CheckboxGraphics::Cross, true);
             UIWidgets::Tooltip(
                 "Matches the color of small keys and boss keys to the dungeon they belong to. "
                 "This helps identify keys from afar and adds a little bit of flair.\n\nThis only "
@@ -1478,6 +1478,58 @@ void SohMenuBar::DrawElement() {
         DrawRandomizerMenu();
 
         ImGui::PopStyleVar(1);
+
+        if (ImGui::BeginMenu("Leveled")) {
+            if (ImGui::BeginMenu("Floating Numbers")) {
+                EnhancementCheckbox("Enemy Damage", "gLeveledFloatingNumberEnemyDamage", false, "",
+                                    UIWidgets::CheckboxGraphics::Checkmark, true);
+                EnhancementCheckbox("Player Damage", "gLeveledFloatingNumberPlayerDamage", false, "",
+                                    UIWidgets::CheckboxGraphics::Checkmark, true);
+                EnhancementCheckbox("EXP Gain", "gLeveledFloatingNumberExpGain", false, "",
+                                    UIWidgets::CheckboxGraphics::Checkmark, true);
+                ImGui::EndMenu();
+            }
+
+            EnhancementCheckbox("Level Gives Bonus Hearts", "gLeveledHeartsWithLevelUp", false, "",
+                                UIWidgets::CheckboxGraphics::Checkmark, true);
+            EnhancementCheckbox("Level Affects Magic Capacity", "gLeveledMagicWithLevelUp", false, "",
+                                UIWidgets::CheckboxGraphics::Checkmark, true);
+            EnhancementCheckbox("Enemy Level Affects Base Attack", "gLeveledEnemyAttackScalesWithLevel",
+                                false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
+            UIWidgets::Tooltip("Enemies have a fixed attack value. This option scales this up the higher the enemy's "
+                               "Power(Strength) stat. \nThis will increase difficulty a bit.");
+            EnhancementCheckbox("Equipment Affects Stats", "gLeveledEquipmentStats", false, "",
+                                UIWidgets::CheckboxGraphics::Checkmark, true);
+            EnhancementCheckbox("Navi tells enemy level", "gLeveledNaviLevel", false, "",
+                                UIWidgets::CheckboxGraphics::Checkmark, true);
+            EnhancementCheckbox("Navi tells enemy max HP", "gLeveledNaviMaxHP", false, "",
+                                UIWidgets::CheckboxGraphics::Checkmark, true);
+
+            if (ImGui::BeginMenu("Heart Capacity in Units")) {
+                CVarGetInteger("gLeveledHeartUnits", 4);
+                UIWidgets::EnhancementRadioButton("4", "gLeveledHeartUnits", 1);
+                UIWidgets::EnhancementRadioButton("8", "gLeveledHeartUnits", 2);
+                UIWidgets::EnhancementRadioButton("12", "gLeveledHeartUnits", 3);
+                UIWidgets::EnhancementRadioButton("16 (Vanilla)", "gLeveledHeartUnits", 4);
+                UIWidgets::EnhancementRadioButton("20", "gLeveledHeartUnits", 5);
+                UIWidgets::EnhancementRadioButton("24", "gLeveledHeartUnits", 6);
+                UIWidgets::EnhancementRadioButton("28", "gLeveledHeartUnits", 7);
+                UIWidgets::EnhancementRadioButton("32", "gLeveledHeartUnits", 8);
+                UIWidgets::EnhancementRadioButton("36", "gLeveledHeartUnits", 9);
+                UIWidgets::EnhancementRadioButton("40", "gLeveledHeartUnits", 10);
+                UIWidgets::EnhancementRadioButton("44", "gLeveledHeartUnits", 11);
+                UIWidgets::EnhancementRadioButton("48", "gLeveledHeartUnits", 12);
+                ImGui::EndMenu();
+            }
+            UIWidgets::Tooltip("Sets how much health units a heart is worth.");
+
+            // if (ImGui::Button("Add 2000 EXP")){
+            //     gSaveContext.experience += 2000;
+            // }
+
+            ImGui::EndMenu();
+        }
+
         ImGui::EndMenuBar();
     }
 }

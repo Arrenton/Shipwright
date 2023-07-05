@@ -562,6 +562,10 @@ void EnBili_UpdateDamage(EnBili* this, PlayState* play) {
                 this->actor.flags &= ~ACTOR_FLAG_TARGETABLE;
             }
 
+            if (this->actor.colChkInfo.health > 0) {
+                Audio_PlayActorSound2(&this->actor, NA_SE_EN_BARI_DAMAGE);
+            }
+
             damageEffect = this->actor.colChkInfo.damageEffect;
 
             if (damageEffect == BIRI_DMGEFF_DEKUNUT) {
@@ -587,7 +591,11 @@ void EnBili_UpdateDamage(EnBili* this, PlayState* play) {
             } else if (damageEffect == BIRI_DMGEFF_SLINGSHOT) {
                 EnBili_SetupRecoil(this);
             } else {
-                EnBili_SetupBurnt(this);
+                // EnBili_SetupBurnt(this);
+                if (this->actor.colChkInfo.health == 0) {
+                    this->actor.params = EN_BILI_TYPE_DYING;
+                    EnBili_SetupBurnt(this);
+                }
             }
 
             if (this->collider.info.acHitInfo->toucher.dmgFlags & 0x1F820) { // DMG_ARROW
