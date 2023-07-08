@@ -1494,6 +1494,7 @@ void SaveManager::LoadBaseVersion3() {
 }
 
 void SaveManager::LoadBaseVersion4() {
+    SaveManager::Instance->LoadData("experience", gSaveContext.experience);
     SaveManager::Instance->LoadData("entranceIndex", gSaveContext.entranceIndex);
     SaveManager::Instance->LoadData("linkAge", gSaveContext.linkAge);
     SaveManager::Instance->LoadData("cutsceneIndex", gSaveContext.cutsceneIndex);
