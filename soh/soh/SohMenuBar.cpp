@@ -1474,7 +1474,7 @@ void DrawLeveledMenu() {
         PaddedEnhancementCheckbox("Navi tells enemy max HP", "gLeveledNaviMaxHP", true, true, false, "",
                             UIWidgets::CheckboxGraphics::Checkmark, true);
 
-        if (ImGui::BeginMenu("Heart Capacity in Units")) {
+        if (ImGui::BeginMenu("Heart Container Value in Units")) {
             CVarGetInteger("gLeveledHeartUnits", 4);
             UIWidgets::EnhancementRadioButton("4", "gLeveledHeartUnits", 1);
             UIWidgets::EnhancementRadioButton("8", "gLeveledHeartUnits", 2);
@@ -1490,7 +1490,7 @@ void DrawLeveledMenu() {
             UIWidgets::EnhancementRadioButton("48", "gLeveledHeartUnits", 12);
             ImGui::EndMenu();
         }
-        UIWidgets::Tooltip("Sets how many health units a heart is worth.");
+        UIWidgets::Tooltip("Sets how many health units each completed heart container is worth.\nOne heart on the health meter is equal to 16 health units.\nA lower setting results in lower total health.");
 
         // if (ImGui::Button("Add 2000 EXP")){
         //     gSaveContext.experience += 2000;
