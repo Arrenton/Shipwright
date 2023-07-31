@@ -1452,26 +1452,26 @@ void DrawLeveledMenu() {
         if (ImGui::BeginMenu("Floating Numbers")) {
             EnhancementCheckbox("Enemy Damage", "gLeveledFloatingNumberEnemyDamage", false, "",
                                 UIWidgets::CheckboxGraphics::Checkmark, true);
-            EnhancementCheckbox("Player Damage", "gLeveledFloatingNumberPlayerDamage", false, "",
+            PaddedEnhancementCheckbox("Player Damage", "gLeveledFloatingNumberPlayerDamage", true, false, false, "",
                                 UIWidgets::CheckboxGraphics::Checkmark, true);
-            EnhancementCheckbox("EXP Gain", "gLeveledFloatingNumberExpGain", false, "",
+            PaddedEnhancementCheckbox("EXP Gain", "gLeveledFloatingNumberExpGain", true, false, false, "",
                                 UIWidgets::CheckboxGraphics::Checkmark, true);
             ImGui::EndMenu();
         }
 
-        EnhancementCheckbox("Level Gives Bonus Hearts", "gLeveledHeartsWithLevelUp", false, "",
+        PaddedEnhancementCheckbox("Level Gives Bonus Hearts", "gLeveledHeartsWithLevelUp", true, false, false, "",
                             UIWidgets::CheckboxGraphics::Checkmark, true);
-        EnhancementCheckbox("Level Affects Magic Capacity", "gLeveledMagicWithLevelUp", false, "",
+        PaddedEnhancementCheckbox("Level Affects Magic Capacity", "gLeveledMagicWithLevelUp", true, false, false, "",
                             UIWidgets::CheckboxGraphics::Checkmark, true);
-        EnhancementCheckbox("Enemy Level Affects Base Attack", "gLeveledEnemyAttackScalesWithLevel",
+        PaddedEnhancementCheckbox("Enemy Level Affects Base Attack", "gLeveledEnemyAttackScalesWithLevel", true, false,
                             false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
         UIWidgets::Tooltip("Enemies have a fixed attack value. This option scales this up the higher the enemy's "
                             "Power(Strength) stat. \nThis will increase difficulty a bit.");
-        EnhancementCheckbox("Equipment Affects Stats", "gLeveledEquipmentStats", false, "",
+        PaddedEnhancementCheckbox("Equipment Affects Stats", "gLeveledEquipmentStats", true, false, false, "",
                             UIWidgets::CheckboxGraphics::Checkmark, true);
-        EnhancementCheckbox("Navi tells enemy level", "gLeveledNaviLevel", false, "",
+        PaddedEnhancementCheckbox("Navi tells enemy level", "gLeveledNaviLevel", true, false, false, "",
                             UIWidgets::CheckboxGraphics::Checkmark, true);
-        EnhancementCheckbox("Navi tells enemy max HP", "gLeveledNaviMaxHP", false, "",
+        PaddedEnhancementCheckbox("Navi tells enemy max HP", "gLeveledNaviMaxHP", true, true, false, "",
                             UIWidgets::CheckboxGraphics::Checkmark, true);
 
         if (ImGui::BeginMenu("Heart Capacity in Units")) {
@@ -1490,7 +1490,7 @@ void DrawLeveledMenu() {
             UIWidgets::EnhancementRadioButton("48", "gLeveledHeartUnits", 12);
             ImGui::EndMenu();
         }
-        UIWidgets::Tooltip("Sets how much health units a heart is worth.");
+        UIWidgets::Tooltip("Sets how many health units a heart is worth.");
 
         // if (ImGui::Button("Add 2000 EXP")){
         //     gSaveContext.experience += 2000;
