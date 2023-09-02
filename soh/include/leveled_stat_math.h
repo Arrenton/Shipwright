@@ -3,6 +3,11 @@
 #define HEALTH_ATTACK_MULTIPLIER 7
 #include "z64.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 u16 GetActorStat_DisplayAttack(u16 attack, u8 power);
 u16 GetActorStat_Attack(u16 attack, u8 power);
 u8 GetActorStat_Power(u8 level);
@@ -16,8 +21,12 @@ u16 GetPlayerStat_GetModifiedHealthCapacity(u16 baseHealth, u8 level);
 u16 GetPlayerStat_NextLevelExpAtLevel(u8 level);
 u16 GetActorStat_NextLevelExp(u8 level, u32 currentExp);
 f32 Leveled_DamageFormula(f32 attack, u8 power, u8 courage);
-f32 Leveled_DamageModify(Actor* actor, Actor* attackingActor, f32 attack);
+f32 Leveled_DamageModify(Actor * actor, Actor * attackingActor, f32 attack);
 u16 Leveled_GoldSkulltulaExperience(u8 tokens);
-void Leveled_SetPlayerModifiedStats(Player* player);
+void Leveled_SetPlayerModifiedStats(Player * player);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
