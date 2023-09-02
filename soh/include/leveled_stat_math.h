@@ -2,7 +2,6 @@
 #define LEVELED_STAT_MATH_H
 #define HEALTH_ATTACK_MULTIPLIER 7
 #include "z64.h"
-#endif
 
 u16 GetActorStat_DisplayAttack(u16 attack, u8 power);
 u16 GetActorStat_Attack(u16 attack, u8 power);
@@ -20,3 +19,5 @@ f32 Leveled_DamageFormula(f32 attack, u8 power, u8 courage);
 f32 Leveled_DamageModify(Actor* actor, Actor* attackingActor, f32 attack);
 u16 Leveled_GoldSkulltulaExperience(u8 tokens);
 void Leveled_SetPlayerModifiedStats(Player* player);
+
+#endif

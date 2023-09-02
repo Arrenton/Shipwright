@@ -6,6 +6,7 @@
 #include "functions.h"
 #include "macros.h"
 #include <variables.h>
+#include "leveled_stat_math.h"
 #include "soh/Enhancements/boss-rush/BossRush.h"
 #include <libultraship/libultraship.h>
 
@@ -416,6 +417,11 @@ void SaveManager::InitMeta(int fileNum) {
     fileMetaInfo[fileNum].questItems = gSaveContext.inventory.questItems;
     fileMetaInfo[fileNum].defense = gSaveContext.inventory.defenseHearts;
     fileMetaInfo[fileNum].health = gSaveContext.health;
+    fileMetaInfo[fileNum].level = 0;
+
+    while (GetActorStat_NextLevelExp(fileMetaInfo[fileNum].level, gSaveContext.experience) <= 0 && fileMetaInfo[fileNum].level < 99) {
+        fileMetaInfo[fileNum].level += 1;
+    }
 
     for (int i = 0; i < ARRAY_COUNT(fileMetaInfo[fileNum].seedHash); i++) {
         fileMetaInfo[fileNum].seedHash[i] = gSaveContext.seedIcons[i];
