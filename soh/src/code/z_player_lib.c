@@ -520,6 +520,10 @@ s32 Player_GetStrength(void) {
 
 void Player_GainExperience(PlayState* play, u16 experience) {
     Player* player = GET_PLAYER(play);
+
+    if (player == NULL)
+        return;
+
     bool levelUp = false;
     u8 prevPower = player->actor.power;
     u8 prevCourage = player->actor.courage;

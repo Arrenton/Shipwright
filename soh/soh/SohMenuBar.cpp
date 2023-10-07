@@ -1449,6 +1449,13 @@ void DrawRandomizerMenu() {
 
 void DrawLeveledMenu() {
     if (ImGui::BeginMenu("Leveled")) {
+        if (ImGui::BeginMenu("HUD")) {
+            EnhancementCheckbox("EXP to NEXT Level", "gLeveledHUDExperienceNextLevel", false, "",
+                                UIWidgets::CheckboxGraphics::Checkmark, true);
+            UIWidgets::Tooltip("Show experience required to level up popup in the HUD when gaining EXP.");
+            ImGui::EndMenu();
+        }
+
         if (ImGui::BeginMenu("Floating Numbers")) {
             EnhancementCheckbox("Enemy Damage", "gLeveledFloatingNumberEnemyDamage", false, "",
                                 UIWidgets::CheckboxGraphics::Checkmark, true);

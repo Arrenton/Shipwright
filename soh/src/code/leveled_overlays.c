@@ -730,7 +730,7 @@ void Leveled_Interface_DrawNextLevel(PlayState* play) {
     } else {
         return;
     }
-    if (play->pauseCtx.state != 0)
+    if (play->pauseCtx.state != 0 || !CVarGetInteger("gLeveledHUDExperienceNextLevel", 1))
         return;
 
     Player* player = GET_PLAYER(play);
@@ -799,8 +799,13 @@ void Leveled_Interface_DrawNextLevel(PlayState* play) {
     for (u8 i = 0; i < digits; i++) {
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, 255 - play->pauseCtx.alpha);
 
-        for (j = 0; j < 4; j++) {
-            OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16, posX - i * width + width * (digits - 1) + numbersPosX + (j % 2) * 2 - 1, posY + (j / 2) * 2 - 1, 8, 16, 1 << 10, 1 << 10);
+        for (j = 0; j < 3; j++) {
+            for (u8 k = 0; k < 3; k++) {
+                if (j == 1 && k == 1)
+                    continue;
+        OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16,
+                                         posX - i * width + width * (digits - 1) + numbersPosX - 1 + k, posY - 1 + j, 8, 16, 1024, 1024);
+            }
         }
 
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, 255 - play->pauseCtx.alpha);
