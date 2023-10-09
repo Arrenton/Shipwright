@@ -3368,6 +3368,9 @@ void Message_Update(PlayState* play) {
                 gSaveContext.inventory.questItems ^= 0x40000000;
                 gSaveContext.healthCapacity += 0x10;
                 gSaveContext.health += heartUnits;
+                if (play != NULL) {
+                    Actor_RefreshLeveledStats(&GET_PLAYER(play)->actor, GET_PLAYER(play));
+                }
             }
             if (msgCtx->ocarinaAction != OCARINA_ACTION_CHECK_NOWARP_DONE) {
                 if (sLastPlayedSong == OCARINA_SONG_SARIAS) {

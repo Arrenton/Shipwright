@@ -2227,7 +2227,9 @@ u8 Item_Give(PlayState* play, u8 item) {
         gSaveContext.healthCapacity += 0x10;
         gSaveContext.health += heartUnits;
         gSaveContext.sohStats.heartContainers++;
-        Actor_RefreshLeveledStats(&GET_PLAYER(play)->actor, GET_PLAYER(play));
+        if (play != NULL) {
+            Actor_RefreshLeveledStats(&GET_PLAYER(play)->actor, GET_PLAYER(play));
+        }
         return Return_Item(item, MOD_NONE, ITEM_NONE);
     } else if (item == ITEM_HEART) {
         osSyncPrintf("回復ハート回復ハート回復ハート\n"); // "Recovery Heart"
