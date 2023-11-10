@@ -641,10 +641,11 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     }
 
     // Initialize textures
-        Leveled_DrawTexIA8(play, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 16, -114, -222, 8, 16, 255, 255, 255);
-        Leveled_DrawTexIA8(play, (u8*)gMsgChar76LatinSmallLetterVTex, 8, 16, -114, -222, 8, 16, 255, 255, 255);
-        Leveled_DrawTexIA8(play, (u8*)gMsgChar2BPlusSignTex, 8, 16, -114, -222, 8, 16, 255, 255, 255);
-        Leveled_DrawTexIA8(play, (u8*)gMsgChar2DHyphenMinusTex, 8, 16, -114, -222, 8, 16, 255, 255, 255);
+        Leveled_DrawTexI8(play, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 16, -114, -222, 16, 16, 255, 255, 255);
+        Leveled_DrawTexI8(play, (u8*)gMsgChar76LatinSmallLetterVTex, 8, 16, -114, -222, 16, 16, 255, 255, 255);
+        Leveled_DrawTexI8(play, (u8*)gMsgChar2BPlusSignTex, 8, 16, -114, -222, 8, 16, 255, 255, 255);
+        Leveled_DrawTexI8(play, (u8*)gMsgChar2DHyphenMinusTex, 8, 16, -114, -222, 8, 16, 255, 255, 255);
+        Leveled_DrawTexI8(play, (u8*)gMsgChar2FSolidusTex, 8, 16, -114, -222, 8, 16, 255, 255, 255);
     
     Leveled_DrawTex32(play, (u8*)gKokiriSwordIconTex, 32, 32, -192, -268, 32, 32);
     Leveled_DrawTex32(play, (u8*)gSilverGauntletsIconTex, 32, 32, -192, -268, 32, 32);
@@ -657,22 +658,21 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
 
     // Values and Icons
     // Level
-    for (u8 i = 0; i < 10; i++) {
-        Leveled_DrawTexIA8(play, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 8, 92, statY, 8, 16, 255, 255, 255);
-        Leveled_DrawTexIA8(play, (u8*)gMsgChar76LatinSmallLetterVTex, 8, 8, 95, statY, 8, 16, 255, 255, 255);
-    }
+    Leveled_DrawTexI8(play, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 8, 92, statY, 8, 16, 255, 255, 255);
+    Leveled_DrawTexI8(play, (u8*)gMsgChar76LatinSmallLetterVTex, 8, 8, 95, statY, 8, 16, 255, 255, 255);
+
     Leveled_BigValueNumberDraw(play, 100, statY - 6, player->actor.level, 255, 255, 255, 255);
     statY += 10;
     // Health
     Leveled_DrawTexIA8(play, (u8*)gHeartFullTex, 8, 8, 92, statY, 16, 16, 255, 70, 0);
-    Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 11, 116, statY - 2, 8, 16, 255, 255, 255);
+    Leveled_DrawTexI8(play, (u8*)gMsgChar2FSolidusTex, 8, 9, 119, statY - 1, 8, 9, 255, 255, 255);
     Leveled_ValueNumberDraw(play, 100, statY, gSaveContext.health, 255, 255, 255);
     Leveled_ValueNumberDraw(play, 123, statY, gSaveContext.healthCapacity2, 120, 255, 0);
     statY += 8;
     // Magic
     if (gSaveContext.magicCapacity > 0) {
         Leveled_DrawTex32(play, (u8*)gBigMagicJarIconTex, 8, 8, 92, statY, 24, 24);
-        Leveled_DrawTexI8(play, (u8*)digitTextures[1], 8, 11, 116, statY - 2, 8, 16, 255, 255, 255);
+        Leveled_DrawTexI8(play, (u8*)gMsgChar2FSolidusTex, 8, 9, 119, statY - 1, 8, 9, 255, 255, 255);
         Leveled_ValueNumberDraw(play, 100, statY, gSaveContext.magic, 255, 255, 255);
         Leveled_ValueNumberDraw(play, 123, statY, gSaveContext.magicCapacity, 120, 255, 0);
         statY += 8;
@@ -685,14 +685,10 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     Leveled_DrawTex32(play, (u8*)gSilverGauntletsIconTex, 8, 7, 92, statY, 8, 7);
     Leveled_ValueNumberDraw(play, 100, statY, player->actor.power, 255, 255, 255);
     if (player->actor.powerModifier > 0){
-        for (u8 i = 0; i < 10; i++) {
-            Leveled_DrawTexIA8(play, (u8*)gMsgChar2BPlusSignTex, 8, 8, 114, statY, 8, 16, 120, 255, 0);
-        }
+        Leveled_DrawTexI8(play, (u8*)gMsgChar2BPlusSignTex, 16, 12, 111, statY - 3, 8, 16, 120, 255, 0);
         Leveled_ValueNumberDraw(play, 118, statY, player->actor.powerModifier, 120, 255, 0);
     } else if (player->actor.powerModifier < 0){
-        for (u8 i = 0; i < 10; i++) {
-            Leveled_DrawTexIA8(play, (u8*)gMsgChar2DHyphenMinusTex, 8, 8, 114, statY, 8, 16, 255, 0, 0);
-        }
+        Leveled_DrawTexI8(play, (u8*)gMsgChar2DHyphenMinusTex, 16, 16, 111, statY - 5, 8, 16, 255, 0, 0);
         Leveled_ValueNumberDraw(play, 118, statY, -player->actor.powerModifier, 255, 0, 0);
     }
     statY += 8;
@@ -700,14 +696,10 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     Leveled_DrawTex32(play, (u8*)gHylianShieldIconTex, 8, 7, 92, statY, 8, 7);
     Leveled_ValueNumberDraw(play, 100, statY, player->actor.courage, 255, 255, 255);
     if (player->actor.courageModifier > 0){
-        for (u8 i = 0; i < 10; i++) {
-            Leveled_DrawTexIA8(play, (u8*)gMsgChar2BPlusSignTex, 8, 8, 114, statY, 8, 16, 120, 255, 0);
-        }
+        Leveled_DrawTexI8(play, (u8*)gMsgChar2BPlusSignTex, 16, 12, 111, statY - 3, 8, 16, 120, 255, 0);
         Leveled_ValueNumberDraw(play, 118, statY, player->actor.courageModifier, 120, 255, 0);
     } else if (player->actor.courageModifier < 0){
-        for (u8 i = 0; i < 10; i++) {
-            Leveled_DrawTexIA8(play, (u8*)gMsgChar2DHyphenMinusTex, 8, 8, 114, statY, 8, 16, 255, 0, 0);
-        }
+        Leveled_DrawTexI8(play, (u8*)gMsgChar2DHyphenMinusTex, 16, 16, 113, statY - 5, 8, 16, 255, 0, 0);
         Leveled_ValueNumberDraw(play, 118, statY, -player->actor.courageModifier, 255, 0, 0);
     }
     statY += 67;

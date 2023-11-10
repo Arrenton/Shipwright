@@ -20,10 +20,12 @@ u8 GetPlayerStat_MagicUnits(u8 level);
 u16 GetPlayerStat_GetModifiedHealthCapacity(u16 baseHealth, u8 level);
 u16 GetPlayerStat_NextLevelExpAtLevel(u8 level);
 u16 GetActorStat_NextLevelExp(u8 level, u32 currentExp);
+u16 GetEnemyExperienceReward(u8 level, u16 expRate);
 f32 Leveled_DamageFormula(f32 attack, u8 power, u8 courage);
 f32 Leveled_DamageModify(Actor * actor, Actor * attackingActor, f32 attack);
 u16 Leveled_GoldSkulltulaExperience(u8 tokens);
 void Leveled_SetPlayerModifiedStats(Player * player);
+s8 Leveled_GetSceneLevel(s16 sceneId);
 
 #ifdef __cplusplus
 }
