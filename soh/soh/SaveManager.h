@@ -19,6 +19,7 @@ typedef struct {
     s16 buildVersionMajor;
     s16 buildVersionMinor;
     s16 buildVersionPatch;
+    u8 level;
 } SaveFileMetaInfo;
 
 #ifdef __cplusplus

@@ -363,6 +363,7 @@ void EnFz_ApplyDamage(EnFz* this, PlayState* play) {
                         vec.z = this->actor.world.pos.z;
                         EnFz_Damaged(this, play, &vec, 30, 10.0f);
                         EnFz_SetupDespawn(this, play);
+                        Player_GainExperience(play, this->actor.exp);
                         gSaveContext.sohStats.count[COUNT_ENEMIES_DEFEATED_FREEZARD]++;
                     }
                 }
@@ -371,6 +372,7 @@ void EnFz_ApplyDamage(EnFz* this, PlayState* play) {
                 Actor_SetColorFilter(&this->actor, 0x4000, 0xFF, 0x2000, 8);
                 if (this->actor.colChkInfo.health == 0) {
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_FREEZAD_DEAD);
+                    Player_GainExperience(play, this->actor.exp);
                     EnFz_SetupMelt(this);
                 } else {
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_FREEZAD_DAMAGE);
@@ -717,7 +719,7 @@ void EnFz_Draw(Actor* thisx, PlayState* play) {
     s32 pad;
     s32 index;
 
-    index = (6 - this->actor.colChkInfo.health) >> 1;
+    index = (6 - (u8)CLAMP(((f32)this->actor.colChkInfo.health / GetActorStat_EnemyMaxHealth(6, this->actor.level) * 5 + 0.99999f), 0, 6)) >> 1;
 
     OPEN_DISPS(play->state.gfxCtx);
 

@@ -673,6 +673,7 @@ void func_809D0424(EnBw* this, PlayState* play) {
                 this->unk_230 = 1;
             }
             Item_DropCollectibleRandom(play, &this->actor, &this->actor.world.pos, 0x90);
+            Player_GainExperience(play, this->actor.exp);
             func_809D00F4(this);
         }
     }
@@ -716,6 +717,7 @@ void func_809D0584(EnBw* this, PlayState* play) {
                         this->unk_230 = 1;
                     }
                     Item_DropCollectibleRandom(play, &this->actor, &this->actor.world.pos, 0x90);
+                    Player_GainExperience(play, this->actor.exp);
                     func_809D00F4(this);
                 }
             } else if ((this->unk_220 != 1) && (this->unk_220 != 6)) {
