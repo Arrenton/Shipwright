@@ -104,14 +104,7 @@ u16 GetEnemyExperienceReward(u8 level, u16 expRate) {
     if (expRate == 0)
         return 0;
 
-    return min(
-        max(
-            round(
-                (3 + min(floor(level / 6) * 4, 4) + (level - 1) * ((0.1 + (level / 95.0)) + pow(max(level - 8, 0), 1.25) / 80.0)) * expRate / 100.0
-            ), 1
-        ), 
-        9999
-    );
+    return CLAMP(round((3 + CLAMP_MAX(floor(level / 6) * 4, 4) + (level - 1) * ((0.1 + (level / 95.0)) + pow(CLAMP_MIN(level - 8, 0), 1.25) / 80.0)) * expRate / 100.0), 1, 9999);
 }
 
 f32 Leveled_DamageFormula(f32 attack, u8 power, u8 courage) {

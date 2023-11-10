@@ -954,7 +954,7 @@ void Actor_GetLevelAndExperience(PlayState* play, Actor* actor, u16 actorIdOverr
 
     s8 sceneLevel = Leveled_GetSceneLevel(play->sceneNum);
     if (!levelEntry.ignoreEntry && sceneLevel >= 0) {
-        actor->level = max(sceneLevel + levelEntry.levelModifier, 1);
+        actor->level = CLAMP_MIN(sceneLevel + levelEntry.levelModifier, 1);
         actor->exp = GetEnemyExperienceReward(actor->level, levelEntry.experienceRate);
     }
 }
