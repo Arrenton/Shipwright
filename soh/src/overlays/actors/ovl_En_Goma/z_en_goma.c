@@ -616,7 +616,7 @@ void EnGoma_UpdateHit(EnGoma* this, PlayState* play) {
         this->hurtTimer--;
     } else {
         ColliderInfo* acHitInfo;
-        u8 swordDamage;
+        u16 swordDamage;
 
         if ((this->colCyl1.base.atFlags & 2) && this->actionFunc == EnGoma_Jump) {
             EnGoma_SetupLand(this);
@@ -655,7 +655,9 @@ void EnGoma_UpdateHit(EnGoma* this, PlayState* play) {
                         swordDamage = 1;
                     }
 
+                    swordDamage = Leveled_DamageModify(&this->actor, &player->actor, swordDamage * HEALTH_ATTACK_MULTIPLIER);
                     this->actor.colChkInfo.health -= swordDamage;
+                    ActorDamageNumber_New(&this->actor, swordDamage);
                     EnGoma_SetupHurt(this, play);
                     Actor_SetColorFilter(&this->actor, 0x4000, 255, 0, 5);
                     this->hurtTimer = 13;

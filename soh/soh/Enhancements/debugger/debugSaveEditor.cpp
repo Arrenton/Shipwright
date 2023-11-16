@@ -341,12 +341,12 @@ void DrawInfoTab() {
         gSaveContext.healthCapacity = healthIntermediary;
     }
     UIWidgets::InsertHelpHoverText("Maximum health. 16 units per full heart");
-    if (gSaveContext.health > gSaveContext.healthCapacity) {
-        gSaveContext.health = gSaveContext.healthCapacity; // Clamp health to new max
+    if (gSaveContext.health > gSaveContext.healthCapacity2) {
+        gSaveContext.health = gSaveContext.healthCapacity2; // Clamp health to new max
     }
 
     const uint16_t healthMin = 0;
-    const uint16_t healthMax = gSaveContext.healthCapacity;
+    const uint16_t healthMax = gSaveContext.healthCapacity2;
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
     ImGui::SliderScalar("Health", ImGuiDataType_S16, &gSaveContext.health, &healthMin, &healthMax);
     UIWidgets::InsertHelpHoverText("Current health. 16 units per full heart");
@@ -388,7 +388,7 @@ void DrawInfoTab() {
         ImGui::EndCombo();
     }
     UIWidgets::InsertHelpHoverText("Current magic level");
-    gSaveContext.magicCapacity = gSaveContext.magicLevel * 0x30; // Set to get the bar drawn in the UI
+    gSaveContext.magicCapacity = gSaveContext.magicLevel * gSaveContext.magicUnits; // Set to get the bar drawn in the UI
     if (gSaveContext.magic > gSaveContext.magicCapacity) {
         gSaveContext.magic = gSaveContext.magicCapacity; // Clamp magic to new max
     }
@@ -396,7 +396,7 @@ void DrawInfoTab() {
     const uint8_t magicMin = 0;
     const uint8_t magicMax = gSaveContext.magicCapacity;
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
-    ImGui::SliderScalar("Magic", ImGuiDataType_S8, &gSaveContext.magic, &magicMin, &magicMax);
+    ImGui::SliderScalar("Magic", ImGuiDataType_U8, &gSaveContext.magic, &magicMin, &magicMax);
     UIWidgets::InsertHelpHoverText("Current magic. 48 units per magic level");
 
     ImGui::InputScalar("Rupees", ImGuiDataType_S16, &gSaveContext.rupees);
