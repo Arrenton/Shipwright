@@ -630,8 +630,11 @@ void Leveled_BigValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, 
 void Leveled_KaleidoEquip_Stats(PlayState* play) {
     extern const char* digitTextures[];
     Player* player = GET_PLAYER(play);
-    u16 statY = 70;
+    u16 statX = 92;
+    u16 statY = 76;
     u8 attack = 1;
+    Color_RGBA8 textColor = { 255, 255, 255, 255 };
+
     if (CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD) == 1)
         attack = HEALTH_ATTACK_MULTIPLIER;
     if (CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD) == 2)
@@ -645,8 +648,6 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     // Initialize textures
         Leveled_DrawTexI8(play, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 16, -114, -222, 16, 16, 255, 255, 255);
         Leveled_DrawTexI8(play, (u8*)gMsgChar76LatinSmallLetterVTex, 8, 16, -114, -222, 16, 16, 255, 255, 255);
-        Leveled_DrawTexI8(play, (u8*)gMsgChar2BPlusSignTex, 8, 16, -114, -222, 8, 16, 255, 255, 255);
-        Leveled_DrawTexI8(play, (u8*)gMsgChar2DHyphenMinusTex, 8, 16, -114, -222, 8, 16, 255, 255, 255);
         Leveled_DrawTexI8(play, (u8*)gMsgChar2FSolidusTex, 8, 16, -114, -222, 8, 16, 255, 255, 255);
     
     Leveled_DrawTex32(play, (u8*)gItemIconSwordKokiriTex, 32, 32, -192, -268, 32, 32);
@@ -660,61 +661,66 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
 
     // Values and Icons
     // Level
-    Leveled_DrawTexI8(play, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 8, 92, statY, 8, 16, 255, 255, 255);
-    Leveled_DrawTexI8(play, (u8*)gMsgChar76LatinSmallLetterVTex, 8, 8, 95, statY, 8, 16, 255, 255, 255);
+    Leveled_DrawTexI8(play, (u8*)gMsgChar4CLatinCapitalLetterLTex, 8, 8, statX + 2, statY, 8, 16, 255, 255, 255);
+    Leveled_DrawTexI8(play, (u8*)gMsgChar76LatinSmallLetterVTex, 8, 8, statX + 5, statY, 8, 16, 255, 255, 255);
 
-    Leveled_BigValueNumberDraw(play, 100, statY - 6, player->actor.level, 255, 255, 255, 255);
+    Leveled_BigValueNumberDraw(play, statX + 10, statY - 6, player->actor.level, 255, 255, 255, 255);
     statY += 10;
     // Health
-    Leveled_DrawTexIA8(play, (u8*)gHeartFullTex, 8, 8, 92, statY, 16, 16, 255, 70, 0);
-    Leveled_DrawTexI8(play, (u8*)gMsgChar2FSolidusTex, 8, 9, 119, statY - 1, 8, 9, 255, 255, 255);
-    Leveled_ValueNumberDraw(play, 100, statY, gSaveContext.health, 255, 255, 255);
-    Leveled_ValueNumberDraw(play, 123, statY, gSaveContext.healthCapacity2, 120, 255, 0);
+    Leveled_DrawTexIA8(play, (u8*)gHeartFullTex, 8, 8, statX + 2, statY, 16, 16, 255, 70, 0);
+    Leveled_DrawTexI8(play, (u8*)gMsgChar2FSolidusTex, 8, 9, statX + 29, statY - 1, 8, 9, 255, 255, 255);
+    Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.health, 255, 255, 255);
+    Leveled_ValueNumberDraw(play, statX + 33, statY, gSaveContext.healthCapacity2, 120, 255, 0);
     statY += 8;
     // Magic
     if (gSaveContext.magicCapacity > 0) {
-        Leveled_DrawTex32(play, (u8*)gQuestIconMagicJarBigTex, 8, 8, 92, statY, 24, 24);
-        Leveled_DrawTexI8(play, (u8*)gMsgChar2FSolidusTex, 8, 9, 119, statY - 1, 8, 9, 255, 255, 255);
-        Leveled_ValueNumberDraw(play, 100, statY, gSaveContext.magic, 255, 255, 255);
-        Leveled_ValueNumberDraw(play, 123, statY, gSaveContext.magicCapacity, 120, 255, 0);
+        Leveled_DrawTex32(play, (u8*)gQuestIconMagicJarBigTex, 8, 8, statX + 2, statY, 24, 24);
+        Leveled_DrawTexI8(play, (u8*)gMsgChar2FSolidusTex, 8, 9, statX + 29, statY - 1, 8, 9, 255, 255, 255);
+        Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.magic, 255, 255, 255);
+        Leveled_ValueNumberDraw(play, statX + 33, statY, gSaveContext.magicCapacity, 120, 255, 0);
         statY += 8;
     }
     // Attack
-    Leveled_DrawTex32(play, (u8*)gItemIconSwordKokiriTex, 10, 12, 90, statY - 1, 10, 8);
-    Leveled_ValueNumberDraw(play, 100, statY, GetActorStat_Attack(attack, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255)), 255, 255, 255);
+    Leveled_DrawTex32(play, (u8*)gItemIconSwordKokiriTex, 10, 12, statX, statY - 1, 10, 8);
+    Leveled_ValueNumberDraw(play, statX + 10, statY, GetActorStat_Attack(attack, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255)), 255, 255, 255);
     statY += 8;
     // Power
-    Leveled_DrawTex32(play, (u8*)gItemIconSilverGauntletsTex, 8, 7, 92, statY, 8, 7);
-    Leveled_ValueNumberDraw(play, 100, statY, player->actor.power, 255, 255, 255);
-    if (player->actor.powerModifier > 0){
-        Leveled_DrawTexI8(play, (u8*)gMsgChar2BPlusSignTex, 16, 12, 111, statY - 3, 8, 16, 120, 255, 0);
-        Leveled_ValueNumberDraw(play, 118, statY, player->actor.powerModifier, 120, 255, 0);
-    } else if (player->actor.powerModifier < 0){
-        Leveled_DrawTexI8(play, (u8*)gMsgChar2DHyphenMinusTex, 16, 16, 111, statY - 5, 8, 16, 255, 0, 0);
-        Leveled_ValueNumberDraw(play, 118, statY, -player->actor.powerModifier, 255, 0, 0);
+    if (player->actor.powerModifier > 0) {
+        textColor.r = 120;
+        textColor.g = 255;
+        textColor.b = 0;
+    } else if (player->actor.powerModifier < 0) {
+        textColor.r = 255;
+        textColor.g = 0;
+        textColor.b = 0;
     }
+    Leveled_DrawTex32(play, (u8*)gItemIconSilverGauntletsTex, 8, 7, statX + 2, statY, 8, 7);
+    Leveled_ValueNumberDraw(play, statX + 10, statY, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255), textColor.r, textColor.g, textColor.b);
     statY += 8;
     // Courage
-    Leveled_DrawTex32(play, (u8*)gItemIconShieldHylianTex, 8, 7, 92, statY, 8, 7);
-    Leveled_ValueNumberDraw(play, 100, statY, player->actor.courage, 255, 255, 255);
-    if (player->actor.courageModifier > 0){
-        Leveled_DrawTexI8(play, (u8*)gMsgChar2BPlusSignTex, 16, 12, 111, statY - 3, 8, 16, 120, 255, 0);
-        Leveled_ValueNumberDraw(play, 118, statY, player->actor.courageModifier, 120, 255, 0);
-    } else if (player->actor.courageModifier < 0){
-        Leveled_DrawTexI8(play, (u8*)gMsgChar2DHyphenMinusTex, 16, 16, 113, statY - 5, 8, 16, 255, 0, 0);
-        Leveled_ValueNumberDraw(play, 118, statY, -player->actor.courageModifier, 255, 0, 0);
+    if (player->actor.courageModifier > 0) {
+        textColor.r = 120;
+        textColor.g = 255;
+        textColor.b = 0;
+    } else if (player->actor.courageModifier < 0) {
+        textColor.r = 255;
+        textColor.g = 0;
+        textColor.b = 0;
     }
-    statY += 67;
+    Leveled_DrawTex32(play, (u8*)gItemIconShieldHylianTex, 8, 7, statX + 2, statY, 8, 7);
+    Leveled_ValueNumberDraw(play, statX + 10, statY, CLAMP(player->actor.courage + player->actor.courageModifier, 0, 255), textColor.r, textColor.g, textColor.b);
+    statX = 90;
+    statY += 60;
     if (gSaveContext.magicCapacity > 0) {
         statY -= 8;
     }
     // EXP
-    Leveled_DrawTex32(play, (u8*)gItemIconGoronsBraceletTex, 8, 7, 92, statY, 10, 7);
-    Leveled_ValueNumberDraw(play, 100, statY, gSaveContext.experience, 255, 255, 255);
+    Leveled_DrawTex32(play, (u8*)gItemIconGoronsBraceletTex, 8, 7, statX + 2, statY, 10, 7);
+    Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.experience, 255, 255, 255);
     statY += 8;
     // Next LV
-    Leveled_DrawTex4b(play, (u8*)gNextDoActionENGTex, 24, 10, 84, statY, 24, 7);
-    Leveled_ValueNumberDraw(play, 112, statY,
+    Leveled_DrawTex4b(play, (u8*)gNextDoActionENGTex, 24, 10, statX - 6, statY, 24, 7);
+    Leveled_ValueNumberDraw(play, statX + 22, statY,
                             GetActorStat_NextLevelExp(player->actor.level, gSaveContext.experience), 255, 255, 255);
 }
 
