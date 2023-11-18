@@ -764,6 +764,13 @@ void Leveled_Anubis(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) 
     }
 }
 
+void Leveled_Arwing(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) {
+    actor->level = 20;
+    actor->exp = 50;
+    levelEntry->levelModifier = 3;
+    levelEntry->experienceRate = 215;
+}
+
 
 void Actor_GetLevelAndExperience(PlayState* play, Actor* actor, u16 actorIdOverride) {
     SceneLevelEntry levelEntry;
@@ -946,6 +953,9 @@ void Actor_GetLevelAndExperience(PlayState* play, Actor* actor, u16 actorIdOverr
         case ACTOR_EN_ANUBICE:
         case ACTOR_EN_ANUBICE_FIRE:
             Leveled_Anubis(play, actor, &levelEntry);
+            break;
+        case ACTOR_EN_CLEAR_TAG:
+            Leveled_Arwing(play, actor, &levelEntry);
             break;
         default:
             actor->level = GET_PLAYER(play)->actor.level;

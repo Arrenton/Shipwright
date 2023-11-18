@@ -371,10 +371,17 @@ void EnClearTag_Update(Actor* thisx, PlayState* play2) {
                     this->acceleration.z = Rand_CenteredFloat(15.0f);
 
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_FANTOM_THUNDER_GND);
-                    this->actor.colChkInfo.health--;
-                    if ((s8)this->actor.colChkInfo.health <= 0) {
+                    u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, HEALTH_ATTACK_MULTIPLIER);
+                    if (damage <= this->actor.colChkInfo.health) {
+                        this->actor.colChkInfo.health -= damage;
+                    } else {
+                        this->actor.colChkInfo.health = 0;
+                    }
+                    ActorDamageNumber_New(&this->actor, damage);
+                    if (this->actor.colChkInfo.health <= 0) {
                         this->state = CLEAR_TAG_STATE_CRASHING;
                         this->actor.velocity.y = 0.0f;
+                        Player_GainExperience(play, this->actor.exp);
                         GameInteractor_ExecuteOnEnemyDefeat(&this->actor);
                         goto state_crashing;
                     }
