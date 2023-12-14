@@ -2879,7 +2879,7 @@ void KaleidoScope_InitVertices(PlayState* play, GraphicsContext* gfxCtx) {
         }
     }
 
-    pauseCtx->equipVtx = Graph_Alloc(gfxCtx, 112 * sizeof(Vtx));
+    pauseCtx->equipVtx = Graph_Alloc(gfxCtx, (112 + 140) * sizeof(Vtx));
 
     for (phi_t4 = 0, phi_t2 = 0, phi_t5 = 58; phi_t2 < 4; phi_t2++, phi_t5 -= 32) {
         for (phi_t3 = 0; phi_t3 < 4; phi_t3++, phi_t4 += 4) {
@@ -3006,6 +3006,8 @@ void KaleidoScope_InitVertices(PlayState* play, GraphicsContext* gfxCtx) {
 
         phi_t4 += 4;
     }
+
+    Leveled_Keleido_EquipStats_InitVertices(play);
 
     pauseCtx->questVtx = Graph_Alloc(gfxCtx, 188 * sizeof(Vtx));
 

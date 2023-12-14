@@ -1,5 +1,5 @@
-#ifndef LEVELED_OVERLAYS_H
-#define LEVELED_OVERLAYS_H
+#ifndef leveled_interface_H
+#define leveled_interface_H
 #include "z64.h"
 #endif
 

@@ -8,7 +8,7 @@
 #include "functions.h"
 #include "variables.h"
 #include "macros.h"
-#include "leveled_overlays.h"
+#include "leveled_interface.h"
 #include "leveled_stat_math.h"
 #include "leveled_actor_level_table.h"
 #include "soh/OTRGlobals.h"

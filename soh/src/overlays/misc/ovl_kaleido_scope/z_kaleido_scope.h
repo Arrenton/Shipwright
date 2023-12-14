@@ -3,6 +3,7 @@
 
 #include <libultraship/libultra.h>
 #include "global.h"
+#include "leveled_keleido_equipment_stats.h"
 
 extern u8 gAmmoItems[];
 extern s16 D_8082AAEC[];
