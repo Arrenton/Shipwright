@@ -9,6 +9,56 @@
 extern const char* _gAmmoDigit0Tex[];
 extern const char* digitTextures[];
 
+typedef enum {
+    LEVEL_L = 112,
+    LEVEL_V = 116,
+    HEALTH_ICON = 120,
+    MAGIC_ICON = 124,
+    ATTACK_ICON = 128,
+    POWER_ICON = 132,
+    COURAGE_ICON = 136,
+    EXP_ICON = 140,
+    NEXTLV_ICON = 144,
+    HEALTH_DIVIDER = 148,
+    MAGIC_DIVIDER = 152,
+    LEVEL_DIGIT_1 = 156,
+    LEVEL_DIGIT_2 = 160,
+    HEALTH_DIGIT_1 = 164,
+    HEALTH_DIGIT_2 = 168,
+    HEALTH_DIGIT_3 = 172,
+    HEALTH_DIGIT_4 = 176,
+    MAXHEALTH_DIGIT_1 = 180,
+    MAXHEALTH_DIGIT_2 = 184,
+    MAXHEALTH_DIGIT_3 = 188,
+    MAXHEALTH_DIGIT_4 = 192,
+    MAGIC_DIGIT_1 = 196,
+    MAGIC_DIGIT_2 = 200,
+    MAGIC_DIGIT_3 = 204,
+    MAXMAGIC_DIGIT_1 = 208,
+    MAXMAGIC_DIGIT_2 = 212,
+    MAXMAGIC_DIGIT_3 = 216,
+    ATTACK_DIGIT_1 = 220,
+    ATTACK_DIGIT_2 = 224,
+    ATTACK_DIGIT_3 = 228,
+    ATTACK_DIGIT_4 = 232,
+    POWER_DIGIT_1 = 236,
+    POWER_DIGIT_2 = 240,
+    POWER_DIGIT_3 = 244,
+    COURAGE_DIGIT_1 = 248,
+    COURAGE_DIGIT_2 = 252,
+    COURAGE_DIGIT_3 = 256,
+    EXP_DIGIT_1 = 260,
+    EXP_DIGIT_2 = 264,
+    EXP_DIGIT_3 = 268,
+    EXP_DIGIT_4 = 272,
+    EXP_DIGIT_5 = 276,
+    EXP_DIGIT_6 = 280,
+    NEXTLV_DIGIT_1 = 284,
+    NEXTLV_DIGIT_2 = 288,
+    NEXTLV_DIGIT_3 = 292,
+    NEXTLV_DIGIT_4 = 296,
+    NEXTLV_DIGIT_5 = 300
+} ElementVtxIndex;
 
 
 void Leveled_Keleido_Draw4b(PlayState* play, u16 vtxIndex, void* texture, u8 width, u8 height, Color_RGB8* color) {
@@ -56,8 +106,8 @@ void Leveled_Keleido_DrawIA8(PlayState* play, u16 vtxIndex, void* texture, u8 wi
 
     OPEN_DISPS(play->state.gfxCtx);
 
-    gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, color->r, color->g, color->b, pauseCtx->alpha);
     gDPPipeSync(POLY_KAL_DISP++);
+    gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, color->r, color->g, color->b, pauseCtx->alpha);
 
     gSPVertex(POLY_KAL_DISP++, &play->pauseCtx.equipVtx[vtxIndex], 4, 0);
     POLY_KAL_DISP = KaleidoScope_QuadTextureIA8(POLY_KAL_DISP, texture, width, height, 0);
@@ -71,8 +121,8 @@ void Leveled_Keleido_Draw32(PlayState* play, u16 vtxIndex, void* texture, u8 wid
 
     OPEN_DISPS(play->state.gfxCtx);
 
-    gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, color->r, color->g, color->b, pauseCtx->alpha);
     gDPPipeSync(POLY_KAL_DISP++);
+    gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, color->r, color->g, color->b, pauseCtx->alpha);
 
     gSPVertex(POLY_KAL_DISP++, &play->pauseCtx.equipVtx[vtxIndex], 4, 0);
     KaleidoScope_DrawQuadTextureRGBA32(play->state.gfxCtx, texture, width, height, 0);
@@ -184,8 +234,6 @@ void Leveled_Keleido_Vtx_DrawLargeNumber(PlayState* play, Vtx* vtx, u16 vtxIndex
 }
 
 void Leveled_Keleido_EquipStats_Draw(PlayState* play) {
-    u16 vtxIndex = 0;
-    u16 vtxIndexStart = 112;
     u8 attack = 1;
     Player* player = GET_PLAYER(play);
     Color_RGB8 textColor = { 255, 255, 255 };
@@ -207,40 +255,26 @@ void Leveled_Keleido_EquipStats_Draw(PlayState* play) {
                       ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
     gDPSetTextureFilter(POLY_KAL_DISP++, G_TF_AVERAGE);
 
-    Leveled_Keleido_Draw4b(play, vtxIndexStart + vtxIndex++ * 4, gMsgChar4CLatinCapitalLetterLTex, 16, 16, &(Color_RGB8){ 255, 255, 255 });
-    Leveled_Keleido_Draw4b(play, vtxIndexStart + vtxIndex++ * 4, gMsgChar76LatinSmallLetterVTex, 16, 16, &(Color_RGB8){ 255, 255, 255 });
-    Leveled_Keleido_DrawIA8(play, vtxIndexStart + vtxIndex++ * 4, gHeartFullTex, 16, 16, &(Color_RGB8){ 255, 77, 55 });
-    if (gSaveContext.magicCapacity > 0)
-        Leveled_Keleido_Draw32(play, vtxIndexStart + vtxIndex++ * 4, gQuestIconMagicJarBigTex, 24, 24, &(Color_RGB8){ 255, 255, 255 });
-    else
-        vtxIndex++;
-    Leveled_Keleido_Draw32(play, vtxIndexStart + vtxIndex++ * 4, gItemIconSwordKokiriTex, 32, 32, &(Color_RGB8){ 255, 255, 255 });
-    Leveled_Keleido_Draw32(play, vtxIndexStart + vtxIndex++ * 4, gItemIconSilverGauntletsTex, 32, 32, &(Color_RGB8){ 255, 255, 255 });
-    Leveled_Keleido_Draw32(play, vtxIndexStart + vtxIndex++ * 4, gItemIconShieldHylianTex, 32, 32, &(Color_RGB8){ 255, 255, 255 });
-    Leveled_Keleido_Draw32(play, vtxIndexStart + vtxIndex++ * 4, gItemIconGoronsBraceletTex, 32, 32, &(Color_RGB8){ 255, 255, 255 });
-    Leveled_Keleido_Draw4b(play, vtxIndexStart + vtxIndex++ * 4, gNextDoActionENGTex, 48, 16, &(Color_RGB8){ 255, 255, 255 });
-    Leveled_Keleido_Draw4b(play, vtxIndexStart + vtxIndex++ * 4, gMsgChar2FSolidusTex, 16, 16, &(Color_RGB8){ 255, 255, 255 });
-    if (gSaveContext.magicCapacity > 0)
-        Leveled_Keleido_Draw4b(play, vtxIndexStart + vtxIndex++ * 4, gMsgChar2FSolidusTex, 16, 16, &(Color_RGB8){ 255, 255, 255 });
-    else
-        vtxIndex++;
+    Leveled_Keleido_Draw4b(play, LEVEL_L, gMsgChar4CLatinCapitalLetterLTex, 16, 16, &(Color_RGB8){ 255, 255, 255 });
+    Leveled_Keleido_Draw4b(play, LEVEL_V, gMsgChar76LatinSmallLetterVTex, 16, 16, &(Color_RGB8){ 255, 255, 255 });
+    Leveled_Keleido_DrawIA8(play, HEALTH_ICON, gHeartFullTex, 16, 16, &(Color_RGB8){ 255, 77, 55 });
+    Leveled_Keleido_Draw32(play, MAGIC_ICON, gQuestIconMagicJarBigTex, 24, 24, &(Color_RGB8){ 255, 255, 255 });
+    Leveled_Keleido_Draw32(play, ATTACK_ICON, gItemIconSwordKokiriTex, 32, 32, &(Color_RGB8){ 255, 255, 255 });
+    Leveled_Keleido_Draw32(play, POWER_ICON, gItemIconSilverGauntletsTex, 32, 32, &(Color_RGB8){ 255, 255, 255 });
+    Leveled_Keleido_Draw32(play, COURAGE_ICON, gItemIconShieldHylianTex, 32, 32, &(Color_RGB8){ 255, 255, 255 });
+    Leveled_Keleido_Draw32(play, EXP_ICON, gItemIconGoronsBraceletTex, 32, 32, &(Color_RGB8){ 255, 255, 255 });
+    Leveled_Keleido_Draw4b(play, NEXTLV_ICON, gNextDoActionENGTex, 48, 16, &(Color_RGB8){ 255, 255, 255 });
+    Leveled_Keleido_Draw4b(play, HEALTH_DIVIDER, gMsgChar2FSolidusTex, 16, 16, &(Color_RGB8){ 255, 255, 255 });
+    Leveled_Keleido_Draw4b(play, MAGIC_DIVIDER, gMsgChar2FSolidusTex, 16, 16, &(Color_RGB8){ 255, 255, 255 });
 
-    Leveled_Keleido_Vtx_DrawLargeNumber(play, play->pauseCtx.equipVtx, vtxIndexStart + vtxIndex * 4, player->actor.level, 2, &(Color_RGB8){ 255, 255, 255 });
-    vtxIndex += 2;
-    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, vtxIndexStart + vtxIndex * 4, gSaveContext.health, 4, &(Color_RGB8){ 255, 255, 255 });
-    vtxIndex += 4;
-    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, vtxIndexStart + vtxIndex * 4, gSaveContext.healthCapacity2, 4, &(Color_RGB8){ 120, 255, 0 });
-    vtxIndex += 4;
+    Leveled_Keleido_Vtx_DrawLargeNumber(play, play->pauseCtx.equipVtx, LEVEL_DIGIT_1, player->actor.level, 2, &(Color_RGB8){ 255, 255, 255 });
+    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, HEALTH_DIGIT_1, gSaveContext.health, 4, &(Color_RGB8){ 255, 255, 255 });
+    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, MAXHEALTH_DIGIT_1, gSaveContext.healthCapacity2, 4, &(Color_RGB8){ 120, 255, 0 });
     if (gSaveContext.magicCapacity > 0) {
-        Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, vtxIndexStart + vtxIndex * 4, gSaveContext.magic, 3, &(Color_RGB8){ 255, 255, 255 });
-        vtxIndex += 3;
-        Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, vtxIndexStart + vtxIndex * 4, gSaveContext.magicCapacity, 3, &(Color_RGB8){ 120, 255, 0 });
-        vtxIndex += 3;
-    } else {
-        vtxIndex += 6;
+        Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, MAGIC_DIGIT_1, gSaveContext.magic, 3, &(Color_RGB8){ 255, 255, 255 });
+        Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, MAXMAGIC_DIGIT_1, gSaveContext.magicCapacity, 3, &(Color_RGB8){ 120, 255, 0 });
     }
-    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, vtxIndexStart + vtxIndex * 4, GetActorStat_Attack(attack, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255)), 4, &(Color_RGB8){ 255, 255, 255 });
-    vtxIndex += 4;
+    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, ATTACK_DIGIT_1, GetActorStat_Attack(attack, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255)), 4, &(Color_RGB8){ 255, 255, 255 });
     if (player->actor.powerModifier > 0) {
         textColor.r = 120;
         textColor.g = 255;
@@ -250,8 +284,7 @@ void Leveled_Keleido_EquipStats_Draw(PlayState* play) {
         textColor.g = 0;
         textColor.b = 0;
     }
-    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, vtxIndexStart + vtxIndex * 4, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255), 3, &textColor);
-    vtxIndex += 3;
+    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, POWER_DIGIT_1, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255), 3, &textColor);
     if (player->actor.courageModifier > 0) {
         textColor.r = 120;
         textColor.g = 255;
@@ -261,14 +294,9 @@ void Leveled_Keleido_EquipStats_Draw(PlayState* play) {
         textColor.g = 0;
         textColor.b = 0;
     }
-    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, vtxIndexStart + vtxIndex * 4, CLAMP(player->actor.courage + player->actor.courageModifier, 0, 255), 3, &textColor);
-    vtxIndex += 3;
-    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, vtxIndexStart + vtxIndex * 4, gSaveContext.experience, 6, &(Color_RGB8){ 255, 255, 255 });
-    vtxIndex += 6;
-    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, vtxIndexStart + vtxIndex * 4, GetActorStat_NextLevelExp(player->actor.level, gSaveContext.experience), 5, &(Color_RGB8){ 255, 255, 255 });
-    vtxIndex += 5;
-
-    
+    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, COURAGE_DIGIT_1, CLAMP(player->actor.courage + player->actor.courageModifier, 0, 255), 3, &textColor);
+    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, EXP_DIGIT_1, gSaveContext.experience, 6, &(Color_RGB8){ 255, 255, 255 });
+    Leveled_Keleido_Vtx_DrawSmallNumber(play, play->pauseCtx.equipVtx, NEXTLV_DIGIT_1, GetActorStat_NextLevelExp(player->actor.level, gSaveContext.experience), 5, &(Color_RGB8){ 255, 255, 255 });
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
@@ -308,31 +336,32 @@ void Leveled_Keleido_CreateQuadVertexGroup(Vtx* vtxList, s32 xStart, s32 yStart,
 void Leveled_Keleido_EquipStats_InitVertices(PlayState* play) {
     PauseContext* pauseCtx = &play->pauseCtx;
     u16 vtxIndex = 112;
-    u16 xPos = -66;
-    u16 yPos = -54 - pauseCtx->offsetY;
+    u8 i = 0;
+    s16 xPos = -66;
+    s16 yPos = -54 - pauseCtx->offsetY;
     u8 smallNumberSpacing = 6;
 
     // L
-    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[112], xPos + 2, -yPos - 6, 8, 8, false, 0.5f);
+    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[LEVEL_L], xPos + 2, -yPos - 6, 8, 8, false, 0.5f);
     // V
-    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[116], xPos + 5, -yPos - 6, 8, 8, false, 0.5f);
+    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[LEVEL_V], xPos + 5, -yPos - 6, 8, 8, false, 0.5f);
     // Lv Digits
-    for (int i = 0, vtxIndex = 156; vtxIndex < 164; vtxIndex += 4, i++) {
+    for (i = 0, vtxIndex = LEVEL_DIGIT_1; vtxIndex <= LEVEL_DIGIT_2; vtxIndex += 4, i++) {
         Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[vtxIndex], (xPos + 9) + i * 8, -yPos, 8, 16, false, 1.0f);
     }
 
     xPos = -64;
     yPos += 15;
     // Heart
-    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[120], xPos, -yPos, 8, 8, false, 0.5f);
+    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[HEALTH_ICON], xPos, -yPos, 8, 8, false, 0.5f);
     // Divider
-    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[148], xPos + 24, -yPos + 2, 8, 8, false, 1.0f);
+    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[HEALTH_DIVIDER], xPos + 24, -yPos + 2, 8, 8, false, 1.0f);
     // Health Digits
-    for (int i = 0, vtxIndex = 164; vtxIndex < 180; vtxIndex += 4, i++) {
+    for (i = 0, vtxIndex = HEALTH_DIGIT_1; vtxIndex <= HEALTH_DIGIT_4; vtxIndex += 4, i++) {
         Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[vtxIndex], (xPos + 8) + i * smallNumberSpacing, -yPos, 8, 8, false, 1.0f);
     }
     // Max Health Digits
-    for (int i = 0, vtxIndex = 180; vtxIndex < 196; vtxIndex += 4, i++) {
+    for (i = 0, vtxIndex = MAXHEALTH_DIGIT_1; vtxIndex <= MAXHEALTH_DIGIT_4; vtxIndex += 4, i++) {
         Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[vtxIndex], (xPos + 32) + i * smallNumberSpacing, -yPos, 8, 8, false, 1.0f);
     }
 
@@ -340,55 +369,55 @@ void Leveled_Keleido_EquipStats_InitVertices(PlayState* play) {
         yPos += 8;
     }
     // Magic Pot
-    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[124], xPos, -yPos, 8, 8, false, 0.3f);
+    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[MAGIC_ICON], xPos, -yPos, 8, 8, false, 0.3f);
     // Divider
-    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[152], xPos + 24, -yPos + 2, 8, 8, false, 1.0f);
+    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[MAGIC_DIVIDER], xPos + 24, -yPos + 2, 8, 8, false, 1.0f);
     // Magic Digits
-    for (int i = 0, vtxIndex = 196; vtxIndex < 208; vtxIndex += 4, i++) {
+    for (i = 0, vtxIndex = MAGIC_DIGIT_1; vtxIndex <= MAGIC_DIGIT_3; vtxIndex += 4, i++) {
         Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[vtxIndex], (xPos + 8) + i * smallNumberSpacing, -yPos, 8, 8, false, 1.0f);
     }
     // Max Magic Digits
-    for (int i = 0, vtxIndex = 208; vtxIndex < 220; vtxIndex += 4, i++) {
+    for (i = 0, vtxIndex = MAXMAGIC_DIGIT_1; vtxIndex <= MAXMAGIC_DIGIT_3; vtxIndex += 4, i++) {
         Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[vtxIndex], (xPos + 32) + i * smallNumberSpacing, -yPos, 8, 8, false, 1.0f);
     }
 
     yPos += 8;
     // Sword
-    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[128], xPos - 1, -yPos + 2, 8, 8, false, 0.33f);
+    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[ATTACK_ICON], xPos - 1, -yPos + 2, 8, 8, false, 0.33f);
     // Attack Val Digits
-    for (int i = 0, vtxIndex = 220; vtxIndex < 236; vtxIndex += 4, i++) {
+    for (i = 0, vtxIndex = ATTACK_DIGIT_1; vtxIndex <= ATTACK_DIGIT_4; vtxIndex += 4, i++) {
         Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[vtxIndex], (xPos + 8) + i * smallNumberSpacing, -yPos, 8, 8, false, 1.0f);
     }
 
     yPos += 8;
     // Power Glove
-    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[132], xPos, -yPos, 8, 8, false, 0.25f);
+    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[POWER_ICON], xPos, -yPos, 8, 8, false, 0.25f);
     // Power Val Digits
-    for (int i = 0, vtxIndex = 236; vtxIndex < 248; vtxIndex += 4, i++) {
+    for (i = 0, vtxIndex = POWER_DIGIT_1; vtxIndex <= POWER_DIGIT_3; vtxIndex += 4, i++) {
         Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[vtxIndex], (xPos + 8) + i * smallNumberSpacing, -yPos, 8, 8, false, 1.0f);
     }
 
     yPos += 8;
     // Shield
-    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[136], xPos, -yPos, 8, 8, false, 0.25f);
+    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[COURAGE_ICON], xPos, -yPos, 8, 8, false, 0.25f);
     // Courage Val Digits
-    for (int i = 0, vtxIndex = 248; vtxIndex < 260; vtxIndex += 4, i++) {
+    for (i = 0, vtxIndex = COURAGE_DIGIT_1; vtxIndex <= COURAGE_DIGIT_3; vtxIndex += 4, i++) {
         Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[vtxIndex], (xPos + 8) + i * smallNumberSpacing, -yPos, 8, 8, false, 1.0f);
     }
 
-    yPos = 46;
+    yPos = 46 - pauseCtx->offsetY;
     // Bracelet
-    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[140], xPos, -yPos, 8, 8, false, 0.25f);
+    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[EXP_ICON], xPos, -yPos, 8, 8, false, 0.25f);
     // Experience Digits
-    for (int i = 0, vtxIndex = 260; vtxIndex < 284; vtxIndex += 4, i++) {
+    for (i = 0, vtxIndex = EXP_DIGIT_1; vtxIndex <= EXP_DIGIT_6; vtxIndex += 4, i++) {
         Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[vtxIndex], (xPos + 8) + i * smallNumberSpacing, -yPos, 8, 8, false, 1.0f);
     }
 
     yPos += 8;
     // Next
-    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[144], xPos - 6, -yPos + 1, 48, 16, false, 0.5f);
+    Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[NEXTLV_ICON], xPos - 6, -yPos + 1, 48, 16, false, 0.5f);
     // Next Lv Digits
-    for (int i = 0, vtxIndex = 284; vtxIndex < 304; vtxIndex += 4, i++) {
+    for (i = 0, vtxIndex = NEXTLV_DIGIT_1; vtxIndex <= NEXTLV_DIGIT_5; vtxIndex += 4, i++) {
         Leveled_Keleido_CreateQuadVertexGroup(&pauseCtx->equipVtx[vtxIndex], (xPos + 14) + i * smallNumberSpacing, -yPos, 8, 8, false, 1.0f);
     }
 }
