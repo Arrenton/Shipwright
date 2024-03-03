@@ -94,7 +94,7 @@ s8 Leveled_GetSceneLevel(s16 sceneId) {
 
 	case SCENE_KOKIRI_FOREST:
 		if (LINK_IS_CHILD)
-			return 3;
+			return 2;
 		else
 			return 21;
 
