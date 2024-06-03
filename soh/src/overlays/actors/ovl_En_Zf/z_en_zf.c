@@ -1944,6 +1944,7 @@ void EnZf_Die(EnZf* this, PlayState* play) {
             if ((this->actor.params >= ENZF_TYPE_LIZALFOS_MINIBOSS_A) /* miniboss */ && (D_80B4A1B4 == -1)) {
                 Flags_SetSwitch(play, this->clearFlag);
                 func_800F5B58();
+                Player_GainExperience(play, this->actor.exp);
             } else {
                 D_80B4A1B4 = -1;
             }

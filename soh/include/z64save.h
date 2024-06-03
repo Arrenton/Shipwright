@@ -181,7 +181,7 @@ typedef struct {
     /* 0x002E */ s16 healthCapacity; // "max_life"
     /* 0x0030 */ s16 health; // "now_life"
     /* 0x0032 */ s8 magicLevel; // 0 for no magic/new load, 1 for magic, 2 for double magic
-    /* 0x0033 */ s8 magic; // current magic available for use
+    /* 0x0033 */ u8 magic; // current magic available for use
     /* 0x0034 */ s16 rupees;
     /* 0x0036 */ u16 swordHealth;
     /* 0x0038 */ u16 naviTimer;
@@ -325,6 +325,11 @@ typedef struct {
     /*        */ u16 adultTradeItems;
     /*        */ u8 triforcePiecesCollected;
     // #endregion
+    u32 experience;
+    s16 heartContainers;
+    s16 healthCapacity2;    // Modified max health
+    u8 magicUnits;          // Modified magic units per magic level
+    s16 showNeededExpTimer; // Shows EXP required in the hud when greater than 0
 } SaveContext; // size = 0x1428
 
 typedef enum {

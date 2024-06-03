@@ -408,6 +408,7 @@ void func_809B75A0(EnBa* this, PlayState* play2) {
         Matrix_MultVec3f(&sp74, &this->unk_158[i + 1]);
     }
     this->unk_31A = 15;
+    Player_GainExperience(play, this->actor.exp);
     EnBa_SetupAction(this, EnBa_Die);
 }
 
@@ -453,7 +454,14 @@ void EnBa_Update(Actor* thisx, PlayState* play) {
 
     if ((this->actor.params < EN_BA_DEAD_BLOB) && (this->collider.base.acFlags & 2)) {
         this->collider.base.acFlags &= ~2;
-        this->actor.colChkInfo.health--;
+        u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, HEALTH_ATTACK_MULTIPLIER);
+        ActorDamageNumber_New(&this->actor, damage);
+
+        if (damage > this->actor.colChkInfo.health) {
+            this->actor.colChkInfo.health = 0;
+        } else {
+            this->actor.colChkInfo.health -= damage;
+        }
         if (this->actor.colChkInfo.health == 0) {
             func_809B75A0(this, play);
             GameInteractor_ExecuteOnEnemyDefeat(&this->actor);
