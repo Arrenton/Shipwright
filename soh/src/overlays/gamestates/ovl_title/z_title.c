@@ -35,7 +35,7 @@ void Title_PrintBuildInfo(Gfx** gfxp) {
     bool showGitInfo = gGitCommitTag[0] == 0;
 
     GfxPrint_SetPos(&printer, 1, 21);
-    GfxPrint_Printf(&printer, "Leveled Mod Version: 1.1.2.1");
+    GfxPrint_Printf(&printer, "Leveled Mod Version: 1.1.2.2");
     GfxPrint_SetPos(&printer, 1, 22);
     GfxPrint_Printf(&printer, "A Mod By Gotest, AKA Arrenton");
 
