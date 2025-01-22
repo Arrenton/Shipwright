@@ -618,7 +618,11 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     // Health
     Leveled_DrawTexIA8(play, dgHeartFullTex, 16, 16, statX + 2, statY, 8, 8, 255, 70, 0);
     u8 healthValX = gSaveContext.healthCapacity2 >= 1000 ? 12 : gSaveContext.healthCapacity2 >= 100 ? 6 : 0;
-    Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.health, 255, 255, 255);
+    if (HealthMeter_IsCritical()) {
+        Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.health, 255, 127, 0);
+    } else {
+        Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.health, 255, 255, 255);
+    }
     Leveled_DrawTexI8(play, dgMsgChar2FSolidusTex, 8, 16, statX + 23 + healthValX, statY - 1, 8, 9, 255, 255, 255);
     Leveled_ValueNumberDraw(play, statX + 28 + healthValX, statY, gSaveContext.healthCapacity2, 120, 255, 0);
     statY += 8;
@@ -657,6 +661,10 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
         textColor.r = 255;
         textColor.g = 0;
         textColor.b = 0;
+    } else {
+        textColor.r = 255;
+        textColor.g = 255;
+        textColor.b = 255;
     }
     Leveled_DrawTex32(play, dgItemIconShieldHylianTex, 32, 32, statX + 2, statY, 16, 16);
     Leveled_ValueNumberDraw(play, statX + 10, statY, CLAMP(player->actor.courage + player->actor.courageModifier, 0, 255), textColor.r, textColor.g, textColor.b);
