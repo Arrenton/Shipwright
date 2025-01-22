@@ -1288,12 +1288,15 @@ void BossFd_CollisionCheck(BossFd* this, PlayState* play) {
     if (headCollider->info.bumperFlags & BUMP_HIT) {
         headCollider->info.bumperFlags &= ~BUMP_HIT;
         hurtbox = headCollider->info.acHitInfo;
-        this->actor.colChkInfo.health -= 2;
-        if (hurtbox->toucher.dmgFlags & 0x1000) {
-            this->actor.colChkInfo.health -= 2;
-        }
-        if ((s8)this->actor.colChkInfo.health <= 2) {
-            this->actor.colChkInfo.health = 2;
+        u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, 2 * Leveled_GetHealthAttackMultiplier());
+        if (hurtbox->toucher.dmgFlags & 0x1000)
+            damage <<= 1;
+        ActorDamageNumber_New(&this->actor, damage);
+
+        if (this->actor.colChkInfo.health - 1 > damage) {
+            this->actor.colChkInfo.health -= damage;
+        } else {
+            this->actor.colChkInfo.health = 1;
         }
         this->work[BFD_DAMAGE_FLASH_TIMER] = 10;
         this->work[BFD_INVINC_TIMER] = 20;
@@ -1479,7 +1482,8 @@ void BossFd_UpdateEffects(BossFd* this, PlayState* play) {
                 diff.z = player->actor.world.pos.z - effect->pos.z;
                 if ((this->timers[3] == 0) && (sqrtf(SQ(diff.x) + SQ(diff.y) + SQ(diff.z)) < 20.0f)) {
                     this->timers[3] = 50;
-                    func_8002F6D4(play, NULL, 5.0f, effect->kbAngle, 0.0f, 0x30);
+                    u16 damage = Leveled_DamageModify(&player->actor, &this->actor, 0x30);
+                    func_8002F6D4(play, NULL, 5.0f, effect->kbAngle, 0.0f, damage);
                     if (player->bodyIsBurning == false) {
                         for (i2 = 0; i2 < ARRAY_COUNT(player->bodyFlameTimers); i2++) {
                             player->bodyFlameTimers[i2] = Rand_S16Offset(0, 200);

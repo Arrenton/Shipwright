@@ -1215,12 +1215,36 @@ void Actor_SetObjectDependency(PlayState* play, Actor* actor) {
     gSegments[6] = VIRTUAL_TO_PHYSICAL(play->objectCtx.status[actor->objBankIndex].segment);
 }
 
+void Actor_RefreshLeveledStats(Actor* actor, Player* player) {
+    if (actor->category == ACTORCAT_PLAYER) {
+        actor->power = GetActorStat_PlayerPower(actor->level);
+        actor->courage = GetActorStat_PlayerCourage(actor->level);
+        gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, actor->level);
+        if (gSaveContext.health > gSaveContext.healthCapacity2)
+            gSaveContext.health = gSaveContext.healthCapacity2;
+        gSaveContext.magicUnits = GetPlayerStat_MagicUnits(actor->level);
+        Leveled_SetPlayerModifiedStats(player);
+    } else {
+        actor->power = GetActorStat_Power(actor->level);
+        actor->powerModifier = 1;
+        actor->courage = GetActorStat_Courage(actor->level);
+        actor->courageModifier = 0;
+    }
+}
+
 void Actor_Init(Actor* actor, PlayState* play) {
     Actor_SetWorldToHome(actor);
     Actor_SetShapeRotToWorld(actor);
     Actor_SetFocus(actor, 0.0f);
     Math_Vec3f_Copy(&actor->prevPos, &actor->world.pos);
     Actor_SetScale(actor, 0.01f);
+    actor->level = 0;
+    actor->exp = 0;
+    actor->ignoreExpReward = false;
+    for (u8 i = 0; i < 5; i++) {
+        actor->floatingNumber[i] = 0;
+        actor->floatingNumberLife[i] = 0;
+    }
     actor->targetMode = 3;
     actor->minVelocityY = -20.0f;
     actor->xyzDistToPlayerSq = FLT_MAX;
@@ -1236,12 +1260,18 @@ void Actor_Init(Actor* actor, PlayState* play) {
         actor->init(actor, play);
         actor->init = NULL;
 
+        if (actor->category != ACTORCAT_PLAYER) {
+            Actor_GetLevelAndExperience(play, actor, 0);
+            actor->colChkInfo.health = GetActorStat_EnemyMaxHealth(actor->colChkInfo.health, actor->level);
+        }
+
         GameInteractor_ExecuteOnActorInit(actor);
 
-        // For enemy health bar we need to know the max health during init
-        if (actor->category == ACTORCAT_ENEMY) {
+        if (actor->category != ACTORCAT_PLAYER) {
             actor->maximumHealth = actor->colChkInfo.health;
         }
+
+        Actor_RefreshLeveledStats(actor, GET_PLAYER(play));
     }
 }
 
@@ -2179,7 +2209,12 @@ s32 Actor_NotMounted(PlayState* play, Actor* horse) {
 void func_8002F698(PlayState* play, Actor* actor, f32 arg2, s16 arg3, f32 arg4, u32 arg5, u32 arg6) {
     Player* player = GET_PLAYER(play);
 
-    player->unk_8A0 = arg6;
+    u16 damage = arg6;
+    if (actor != NULL && damage != 0) {
+        damage = Leveled_DamageModify(&player->actor, actor, arg6);
+    }
+
+    player->unk_8A0 = damage;
     player->unk_8A1 = arg5;
     player->unk_8A2 = arg3;
     player->unk_8A4 = arg2;
@@ -2582,12 +2617,19 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
                     actor->init(actor, play);
                     actor->init = NULL;
 
+
+                    if (actor->category != ACTORCAT_PLAYER) {
+                        Actor_GetLevelAndExperience(play, actor, 0);
+                        actor->colChkInfo.health = GetActorStat_EnemyMaxHealth(actor->colChkInfo.health, actor->level);
+                    }
+
                     GameInteractor_ExecuteOnActorInit(actor);
 
-                    // For enemy health bar we need to know the max health during init
-                    if (actor->category == ACTORCAT_ENEMY) {
+                    if (actor->category != ACTORCAT_PLAYER) {
                         actor->maximumHealth = actor->colChkInfo.health;
                     }
+
+                    Actor_RefreshLeveledStats(actor, GET_PLAYER(play));
                 }
                 actor = actor->next;
             } else if (!Object_IsLoaded(&play->objectCtx, actor->objBankIndex)) {
@@ -3585,6 +3627,9 @@ Actor* Actor_Find(ActorContext* actorCtx, s32 actorId, s32 actorCategory) {
  */
 void Enemy_StartFinishingBlow(PlayState* play, Actor* actor) {
     play->actorCtx.freezeFlashTimer = 5;
+    if (!actor->ignoreExpReward) {
+        Player_GainExperience(play, actor->exp);
+    }
     SoundSource_PlaySfxAtFixedWorldPos(play, &actor->world.pos, 20, NA_SE_EN_LAST_DAMAGE);
 }
 
@@ -4693,11 +4738,14 @@ u8 func_800355E4(PlayState* play, Collider* collider) {
     }
 }
 
-u8 Actor_ApplyDamage(Actor* actor) {
+u16 Actor_ApplyDamage(Actor* actor) {
     if (actor->colChkInfo.damage >= actor->colChkInfo.health) {
         actor->colChkInfo.health = 0;
     } else {
         actor->colChkInfo.health -= actor->colChkInfo.damage;
+    }
+    if (actor->colChkInfo.damage > 0) {
+        ActorDamageNumber_New(actor, actor->colChkInfo.damage);
     }
 
     return actor->colChkInfo.health;

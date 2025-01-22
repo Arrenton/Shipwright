@@ -326,7 +326,7 @@ void EnGoma_SetupHurt(EnGoma* this, PlayState* play) {
                      Animation_GetLastFrame(&gObjectGolDamagedAnim), ANIMMODE_ONCE, -2.0f);
     this->actionFunc = EnGoma_Hurt;
 
-    if ((s8)this->actor.colChkInfo.health <= 0) {
+    if (this->actor.colChkInfo.health <= 0) {
         this->actionTimer = 5;
         Enemy_StartFinishingBlow(play, &this->actor);
     } else {
@@ -350,7 +350,7 @@ void EnGoma_Hurt(EnGoma* this, PlayState* play) {
     }
 
     if (this->actionTimer == 0) {
-        if ((s8)this->actor.colChkInfo.health <= 0) {
+        if (this->actor.colChkInfo.health <= 0) {
             EnGoma_SetupDie(this);
         } else {
             EnGoma_SetupFlee(this);
@@ -616,7 +616,7 @@ void EnGoma_UpdateHit(EnGoma* this, PlayState* play) {
         this->hurtTimer--;
     } else {
         ColliderInfo* acHitInfo;
-        u8 swordDamage;
+        u16 swordDamage;
 
         if ((this->colCyl1.base.atFlags & 2) && this->actionFunc == EnGoma_Jump) {
             EnGoma_SetupLand(this);
@@ -624,7 +624,7 @@ void EnGoma_UpdateHit(EnGoma* this, PlayState* play) {
             this->actor.velocity.y = 0.0f;
         }
 
-        if ((this->colCyl2.base.acFlags & AC_HIT) && (s8)this->actor.colChkInfo.health > 0) {
+        if ((this->colCyl2.base.acFlags & AC_HIT) && this->actor.colChkInfo.health > 0) {
             acHitInfo = this->colCyl2.info.acHitInfo;
             this->colCyl2.base.acFlags &= ~AC_HIT;
 
@@ -655,7 +655,13 @@ void EnGoma_UpdateHit(EnGoma* this, PlayState* play) {
                         swordDamage = 1;
                     }
 
-                    this->actor.colChkInfo.health -= swordDamage;
+                    swordDamage = Leveled_DamageModify(&this->actor, &player->actor, swordDamage * Leveled_GetHealthAttackMultiplier());
+                    if (swordDamage <= this->actor.colChkInfo.health) {
+                        this->actor.colChkInfo.health -= swordDamage;
+                    } else {
+                        this->actor.colChkInfo.health = 0;
+                    }
+                    ActorDamageNumber_New(&this->actor, swordDamage);
                     EnGoma_SetupHurt(this, play);
                     Actor_SetColorFilter(&this->actor, 0x4000, 255, 0, 5);
                     this->hurtTimer = 13;

@@ -141,8 +141,8 @@ void Sram_OpenSave() {
     osSyncPrintf("scene_no = %d\n", gSaveContext.entranceIndex);
     osSyncPrintf(VT_RST);
 
-    if (gSaveContext.health < 0x30) {
-        gSaveContext.health = CVarGetInteger(CVAR_ENHANCEMENT("FullHealthSpawn"), 0) ? gSaveContext.healthCapacity : 0x30;
+    if (gSaveContext.health < 3 * CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2) {
+        gSaveContext.health = CVarGetInteger(CVAR_ENHANCEMENT("FullHealthSpawn"), 0) ? gSaveContext.healthCapacity2 : 3 * CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
     }
 
     if (gSaveContext.scarecrowLongSongSet) {

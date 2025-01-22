@@ -412,7 +412,7 @@ void EnCrow_Respawn(EnCrow* this, PlayState* play) {
         if (Math_StepToF(&this->actor.scale.x, target, target * 0.1f)) {
             this->actor.flags |= ACTOR_FLAG_TARGETABLE;
             this->actor.flags &= ~ACTOR_FLAG_UPDATE_WHILE_CULLED;
-            this->actor.colChkInfo.health = 1;
+            this->actor.colChkInfo.health = GetActorStat_EnemyMaxHealth(1, this->actor.level);
             EnCrow_SetupFlyIdle(this);
         }
         this->actor.scale.z = this->actor.scale.y = this->actor.scale.x;
@@ -427,10 +427,17 @@ void EnCrow_UpdateDamage(EnCrow* this, PlayState* play) {
             if (this->actor.colChkInfo.damageEffect == 1) { // Deku Nuts
                 EnCrow_SetupTurnAway(this);
             } else {
-                Actor_ApplyDamage(&this->actor);
-                this->actor.flags &= ~ACTOR_FLAG_TARGETABLE;
-                Enemy_StartFinishingBlow(play, &this->actor);
-                EnCrow_SetupDamaged(this, play);
+                if (Actor_ApplyDamage(&this->actor) == 0) {
+                    this->actor.flags &= ~ACTOR_FLAG_TARGETABLE;
+                    Enemy_StartFinishingBlow(play, &this->actor);
+                    EnCrow_SetupDamaged(this, play);
+                } else {
+                    EnCrow_SetupFlyIdle(this);
+                    this->timer = (s16)Rand_ZeroFloat(25) + 30;
+                    Audio_PlayActorSound2(&this->actor, NA_SE_EN_KAICHO_DAMAGE);
+                    this->actor.flags |= ACTOR_FLAG_UPDATE_WHILE_CULLED;
+                    Actor_SetColorFilter(&this->actor, 0x4000, 0xFF, 0, 6);
+                }
             }
         }
     }

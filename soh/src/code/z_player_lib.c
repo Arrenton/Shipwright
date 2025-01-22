@@ -721,6 +721,7 @@ void Player_SetEquipmentData(PlayState* play, Player* this) {
         this->currentSwordItemId = B_BTN_ITEM;
         Player_SetModelGroup(this, Player_ActionToModelGroup(this, this->heldItemAction));
         Player_SetBootData(play, this);
+        Leveled_SetPlayerModifiedStats(this);
     }
 }
 
@@ -799,6 +800,58 @@ s32 Player_GetStrength(void) {
         return PLAYER_STR_BRACELET;
     } else {
         return PLAYER_STR_NONE;
+    }
+}
+
+void Player_GainExperience(PlayState* play, u16 experience) {
+    Player* player = GET_PLAYER(play);
+
+    if (player == NULL)
+        return;
+
+    
+    experience = (u16)(CLAMP(round((f32)experience * CVarGetFloat("gLeveled.Difficulty.EXP.Rate", (f32)1.0)), 0, 0xffff));
+
+    bool levelUp = false;
+    u8 prevPower = player->actor.power;
+    u8 prevCourage = player->actor.courage;
+    u16 prevHealthCapacity = gSaveContext.healthCapacity2;
+    u16 prevMagicUnits = gSaveContext.magicUnits;
+
+    if (player->actor.level == 99)
+        return;
+
+    if (gSaveContext.experience < 999999) {
+        if (experience > 0)
+            gSaveContext.showNeededExpTimer = 60;
+
+        gSaveContext.experience += experience;
+        ActorExperienceNumber_New(&player->actor, experience);
+        if (gSaveContext.experience > 999999)
+            gSaveContext.experience = 999999;
+    }
+
+    while (GetActorStat_NextLevelExp(player->actor.level, gSaveContext.experience) <= 0 && player->actor.level < 99) {
+        player->actor.level += 1;
+        if (experience > 0) {
+            levelUp = true;
+        }
+    }
+
+    Actor_RefreshLeveledStats(&player->actor, player);
+
+    if (gSaveContext.magicLevel == 0) {
+        prevMagicUnits = gSaveContext.magicUnits;
+    }
+
+    if (levelUp) {
+        gSaveContext.magicCapacity = gSaveContext.magicLevel * gSaveContext.magicUnits;
+        if (CVarGetInteger("gLeveled.HUD.LevelUp", 1) == 1) {
+            ActorLevelUp_New(&player->actor, player->actor.power - prevPower, player->actor.courage - prevCourage, gSaveContext.healthCapacity2 - prevHealthCapacity, gSaveContext.magicUnits - prevMagicUnits);
+        }
+        if (CVarGetInteger("gLeveled.HUD.LevelUpSound", 1) == 1) {
+            Audio_PlayFanfare(NA_BGM_ITEM_GET);
+        }
     }
 }
 

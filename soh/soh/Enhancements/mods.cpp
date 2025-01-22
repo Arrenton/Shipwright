@@ -78,8 +78,8 @@ void RegisterInfiniteHealth() {
     GameInteractor::Instance->RegisterGameHook<GameInteractor::OnGameFrameUpdate>([]() {
         if (!GameInteractor::IsSaveLoaded(true)) return;
         if (CVarGetInteger(CVAR_CHEAT("InfiniteHealth"), 0) != 0) {
-            if (gSaveContext.health < gSaveContext.healthCapacity) {
-                gSaveContext.health = gSaveContext.healthCapacity;
+            if (gSaveContext.health < gSaveContext.healthCapacity2) {
+                gSaveContext.health = gSaveContext.healthCapacity2;
             }
         }
     });
@@ -1241,9 +1241,11 @@ void RegisterRandomizedEnemySizes() {
             // Scale the health based on a smaller factor than randomScale
             float healthScalingFactor = 0.8f; // Adjust this factor as needed
             float scaledHealth = actor->colChkInfo.health * (randomScale * healthScalingFactor);
+            float scaledExp = actor->exp * (randomScale * healthScalingFactor);
 
             // Ensure the scaled health doesn't go below zero
             actor->colChkInfo.health = fmax(scaledHealth, 1.0f);
+            actor->exp = fmax(scaledExp, 1.0f);
         } else {
             return;
         }

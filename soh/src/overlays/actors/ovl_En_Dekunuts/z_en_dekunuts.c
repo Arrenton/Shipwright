@@ -406,7 +406,11 @@ void EnDekunuts_Gasp(EnDekunuts* this, PlayState* play) {
 void EnDekunuts_BeDamaged(EnDekunuts* this, PlayState* play) {
     Math_StepToF(&this->actor.speedXZ, 0.0f, 1.0f);
     if (SkelAnime_Update(&this->skelAnime)) {
-        EnDekunuts_SetupDie(this);
+        if (this->actor.colChkInfo.health == 0) {
+            EnDekunuts_SetupDie(this);
+        } else {
+            EnDekunuts_SetupRun(this);
+        }
     }
 }
 

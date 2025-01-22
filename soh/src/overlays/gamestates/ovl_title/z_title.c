@@ -34,6 +34,11 @@ void Title_PrintBuildInfo(Gfx** gfxp) {
     //if tag is empty (not a release build)
     bool showGitInfo = gGitCommitTag[0] == 0;
 
+    GfxPrint_SetPos(&printer, 1, 21);
+    GfxPrint_Printf(&printer, "Leveled Mod Version: 1.1.2.2");
+    GfxPrint_SetPos(&printer, 1, 22);
+    GfxPrint_Printf(&printer, "A Mod By Gotest, AKA Arrenton");
+
     if (showGitInfo) {
         GfxPrint_SetPos(&printer, 1, 24);
         GfxPrint_Printf(&printer, "Git Branch: %s", gGitBranch);

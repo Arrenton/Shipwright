@@ -3043,12 +3043,25 @@ void CollisionCheck_ApplyDamage(PlayState* play, CollisionCheckContext* colChkCt
         damage = tbl->table[i] & 0xF;
         collider->actor->colChkInfo.damageEffect = tbl->table[i] >> 4 & 0xF;
     }
-    if (!(collider->acFlags & AC_HARD)) {
-        collider->actor->colChkInfo.damage += damage;
-    }
 
     if (CVarGetInteger(CVAR_ENHANCEMENT("IvanCoopModeEnabled"), 0)) {
         collider->actor->colChkInfo.damage *= GET_PLAYER(play)->ivanDamageMultiplier;
+    }
+
+    if (!(collider->acFlags & AC_HARD)) {
+        Actor* attacker = collider->ac;
+
+        if (collider->actor->category != ACTORCAT_PLAYER) {
+            damage *= Leveled_GetHealthAttackMultiplier();
+        } else {
+            damage *= (1 << CVarGetInteger(CVAR_ENHANCEMENT("DamageMult"), 0));
+        }
+
+        if (info->acHit->atFlags & AT_TYPE_PLAYER)
+            attacker = &GET_PLAYER(play)->actor;
+
+        damage = (u16)Leveled_DamageModify(collider->actor, attacker, damage);
+        collider->actor->colChkInfo.damage += damage;
     }
 }
 

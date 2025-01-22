@@ -1666,6 +1666,11 @@ void Message_OpenText(PlayState* play, u16 textId) {
                 textId == 0x4D)) {
         Message_FindMessage(play, textId);
         msgCtx->msgLength = font->msgLength = GetEquipNowMessage(font->msgBuf, font->msgOffset, sizeof(font->msgBuf));
+    } else if ((CVarGetInteger("gLeveled.Navi.TellEnemyLevel", 1) || CVarGetInteger("gLeveled.Navi.TellEnemyMaxHP", 1)) &&
+               (textId > 0x0600 && textId < 0x06FF) && play->actorCtx.targetCtx.targetedActor != NULL) {
+        Message_FindMessage(play, textId);
+        msgCtx->msgLength = font->msgLength = GetLeveledNaviEnemyInfo(
+            font->msgBuf, font->msgOffset, sizeof(font->msgBuf), play->actorCtx.targetCtx.targetedActor);
     } else {
         Message_FindMessage(play, textId);
         msgCtx->msgLength = font->msgLength;
@@ -3329,7 +3334,7 @@ void Message_Update(PlayState* play) {
             }
             if ((msgCtx->textId >= 0xC2 && msgCtx->textId < 0xC7) ||
                 (msgCtx->textId >= 0xFA && msgCtx->textId < 0xFE)) {
-                gSaveContext.healthAccumulator = 0x140; // Refill 20 hearts
+                gSaveContext.healthAccumulator = gSaveContext.healthCapacity2; // Refill 20 hearts
             }
             if (msgCtx->textId == 0x301F || msgCtx->textId == 0xA || msgCtx->textId == 0xC || msgCtx->textId == 0xCF ||
                 msgCtx->textId == 0x21C || msgCtx->textId == 9 || msgCtx->textId == 0x4078 ||
@@ -3366,13 +3371,20 @@ void Message_Update(PlayState* play) {
                 msgCtx->textboxEndType = TEXTBOX_ENDTYPE_DEFAULT;
             }
             if ((s32)(gSaveContext.inventory.questItems & 0xF0000000) == 0x40000000) {
+                s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
                 gSaveContext.inventory.questItems ^= 0x40000000;
                 if (!CVarGetInteger(CVAR_ENHANCEMENT("HurtContainer"), 0)) {
                     gSaveContext.healthCapacity += 0x10;
-                    gSaveContext.health += 0x10;
+                    gSaveContext.health += heartUnits;
+                    if (play != NULL) {
+                        Actor_RefreshLeveledStats(&GET_PLAYER(play)->actor, GET_PLAYER(play));
+                    }
                 } else {
                     gSaveContext.healthCapacity -= 0x10;
-                    gSaveContext.health -= 0x10;
+                    gSaveContext.health -= heartUnits;
+                    if (play != NULL) {
+                        Actor_RefreshLeveledStats(&GET_PLAYER(play)->actor, GET_PLAYER(play));
+                    }
                 }
             }
             if (msgCtx->ocarinaAction != OCARINA_ACTION_CHECK_NOWARP_DONE) {

@@ -2029,6 +2029,121 @@ void DrawRandomizerMenu() {
     }
 }
 
+void DrawLeveledMenu() {
+    if (ImGui::BeginMenu("Leveled")) {
+        if (ImGui::BeginMenu("UI")) {
+            if (ImGui::BeginMenu("HUD")) {
+                EnhancementCheckbox("EXP to NEXT Level", "gLeveled.HUD.ExperienceNextLevel", false, "",
+                                    UIWidgets::CheckboxGraphics::Checkmark, true);
+                UIWidgets::Tooltip("Show experience required to level up popup in the HUD when gaining EXP.");
+                EnhancementCheckbox("Level Up", "gLeveled.HUD.LevelUp", false, "",
+                                    UIWidgets::CheckboxGraphics::Checkmark, true);
+                UIWidgets::Tooltip("Show Level Up popup when leveling up.");
+                EnhancementCheckbox("Level Up Sound", "gLeveled.HUD.LevelUpSound", false, "",
+                                    UIWidgets::CheckboxGraphics::Checkmark, true);
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Floating Numbers")) {
+                EnhancementCheckbox("Enemy Damage", "gLeveled.HUD.FloatingNumbers.EnemyDamage", false, "",
+                                    UIWidgets::CheckboxGraphics::Checkmark, true);
+                PaddedEnhancementCheckbox("Player Damage", "gLeveled.HUD.FloatingNumbers.PlayerDamage", true, false,
+                                          false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
+                PaddedEnhancementCheckbox("EXP Gain", "gLeveled.HUD.FloatingNumbers.ExpGain", true, false, false, "",
+                                          UIWidgets::CheckboxGraphics::Checkmark, true);
+                ImGui::EndMenu();
+            }
+            PaddedEnhancementCheckbox("Navi tells enemy level", "gLeveled.Navi.TellEnemyLevel", true, false, false, "",
+                                      UIWidgets::CheckboxGraphics::Checkmark, true);
+            PaddedEnhancementCheckbox("Navi tells enemy max HP", "gLeveled.Navi.TellEnemyMaxHP", true, true, false, "",
+                                      UIWidgets::CheckboxGraphics::Checkmark, true);
+            ImGui::EndMenu();
+        }
+
+        
+        if (ImGui::BeginMenu("Entity Modifications")) {
+            if (ImGui::BeginMenu("Player Modifications")) {
+                PaddedEnhancementCheckbox("Level Gives Bonus Hearts", "gLeveled.Player.Enhancements.HeartsWithLevelUp",
+                                          true, false, false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
+                PaddedEnhancementCheckbox("Level Affects Magic Capacity",
+                                          "gLeveled.Player.Enhancements.MagicWithLevelUp", true, false, false, "",
+                                          UIWidgets::CheckboxGraphics::Checkmark, true);
+                PaddedEnhancementCheckbox("Equipment Affects Stats", "gLeveled.Player.Enhancements.EquipmentStats",
+                                          true, false, false, "", UIWidgets::CheckboxGraphics::Checkmark, true);
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Enemy Modifications")) {
+                PaddedEnhancementCheckbox("Enemy Level Affects Base Attack",
+                                          "gLeveled.Enemy.Enhancements.AttackScalesWithLevel", true, false, false, "",
+                                          UIWidgets::CheckboxGraphics::Checkmark, true);
+                UIWidgets::Tooltip(
+                    "Enemies have a fixed attack value. This option scales this up the higher the enemy's "
+                    "Power(Strength) stat. \nThis will increase difficulty a bit.");
+
+                ImGui::EndMenu();
+            }
+            UIWidgets::EnhancementSliderInt("Enemy HP and Link's Attack Multiplier: %dx", "##LeveledHPandAttackDamageMultiplier", "gLeveled.Enhancements.AttackAndHPMultiplier", 1, 32, "", 9, true, false);
+            UIWidgets::Tooltip("Changes Link's Attack and enemy HP multiplier. This doesn't change balance, but rather the size of numbers.");
+            ImGui::EndMenu();
+        }
+
+        
+        if (ImGui::BeginMenu("Difficulty Options")) {
+            if (ImGui::BeginMenu("Player Options")) {
+                if (ImGui::BeginMenu("Heart Container Value in Units")) {
+                    UIWidgets::EnhancementRadioButton("4 (x0.25)", "gLeveled.Difficulty.HeartUnits", 1);
+                    UIWidgets::EnhancementRadioButton("8 (x0.5)", "gLeveled.Difficulty.HeartUnits", 2);
+                    UIWidgets::EnhancementRadioButton("12 (x0.75)", "gLeveled.Difficulty.HeartUnits", 3);
+                    UIWidgets::EnhancementRadioButton("16 (Vanilla)", "gLeveled.Difficulty.HeartUnits", 4);
+                    UIWidgets::EnhancementRadioButton("20 (x1.25)", "gLeveled.Difficulty.HeartUnits", 5);
+                    UIWidgets::EnhancementRadioButton("24 (x1.5)", "gLeveled.Difficulty.HeartUnits", 6);
+                    UIWidgets::EnhancementRadioButton("28 (x1.75)", "gLeveled.Difficulty.HeartUnits", 7);
+                    UIWidgets::EnhancementRadioButton("32 (x2)", "gLeveled.Difficulty.HeartUnits", 8);
+                    UIWidgets::EnhancementRadioButton("48 (x3)", "gLeveled.Difficulty.HeartUnits", 12);
+                    UIWidgets::EnhancementRadioButton("64 (x4)", "gLeveled.Difficulty.HeartUnits", 16);
+                    UIWidgets::EnhancementRadioButton("80 (x5)", "gLeveled.Difficulty.HeartUnits", 20);
+                    UIWidgets::EnhancementRadioButton("96 (x6)", "gLeveled.Difficulty.HeartUnits", 24);
+                    UIWidgets::EnhancementRadioButton("112 (x7)", "gLeveled.Difficulty.HeartUnits", 28);
+                    UIWidgets::EnhancementRadioButton("128 (x8)", "gLeveled.Difficulty.HeartUnits", 32);
+                    ImGui::EndMenu();
+                }
+                UIWidgets::Tooltip(
+                    "Sets how many health units each completed heart container is worth.\nOne heart on the "
+                    "health meter is equal to 16 health units.\nA lower setting results in lower total health.");
+
+                
+                ImGui::Text("Damage Multiplier: %.2fx", (float)CVarGetInteger("gLeveled.Difficulty.Player.DamageMultiplier", 4) / 4.0f);
+                ImGui::SameLine();
+                UIWidgets::EnhancementSliderInt("", "##LeveledPlayerDamageMultiplier", "gLeveled.Difficulty.Player.DamageMultiplier", 1, 32, "", 4, true, false);
+                UIWidgets::Tooltip("Sets a multiplier for the damage the player takes. Includes ALL sources, even damage while being frozen or burned.\nDamage cannot be reduced below 1.");
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("EXP Options")) {
+                UIWidgets::PaddedEnhancementSliderFloat("EXP Rate: %.1f %%", "##Leveled_EXPRate", "gLeveled.Difficulty.EXP.Rate", 0.0f, 10.0f, "", 1.0f, true, true, false, false);
+                UIWidgets::PaddedEnhancementSliderFloat("Skulltula Token EXP Rate: %.1f %%", "##Leveled_TokenEXPRate", "gLeveled.Difficulty.EXP.TokenRate", 0.0f, 10.0f, "", 1.0f, true, true, false, false);
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Enemy Options")) {
+                UIWidgets::PaddedEnhancementSliderFloat("Enemy HP: %.1f %%", "##Leveled_EnemyHP", "gLeveled.Difficulty.Enemy.HPPercent", 0.0f, 10.0f, "", 1.0f, true, true, false, false);
+                UIWidgets::PaddedEnhancementSliderFloat("Level Scale: %.1f %%", "##Leveled_EnemyLevel", "gLeveled.Difficulty.Enemy.LevelScale", 0.0f, 2.0f, "", 1.0f, true, true, false, false);
+                UIWidgets::Tooltip("Adjust enemy level by percentage. Caps at level 99.");
+                PaddedEnhancementCheckbox("Collecting all 100 tokens makes all enemies in Ganon's Castle level 99.",
+                                          "gLeveled.Difficulty.Enemy.MaxLevelInGanonCastle", true, false, false, "",
+                                          UIWidgets::CheckboxGraphics::Checkmark, false);
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenu();
+        }
+
+        // if (ImGui::Button("Add 2000 EXP")){
+        //     gSaveContext.experience += 2000;
+        // }
+
+        ImGui::EndMenu();
+    }
+}
+
 void SohMenuBar::InitElement() {
     UpdateWindowBackendObjects();
 }
@@ -2068,6 +2183,10 @@ void SohMenuBar::DrawElement() {
         #endif
 
         DrawRandomizerMenu();
+
+        ImGui::SetCursorPosY(0.0f);
+
+        DrawLeveledMenu();
 
         ImGui::PopStyleVar(1);
         ImGui::EndMenuBar();

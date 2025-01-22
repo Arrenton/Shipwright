@@ -205,7 +205,7 @@ void BossFd2_Destroy(Actor* thisx, PlayState* play) {
 void BossFd2_SetupEmerge(BossFd2* this, PlayState* play) {
     BossFd* bossFd = (BossFd*)this->actor.parent;
     s16 temp_rand;
-    s8 health;
+    u16 health;
 
     osSyncPrintf("UP INIT 1\n");
     Animation_PlayOnce(&this->skelAnime, &gHoleVolvagiaEmergeAnim);
@@ -219,11 +219,11 @@ void BossFd2_SetupEmerge(BossFd2* this, PlayState* play) {
     this->timers[0] = 10;
     if (bossFd != NULL) {
         health = bossFd->actor.colChkInfo.health;
-        if (health >= 18) {
+        if (health >= GetActorStat_EnemyMaxHealth(18, this->actor.level)) {
             this->work[FD2_FAKEOUT_COUNT] = 0;
-        } else if (health >= 12) {
+        } else if (health >= GetActorStat_EnemyMaxHealth(12, this->actor.level)) {
             this->work[FD2_FAKEOUT_COUNT] = 1;
-        } else if (health >= 6) {
+        } else if (health >= GetActorStat_EnemyMaxHealth(6, this->actor.level)) {
             this->work[FD2_FAKEOUT_COUNT] = 2;
         } else {
             this->work[FD2_FAKEOUT_COUNT] = 3;
@@ -232,7 +232,7 @@ void BossFd2_SetupEmerge(BossFd2* this, PlayState* play) {
 }
 
 void BossFd2_Emerge(BossFd2* this, PlayState* play) {
-    s8 health;
+    u16 health;
     BossFd* bossFd = (BossFd*)this->actor.parent;
     Player* player = GET_PLAYER(play);
     s16 i;
@@ -256,13 +256,13 @@ void BossFd2_Emerge(BossFd2* this, PlayState* play) {
                 this->work[FD2_HOLE_COUNTER]++;
                 this->actor.world.pos.y = -200.0f;
                 health = bossFd->actor.colChkInfo.health;
-                if (health == 24) {
+                if (health == GetActorStat_EnemyMaxHealth(24, this->actor.level)) {
                     holeTime = 30;
-                } else if (health >= 18) {
+                } else if (health >= GetActorStat_EnemyMaxHealth(18, this->actor.level)) {
                     holeTime = 25;
-                } else if (health >= 12) {
+                } else if (health >= GetActorStat_EnemyMaxHealth(12, this->actor.level)) {
                     holeTime = 20;
-                } else if (health >= 6) {
+                } else if (health >= GetActorStat_EnemyMaxHealth(6, this->actor.level)) {
                     holeTime = 10;
                 } else {
                     holeTime = 5;
@@ -315,20 +315,20 @@ void BossFd2_Emerge(BossFd2* this, PlayState* play) {
 
 void BossFd2_SetupIdle(BossFd2* this, PlayState* play) {
     BossFd* bossFd = (BossFd*)this->actor.parent;
-    s8 health;
+    u16 health;
     s16 idleTime;
 
     osSyncPrintf("UP INIT 1\n");
     Animation_PlayLoop(&this->skelAnime, &gHoleVolvagiaTurnAnim);
     this->actionFunc = BossFd2_Idle;
     health = bossFd->actor.colChkInfo.health;
-    if (health == 24) {
+    if (health == GetActorStat_EnemyMaxHealth(24, this->actor.level)) {
         idleTime = 50;
-    } else if (health >= 18) {
+    } else if (health >= GetActorStat_EnemyMaxHealth(18, this->actor.level)) {
         idleTime = 40;
-    } else if (health >= 12) {
+    } else if (health >= GetActorStat_EnemyMaxHealth(12, this->actor.level)) {
         idleTime = 40;
-    } else if (health >= 6) {
+    } else if (health >= GetActorStat_EnemyMaxHealth(6, this->actor.level)) {
         idleTime = 30;
     } else {
         idleTime = 20;
@@ -382,7 +382,7 @@ void BossFd2_Burrow(BossFd2* this, PlayState* play) {
     } else {
         Math_ApproachF(&this->actor.world.pos.y, -100.0f, 1.0f, 10.0f);
         if (this->timers[0] == 0) {
-            if ((this->work[FD2_HOLE_COUNTER] >= 3) && ((s8)bossFd->actor.colChkInfo.health < 24)) {
+            if ((this->work[FD2_HOLE_COUNTER] >= 3) && (bossFd->actor.colChkInfo.health < GetActorStat_EnemyMaxHealth(24, this->actor.level))) {
                 this->work[FD2_HOLE_COUNTER] = 0;
                 this->actionFunc = BossFd2_Wait;
                 bossFd->handoffSignal = FD2_SIGNAL_FLY;
@@ -845,9 +845,13 @@ void BossFd2_CollisionCheck(BossFd2* this, PlayState* play) {
         hurtbox = this->collider.elements[0].info.acHitInfo;
         if (!bossFd->faceExposed) {
             if (hurtbox->toucher.dmgFlags & 0x40000040) {
-                bossFd->actor.colChkInfo.health -= 2;
-                if ((s8)bossFd->actor.colChkInfo.health <= 2) {
-                    bossFd->actor.colChkInfo.health = 1;
+                u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, 2 * Leveled_GetHealthAttackMultiplier());
+
+                ActorDamageNumber_New(&this->actor, damage);
+                if (this->actor.colChkInfo.health > damage) {
+                    this->actor.colChkInfo.health -= damage;
+                } else {
+                    this->actor.colChkInfo.health = 1;
                 }
                 bossFd->faceExposed = true;
                 BossFd2_SetupVulnerable(this, play);
@@ -873,7 +877,7 @@ void BossFd2_CollisionCheck(BossFd2* this, PlayState* play) {
             }
         } else {
             u8 canKill = false;
-            u8 damage;
+            u16 damage;
 
             if ((damage = CollisionCheck_GetSwordDamage(hurtbox->toucher.dmgFlags, play)) == 0) {
                 damage = (hurtbox->toucher.dmgFlags & 0x00001000) ? 4 : 2;
@@ -883,15 +887,21 @@ void BossFd2_CollisionCheck(BossFd2* this, PlayState* play) {
             if (hurtbox->toucher.dmgFlags & 0x80) {
                 damage = 0;
             }
-            if (((s8)bossFd->actor.colChkInfo.health > 2) || canKill) {
-                bossFd->actor.colChkInfo.health -= damage;
+            damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, damage * Leveled_GetHealthAttackMultiplier());
+            if ((bossFd->actor.colChkInfo.health > 1) || canKill) {
+                if (bossFd->actor.colChkInfo.health >= damage) {
+                    ActorDamageNumber_New(&this->actor, damage);
+                    bossFd->actor.colChkInfo.health -= damage;
+                } else {
+                    bossFd->actor.colChkInfo.health = 0;
+                }
                 osSyncPrintf(VT_FGCOL(GREEN));
                 osSyncPrintf("damage   %d\n", damage);
             }
             osSyncPrintf(VT_RST);
             osSyncPrintf("hp %d\n", bossFd->actor.colChkInfo.health);
 
-            if ((s8)bossFd->actor.colChkInfo.health <= 0) {
+            if (bossFd->actor.colChkInfo.health <= 0) {
                 bossFd->actor.colChkInfo.health = 0;
                 BossFd2_SetupDeath(this, play);
                 this->work[FD2_DAMAGE_FLASH_TIMER] = 10;

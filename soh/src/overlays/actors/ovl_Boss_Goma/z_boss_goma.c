@@ -1832,9 +1832,16 @@ void BossGoma_UpdateHit(BossGoma* this, PlayState* play) {
                 Audio_PlayActorSound2(&this->actor, NA_SE_EN_GOMA_DAM2);
             } else if (this->actionFunc == BossGoma_FloorStunned &&
                        (damage = CollisionCheck_GetSwordDamage(acHitInfo->toucher.dmgFlags, play)) != 0) {
-                this->actor.colChkInfo.health -= damage;
+                damage = Leveled_DamageModify(&this->actor, this->collider.elements[0].info.acHit->actor,
+                                              damage * Leveled_GetHealthAttackMultiplier());
+                if (damage <= this->actor.colChkInfo.health) {
+                    this->actor.colChkInfo.health -= damage;
+                } else {
+                    this->actor.colChkInfo.health = 0;
+                }
+                ActorDamageNumber_New(&this->actor, damage);
 
-                if ((s8)this->actor.colChkInfo.health > 0) {
+                if (this->actor.colChkInfo.health > 0) {
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_GOMA_DAM1);
                     BossGoma_SetupFloorDamaged(this);
                     EffectSsSibuki_SpawnBurst(play, &this->actor.focus.pos);

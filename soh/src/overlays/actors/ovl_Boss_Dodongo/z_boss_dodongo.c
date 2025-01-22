@@ -323,7 +323,8 @@ void BossDodongo_Init(Actor* thisx, PlayState* play) {
     Animation_PlayLoop(&this->skelAnime, &object_kingdodongo_Anim_00F0D8);
     this->unk_1F8 = 1.0f;
     BossDodongo_SetupIntroCutscene(this, play);
-    this->health = 12;
+    Actor_GetLevelAndExperience(play, &this->actor, 0);
+    this->health = GetActorStat_EnemyMaxHealth(12, this->actor.level);
     this->colorFilterMin = 995.0f;
     this->actor.colChkInfo.mass = MASS_IMMOVABLE;
     this->colorFilterMax = 1000.0f;
@@ -331,6 +332,8 @@ void BossDodongo_Init(Actor* thisx, PlayState* play) {
     this->unk_228 = 9200.0f;
     Collider_InitJntSph(play, &this->collider);
     Collider_SetJntSph(play, &this->collider, &this->actor, &sJntSphInit, this->items);
+    for (u8 i = 0; i < this->collider.count; i++)
+        this->collider.elements[i].info.toucher.damage <<= 1; // Double fire damage (to 1 heart)
 
     if (Flags_GetClear(play, play->roomCtx.curRoom.num)) { // KD is dead
         // SOH [General]
@@ -725,7 +728,9 @@ void BossDodongo_Explode(BossDodongo* this, PlayState* play) {
         Audio_PlayActorSound2(&this->actor, NA_SE_IT_BOMB_EXPLOSION);
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_DODO_K_DAMAGE);
         func_80033E88(&this->actor, play, 4, 10);
-        this->health -= 2;
+        u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, 2 * Leveled_GetHealthAttackMultiplier());
+        this->health -= damage;
+        ActorDamageNumber_New(&this->actor, damage);
 
         // make sure not to die from the bomb explosion
         if (this->health <= 0) {
@@ -1470,7 +1475,7 @@ void BossDodongo_SpawnFire(BossDodongo* this, PlayState* play, s16 params) {
 void BossDodongo_UpdateDamage(BossDodongo* this, PlayState* play) {
     s32 pad;
     ColliderInfo* item1;
-    u8 swordDamage;
+    u16 swordDamage;
     s32 damage;
     ColliderInfo* item2;
     s16 i;
@@ -1504,12 +1509,14 @@ void BossDodongo_UpdateDamage(BossDodongo* this, PlayState* play) {
             item1 = this->collider.elements[0].info.acHitInfo;
             if ((this->actionFunc == BossDodongo_Vulnerable) || (this->actionFunc == BossDodongo_LayDown)) {
                 swordDamage = damage = CollisionCheck_GetSwordDamage(item1->toucher.dmgFlags, play);
+                swordDamage = Leveled_DamageModify(&this->actor, this->collider.base.actor, swordDamage * Leveled_GetHealthAttackMultiplier());
 
                 if (damage != 0) {
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_DODO_K_DAMAGE);
                     BossDodongo_SetupDamaged(this);
                     this->unk_1C0 = 5;
                     this->health -= swordDamage;
+                    ActorDamageNumber_New(&this->actor, swordDamage);
                 }
             }
         }

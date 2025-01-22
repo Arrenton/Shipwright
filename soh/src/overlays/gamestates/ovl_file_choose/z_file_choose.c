@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "textures/nes_font_static/nes_font_static.h"
 #include "textures/title_static/title_static.h"
 #include "textures/parameter_static/parameter_static.h"
 #include <textures/icon_item_static/icon_item_static.h>
@@ -1665,9 +1666,9 @@ void FileChoose_SetWindowContentVtx(GameState* thisx) {
     s16 phi_ra;
     s16 temp_t1;
 
-    this->windowContentVtx = Graph_Alloc(this->state.gfxCtx, 0x288 * sizeof(Vtx));
+    this->windowContentVtx = Graph_Alloc(this->state.gfxCtx, 0x298 * sizeof(Vtx));
 
-    for (phi_t2 = 0; phi_t2 < 0x288; phi_t2 += 4) {
+    for (phi_t2 = 0; phi_t2 < 0x298; phi_t2 += 4) {
         this->windowContentVtx[phi_t2].v.ob[0] = this->windowContentVtx[phi_t2 + 2].v.ob[0] = 0x12C;
         this->windowContentVtx[phi_t2 + 1].v.ob[0] = this->windowContentVtx[phi_t2 + 3].v.ob[0] =
             this->windowContentVtx[phi_t2].v.ob[0] + 0x10;
@@ -1825,7 +1826,7 @@ void FileChoose_SetWindowContentVtx(GameState* thisx) {
                     this->windowContentVtx[phi_t2].v.ob[1] - WREG(43);
             }
 
-            phi_t0 = this->windowPosX - 14;
+            phi_t0 = this->windowPosX - 26;
             temp_t1 -= 0x16;
 
             for (phi_a1 = 0; phi_a1 < 4; phi_a1++, phi_t2 += 4) {
@@ -1835,7 +1836,7 @@ void FileChoose_SetWindowContentVtx(GameState* thisx) {
                 this->windowContentVtx[phi_t2].v.ob[1] = this->windowContentVtx[phi_t2 + 1].v.ob[1] = temp_t1;
                 this->windowContentVtx[phi_t2 + 2].v.ob[1] = this->windowContentVtx[phi_t2 + 3].v.ob[1] =
                     this->windowContentVtx[phi_t2].v.ob[1] - D_80812828[phi_a1];
-                phi_t0 += D_80812818[phi_a1];
+                phi_t0 += D_80812818[phi_a1] - 1;
             }
 
             this->windowContentVtx[phi_t2 - 15].v.tc[0] = this->windowContentVtx[phi_t2 - 13].v.tc[0] = 0x400;
@@ -1932,6 +1933,30 @@ void FileChoose_SetWindowContentVtx(GameState* thisx) {
     this->windowContentVtx[phi_t2 + 6].v.ob[1] = this->windowContentVtx[phi_t2 + 7].v.ob[1] =
         this->windowContentVtx[phi_t2 + 4].v.ob[1] - 0x10;
     this->windowContentVtx[phi_t2 + 5].v.tc[0] = this->windowContentVtx[phi_t2 + 7].v.tc[0] = 0x1000;
+
+    phi_t2 += 8;
+    // Level count
+    phi_t0 = this->windowPosX + 30;
+    temp_t1 = 24;
+    for (phi_a1 = 0; phi_a1 < 2; phi_a1++, phi_t2 += 4) {
+        this->windowContentVtx[phi_t2].v.ob[0] = this->windowContentVtx[phi_t2 + 2].v.ob[0] = phi_t0;
+        this->windowContentVtx[phi_t2 + 1].v.ob[0] = this->windowContentVtx[phi_t2 + 3].v.ob[0] =
+            this->windowContentVtx[phi_t2].v.ob[0] + 12;
+        this->windowContentVtx[phi_t2].v.ob[1] = this->windowContentVtx[phi_t2 + 1].v.ob[1] = temp_t1;
+        this->windowContentVtx[phi_t2 + 2].v.ob[1] = this->windowContentVtx[phi_t2 + 3].v.ob[1] =
+            this->windowContentVtx[phi_t2].v.ob[1] - 12;
+        phi_t0 += 5;
+    }
+    phi_t0 += 3;
+    for (phi_a1 = 0; phi_a1 < 2; phi_a1++, phi_t2 += 4) {
+        this->windowContentVtx[phi_t2].v.ob[0] = this->windowContentVtx[phi_t2 + 2].v.ob[0] = phi_t0;
+        this->windowContentVtx[phi_t2 + 1].v.ob[0] = this->windowContentVtx[phi_t2 + 3].v.ob[0] =
+            this->windowContentVtx[phi_t2].v.ob[0] + 12;
+        this->windowContentVtx[phi_t2].v.ob[1] = this->windowContentVtx[phi_t2 + 1].v.ob[1] = temp_t1;
+        this->windowContentVtx[phi_t2 + 2].v.ob[1] = this->windowContentVtx[phi_t2 + 3].v.ob[1] =
+            this->windowContentVtx[phi_t2].v.ob[1] - 12;
+        phi_t0 += 9;
+    }
 }
 
 static u16 D_8081284C[] = { 0x007C, 0x0124, 0x01CC };
@@ -2011,6 +2036,31 @@ void FileChoose_DrawFileInfo(GameState* thisx, s16 fileIndex, s16 isActive) {
                                          vtxOffset);
             }
         }
+
+        // draw level
+        gSPVertex(POLY_OPA_DISP++, &this->windowContentVtx[648], 32, 0);
+        gDPSetPrimColor(POLY_OPA_DISP++, 0x00, 0x00, 255, 255, 100, this->fileInfoAlpha[fileIndex]);
+
+        char lvText[] = { 21, 57 };
+
+        for (i = 0, vtxOffset = 0; i < 2; i++, vtxOffset += 4) {
+            FileChoose_DrawCharacter(this->state.gfxCtx, sp54->fontBuf + lvText[i] * FONT_CHAR_TEX_SIZE, vtxOffset);
+        }
+
+        gDPPipeSync(POLY_OPA_DISP++);
+        gDPSetCombineLERP(POLY_OPA_DISP++, 1, 0, PRIMITIVE, 0, TEXEL0, 0, PRIMITIVE, 0, 1, 0, PRIMITIVE, 0, TEXEL0, 0,
+                          PRIMITIVE, 0);
+        gDPSetPrimColor(POLY_OPA_DISP++, 0x00, 0x00, 255, 255, 100, this->fileInfoAlpha[fileIndex]);
+        gSPVertex(POLY_OPA_DISP++, &this->windowContentVtx[656], 12, 0);
+
+        FileChoose_SplitNumber(Save_GetSaveMetaInfo(fileIndex)->level, &deathCountSplit[0], &deathCountSplit[1],
+                               &deathCountSplit[2]);
+
+        for (i = 1, vtxOffset = 0; i < 3; i++, vtxOffset += 4) {
+            FileChoose_DrawCharacter(this->state.gfxCtx, sp54->fontBuf + deathCountSplit[i] * FONT_CHAR_TEX_SIZE,
+                                     vtxOffset);
+        }
+        // end draw level
 
         gDPPipeSync(POLY_OPA_DISP++);
 
