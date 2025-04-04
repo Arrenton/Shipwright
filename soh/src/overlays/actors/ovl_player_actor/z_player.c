@@ -4545,7 +4545,7 @@ void func_80837C0C(PlayState* play, Player* this, s32 damageResponseType, f32 sp
 
     Player_PlaySfx(this, NA_SE_PL_DAMAGE);
 
-    if (!func_80837B18(play, this, 0 - this->actor.colChkInfo.damage)) {
+    if (!func_80837B18_modified(play, this, 0 - this->actor.colChkInfo.damage, false)) {
         this->stateFlags2 &= ~PLAYER_STATE2_GRABBED_BY_ENEMY;
         if (!(this->actor.bgCheckFlags & 1) && !(this->stateFlags1 & PLAYER_STATE1_IN_WATER)) {
             func_80837B9C(this, play);
@@ -4784,7 +4784,7 @@ s32 func_808382DC(Player* this, PlayState* play) {
                 this->bodyShockTimer = 40;
             }
 
-            this->actor.colChkInfo.damage += this->knockbackDamage;
+            this->actor.colChkInfo.damage += this->knockbackDamage << CVarGetInteger(CVAR_ENHANCEMENT("DamageMult"), 0);
             func_80837C0C(play, this, knockbackResponse[this->knockbackType - 1], this->knockbackSpeed,
                           this->knockbackYVelocity, this->knockbackRot, 20);
         } else {
@@ -4886,7 +4886,7 @@ s32 func_808382DC(Player* this, PlayState* play) {
                      ((this->currentTunic != PLAYER_TUNIC_GORON && CVarGetInteger(CVAR_CHEAT("SuperTunic"), 0) == 0) ||
                       (this->floorTypeTimer >= D_808544F4[sp48])))) {
                     this->floorTypeTimer = 0;
-                    this->actor.colChkInfo.damage = 4;
+                    this->actor.colChkInfo.damage = 4 << CVarGetInteger(CVAR_ENHANCEMENT("DamageMult"), 0);
                     func_80837C0C(play, this, PLAYER_HIT_RESPONSE_NONE, 4.0f, 5.0f, this->actor.shape.rot.y, 20);
                 } else {
                     return 0;
@@ -9279,7 +9279,7 @@ s32 func_80842DF4(PlayState* play, Player* this) {
                 func_80842B7C(play, this);
 
                 if (this->actor.colChkInfo.atHitEffect == 1) {
-                    this->actor.colChkInfo.damage = 8;
+                    this->actor.colChkInfo.damage = 8 << CVarGetInteger(CVAR_ENHANCEMENT("DamageMult"), 0);
                     func_80837C0C(play, this, PLAYER_HIT_RESPONSE_ELECTRIC_SHOCK, 0.0f, 0.0f, this->actor.shape.rot.y,
                                   20);
                     return 1;
@@ -9536,7 +9536,7 @@ void func_80843AE8(PlayState* play, Player* this) {
                     LinkAnimation_Change(play, &this->skelAnime, &gPlayerAnim_link_derth_rebirth, 1.0f, 99.0f,
                                          Animation_GetLastFrame(&gPlayerAnim_link_derth_rebirth), ANIMMODE_ONCE, 0.0f);
                 }
-                gSaveContext.healthAccumulator = 0x140;
+                gSaveContext.healthAccumulator = gSaveContext.healthCapacity2;
                 this->av2.actionVar2 = -1;
             }
         } else if (gSaveContext.healthAccumulator == 0) {
@@ -9914,7 +9914,7 @@ void Player_Action_80844A44(Player* this, PlayState* play) {
     Math_StepToF(&this->linearVelocity, 0.0f, 0.05f);
 
     if (this->actor.bgCheckFlags & 1) {
-        this->actor.colChkInfo.damage = 0x10;
+        this->actor.colChkInfo.damage = 0x10 << CVarGetInteger(CVAR_ENHANCEMENT("DamageMult"), 0);
         func_80837C0C(play, this, PLAYER_HIT_RESPONSE_KNOCKBACK_LARGE, 4.0f, 5.0f, this->actor.shape.rot.y, 20);
     }
 }
@@ -10800,6 +10800,7 @@ void Player_InitCommon(Player* this, PlayState* play, FlexSkeletonHeader* skelHe
     Collider_SetQuad(play, &this->meleeWeaponQuads[1], &this->actor, &D_80854650);
     Collider_InitQuad(play, &this->shieldQuad);
     Collider_SetQuad(play, &this->shieldQuad, &this->actor, &D_808546A0);
+    Player_GainExperience(play, 0);
 
     this->ivanDamageMultiplier = 1;
 }
@@ -14610,25 +14611,27 @@ void Player_Action_8084EAC0(Player* this, PlayState* play) {
 
             if (this->itemAction == PLAYER_IA_BOTTLE_POE) {
                 s32 rand = Rand_S16Offset(-1, 3);
+                s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
 
                 if (rand == 0) {
                     rand = 3;
                 }
 
-                if ((rand < 0) && (gSaveContext.health <= 0x10)) {
+                if ((rand < 0) && (gSaveContext.health <= heartUnits)) {
                     rand = 3;
                 }
 
                 if (rand < 0) {
-                    Health_ChangeBy(play, -0x10);
+                    Health_ChangeBy(play, -heartUnits);
                 } else {
-                    gSaveContext.healthAccumulator = rand * 0x10;
+                    gSaveContext.healthAccumulator = rand * heartUnits;
                 }
             } else {
                 s32 sp28 = D_808549FC[this->itemAction - PLAYER_IA_BOTTLE_POTION_RED];
+                s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
 
                 if (sp28 & 1) {
-                    gSaveContext.healthAccumulator = 0x140;
+                    gSaveContext.healthAccumulator = heartUnits * 20;
                 }
 
                 if (sp28 & 2) {
@@ -14636,7 +14639,7 @@ void Player_Action_8084EAC0(Player* this, PlayState* play) {
                 }
 
                 if (sp28 & 4) {
-                    gSaveContext.healthAccumulator = 0x50;
+                    gSaveContext.healthAccumulator = heartUnits * 5;
                 }
             }
 
@@ -14772,7 +14775,8 @@ void Player_Action_8084EED8(Player* this, PlayState* play) {
         Player_PlaySfx(this, NA_SE_EV_BOTTLE_CAP_OPEN);
         Player_PlaySfx(this, NA_SE_EV_FIATY_HEAL - SFX_FLAG);
     } else if (LinkAnimation_OnFrame(&this->skelAnime, 47.0f)) {
-        gSaveContext.healthAccumulator = 0x140;
+        s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
+        gSaveContext.healthAccumulator = heartUnits * 20;
     }
 }
 

@@ -527,6 +527,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
             // Equip success sound
             Audio_PlaySoundGeneral(NA_SE_SY_DECIDE, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
                                    &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            Leveled_SetPlayerModifiedStats(GET_PLAYER(play));
             // Wait 10 frames before accepting input again
             pauseCtx->unk_1E4 = 7;
             sEquipTimer = 10;
@@ -638,6 +639,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
 
                     Audio_PlaySoundGeneral(NA_SE_SY_DECIDE, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
                                            &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+                    Leveled_SetPlayerModifiedStats(GET_PLAYER(play));
                     pauseCtx->unk_1E4 = 7;
                     sEquipTimer = 10;
                 } else if (CVarGetInteger(CVAR_ENHANCEMENT("AssignableTunicsAndBoots"), 0) != 0) {
@@ -867,6 +869,10 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
 
     Gfx_SetupDL_42Opa(play->state.gfxCtx);
     KaleidoScope_DrawEquipmentImage(play, pauseCtx->playerSegment, PAUSE_EQUIP_PLAYER_WIDTH, PAUSE_EQUIP_PLAYER_HEIGHT);
+
+    if (pauseCtx->pageIndex == PAUSE_EQUIP && (pauseCtx->unk_1E4 == 0 || sEquipTimer > 0) && pauseCtx->alpha == 255) {
+        Leveled_KaleidoEquip_Stats(play);
+    }
 
     if (gUpgradeMasks[0]) {}
 

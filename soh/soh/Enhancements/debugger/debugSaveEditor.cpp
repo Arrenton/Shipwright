@@ -20,6 +20,7 @@ extern "C" {
 #include "functions.h"
 #include "macros.h"
 #include "soh/cvar_prefixes.h"
+#include "leveled_stat_math.h"
 extern PlayState* gPlayState;
 
 #include "textures/icon_item_static/icon_item_static.h"
@@ -171,16 +172,22 @@ void DrawInfoTab() {
     PopStyleInput();
     if (ImGui::IsItemDeactivated()) {
         gSaveContext.healthCapacity = healthIntermediary;
+
+        Player* player = GET_PLAYER(gPlayState);
+        gSaveContext.healthCapacity2 =
+            GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, player->actor.level);
+        if (gSaveContext.health > gSaveContext.healthCapacity2)
+            gSaveContext.health = gSaveContext.healthCapacity2;
     }
     Tooltip("Maximum health. 16 units per full heart");
-    if (gSaveContext.health > gSaveContext.healthCapacity) {
-        gSaveContext.health = gSaveContext.healthCapacity; // Clamp health to new max
+    if (gSaveContext.health > gSaveContext.healthCapacity2) {
+        gSaveContext.health = gSaveContext.healthCapacity2; // Clamp health to new max
     }
     int32_t health = (int32_t)gSaveContext.health;
     if (SliderInt("Health", &health,
                   intSliderOptionsBase.Tooltip("Current health. 16 units per full heart")
                       .Min(0)
-                      .Max(gSaveContext.healthCapacity))) {
+                      .Max(gSaveContext.healthCapacity2))) {
         gSaveContext.health = (int16_t)health;
     }
 
@@ -196,7 +203,7 @@ void DrawInfoTab() {
         gSaveContext.isMagicAcquired = gSaveContext.magicLevel > 0;
         gSaveContext.isDoubleMagicAcquired = gSaveContext.magicLevel == 2;
     }
-    gSaveContext.magicCapacity = gSaveContext.magicLevel * 0x30; // Set to get the bar drawn in the UI
+    gSaveContext.magicCapacity = gSaveContext.magicLevel * gSaveContext.magicUnits; // Set to get the bar drawn in the UI
     if (gSaveContext.magic > gSaveContext.magicCapacity) {
         gSaveContext.magic = gSaveContext.magicCapacity; // Clamp magic to new max
     }
@@ -206,7 +213,7 @@ void DrawInfoTab() {
                   intSliderOptionsBase.Min(0)
                       .Max(gSaveContext.magicCapacity)
                       .Tooltip("Current magic. 48 units per magic level"))) {
-        gSaveContext.magic = (int8_t)magic;
+        gSaveContext.magic = (uint8_t)magic;
     }
 
     PushStyleInput(THEME_COLOR);

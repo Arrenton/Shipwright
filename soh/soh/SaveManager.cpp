@@ -15,6 +15,7 @@
 #include "functions.h"
 #include "macros.h"
 #include <variables.h>
+#include "leveled_stat_math.h"
 #include <libultraship/libultraship.h>
 #include "soh/SohGui/SohGui.hpp"
 
@@ -706,6 +707,12 @@ void SaveManager::InitMeta(int fileNum) {
     fileMetaInfo[fileNum].hasWallet = Flags_GetRandomizerInf(RAND_INF_HAS_WALLET) || !IS_RANDO;
     fileMetaInfo[fileNum].defense = gSaveContext.inventory.defenseHearts;
     fileMetaInfo[fileNum].health = gSaveContext.health;
+    fileMetaInfo[fileNum].level = 0;
+
+    while (GetActorStat_NextLevelExp(fileMetaInfo[fileNum].level, gSaveContext.experience) <= 0 &&
+           fileMetaInfo[fileNum].level < 99) {
+        fileMetaInfo[fileNum].level += 1;
+    }
     auto randoContext = Rando::Context::GetInstance();
 
     for (int i = 0; i < ARRAY_COUNT(fileMetaInfo[fileNum].seedHash); i++) {
@@ -760,9 +767,13 @@ void SaveManager::InitFileNormal() {
         gSaveContext.ship.filenameLanguage =
             (gSaveContext.language == LANGUAGE_JPN) ? NAME_LANGUAGE_NTSC_JPN : NAME_LANGUAGE_NTSC_ENG;
     }
+    gSaveContext.healthCapacity2 = 9999;
+    gSaveContext.magicUnits = 9999;
+    gSaveContext.experience = 0;
+    gSaveContext.showNeededExpTimer = 0;
     gSaveContext.n64ddFlag = 0;
     gSaveContext.healthCapacity = 0x30;
-    gSaveContext.health = 0x30;
+    gSaveContext.health = 3 * CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
     gSaveContext.magicLevel = 0;
     gSaveContext.magic = 0x30;
     gSaveContext.rupees = 0;
@@ -930,9 +941,11 @@ void SaveManager::InitFileDebug() {
         gSaveContext.ship.filenameLanguage =
             (gSaveContext.language == LANGUAGE_JPN) ? NAME_LANGUAGE_NTSC_JPN : NAME_LANGUAGE_NTSC_ENG;
     }
+    gSaveContext.experience = 80000;
     gSaveContext.n64ddFlag = 0;
     gSaveContext.healthCapacity = 0xE0;
-    gSaveContext.health = 0xE0;
+    gSaveContext.healthCapacity2 = 0x270F;
+    gSaveContext.health = 0x270F;
     gSaveContext.magicLevel = 0;
     gSaveContext.magic = 0x30;
     gSaveContext.rupees = 150;
@@ -1482,6 +1495,7 @@ void SaveManager::CreateDefaultGlobal() {
 }
 
 void SaveManager::LoadBaseVersion1() {
+    SaveManager::Instance->LoadData("experience", gSaveContext.experience);
     SaveManager::Instance->LoadData("entranceIndex", gSaveContext.entranceIndex);
     SaveManager::Instance->LoadData("linkAge", gSaveContext.linkAge);
     SaveManager::Instance->LoadData("cutsceneIndex", gSaveContext.cutsceneIndex);
@@ -1626,6 +1640,7 @@ void SaveManager::LoadBaseVersion1() {
 }
 
 void SaveManager::LoadBaseVersion2() {
+    SaveManager::Instance->LoadData("experience", gSaveContext.experience);
     SaveManager::Instance->LoadData("entranceIndex", gSaveContext.entranceIndex);
     SaveManager::Instance->LoadData("linkAge", gSaveContext.linkAge);
     SaveManager::Instance->LoadData("cutsceneIndex", gSaveContext.cutsceneIndex);
@@ -1842,6 +1857,7 @@ void SaveManager::LoadBaseVersion2() {
 }
 
 void SaveManager::LoadBaseVersion3() {
+    SaveManager::Instance->LoadData("experience", gSaveContext.experience);
     SaveManager::Instance->LoadData("entranceIndex", gSaveContext.entranceIndex);
     SaveManager::Instance->LoadData("linkAge", gSaveContext.linkAge);
     SaveManager::Instance->LoadData("cutsceneIndex", gSaveContext.cutsceneIndex);
@@ -2062,6 +2078,7 @@ void SaveManager::LoadBaseVersion3() {
 }
 
 void SaveManager::LoadBaseVersion4() {
+    SaveManager::Instance->LoadData("experience", gSaveContext.experience);
     SaveManager::Instance->LoadData("entranceIndex", gSaveContext.entranceIndex);
     SaveManager::Instance->LoadData("linkAge", gSaveContext.linkAge);
     SaveManager::Instance->LoadData("cutsceneIndex", gSaveContext.cutsceneIndex);
@@ -2244,6 +2261,7 @@ void SaveManager::LoadBaseVersion4() {
 }
 
 void SaveManager::SaveBase(SaveContext* saveContext, int sectionID, bool fullSave) {
+    SaveManager::Instance->SaveData("experience", saveContext->experience);
     SaveManager::Instance->SaveData("entranceIndex", saveContext->entranceIndex);
     SaveManager::Instance->SaveData("linkAge", saveContext->linkAge);
     SaveManager::Instance->SaveData("cutsceneIndex", saveContext->cutsceneIndex);
