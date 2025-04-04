@@ -205,6 +205,7 @@ class SohMenu : public Ship::Menu {
     void AddMenuEnhancements();
     void AddMenuDevTools();
     void AddMenuRandomizer();
+    void AddMenuLeveled();
     void AddMenuNetwork();
     static void UpdateLanguageMap(std::unordered_map<int32_t, const char*>& languageMap);
 

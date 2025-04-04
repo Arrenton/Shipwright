@@ -365,6 +365,7 @@ void EnFz_ApplyDamage(EnFz* this, PlayState* play) {
                         vec.z = this->actor.world.pos.z;
                         EnFz_Damaged(this, play, &vec, 30, 10.0f);
                         EnFz_SetupDespawn(this, play);
+                        Player_GainExperience(play, this->actor.exp);
                         GameInteractor_ExecuteOnEnemyDefeat(&this->actor);
                     }
                 }
@@ -373,6 +374,7 @@ void EnFz_ApplyDamage(EnFz* this, PlayState* play) {
                 Actor_SetColorFilter(&this->actor, 0x4000, 0xFF, 0x2000, 8);
                 if (this->actor.colChkInfo.health == 0) {
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_FREEZAD_DEAD);
+                    Player_GainExperience(play, this->actor.exp);
                     EnFz_SetupMelt(this);
                 } else {
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_FREEZAD_DAMAGE);
@@ -718,17 +720,18 @@ void EnFz_Draw(Actor* thisx, PlayState* play) {
     EnFz* this = (EnFz*)thisx;
     s32 pad;
     s32 index;
+    
+    index = (6 - (u8)CLAMP(((f32)this->actor.colChkInfo.health / GetActorStat_EnemyMaxHealth(6, this->actor.level) * 5 + 0.99999f), 0, 6)) >> 1;
 
-    index = (6 - this->actor.colChkInfo.health) >> 1;
-
+    // Leveled Mod - Already does this.
     // SOH [Enhancement] - With enemy health scaling, the Freezards health could cause an index out of bounds for the
     // displayLists, so we need to recompute the index based on the scaled health (using the maximum health value) and
     // clamp the final result for safety.
-    if (CVarGetInteger(CVAR_ENHANCEMENT("EnemySizeScalesHealth"), 0)) {
+    /* if (CVarGetInteger(CVAR_ENHANCEMENT("EnemySizeScalesHealth"), 0)) {
         u8 scaledHealth = (u8)(((f32)this->actor.colChkInfo.health / this->actor.maximumHealth) * 6);
         index = (6 - scaledHealth) >> 1;
         index = CLAMP(index, 0, 2);
-    }
+    }*/
 
     OPEN_DISPS(play->state.gfxCtx);
 

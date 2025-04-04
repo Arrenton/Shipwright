@@ -32,6 +32,7 @@ typedef struct {
     s32 filenameLanguage;
     s32 gregFound;
     s32 hasWallet;
+    u8 level;
 } SaveFileMetaInfo;
 
 typedef enum {

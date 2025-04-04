@@ -335,6 +335,7 @@ void EnRr_SetupReleasePlayer(EnRr* this, PlayState* play) {
         EnRr_SetupDamage(this);
     } else {
         EnRr_SetupDeath(this);
+        Player_GainExperience(play, this->actor.exp);
     }
 }
 
@@ -463,6 +464,7 @@ void EnRr_CollisionCheck(EnRr* this, PlayState* play) {
                     } else {
                         this->dropType = dropType;
                         EnRr_SetupDeath(this);
+                        Player_GainExperience(play, this->actor.exp);
                     }
                     return;
                 case RR_DMG_FIRE: // Fire Arrow and Din's Fire
@@ -756,6 +758,7 @@ void EnRr_Stunned(EnRr* this, PlayState* play) {
             this->actionFunc = EnRr_Approach;
         } else {
             EnRr_SetupDeath(this);
+            Player_GainExperience(play, this->actor.exp);
         }
     }
 }
