@@ -398,9 +398,11 @@ void HealthMeter_Draw(PlayState* play) {
     InterfaceContext* interfaceCtx = &play->interfaceCtx;
     GraphicsContext* gfxCtx = play->state.gfxCtx;
     Vtx* sp154 = interfaceCtx->beatingHeartVtx;
-    s32 curHeartFraction = (s32)((f32)gSaveContext.health / heartUnits * 16) % 0x10;
     s16 totalHeartCount = gSaveContext.healthCapacity2 / heartUnits;
     s16 fullHeartCount = gSaveContext.health / heartUnits;
+    f32 heartUnit = (f32)gSaveContext.health / heartUnits * 16 - fullHeartCount * 16;
+    heartUnit = heartUnit > 0.0f && heartUnit < 1.0f ? 1.0f : heartUnit;
+    s32 curHeartFraction = (s32)heartUnit % 0x10;
     s32 pad2;
     f32 sp144 = interfaceCtx->unk_22A * 0.1f;
     s32 curCombineModeSet = 0;
@@ -636,7 +638,7 @@ void HealthMeter_Draw(PlayState* play) {
         }
 
         offsetX += 10.0f;
-        s32 lineLength = CVarGetInteger(CVAR_COSMETIC("HUD.Hearts.LineLength"), 10);
+        s32 lineLength = CVarGetInteger(CVAR_COSMETIC("HUD.Hearts.LineLength"), 15);
         if (lineLength != 0 && (i + 1) % lineLength == 0) {
             offsetX = PosX_anchor;
             offsetY += 10.0f;

@@ -721,7 +721,7 @@ void EnFz_Draw(Actor* thisx, PlayState* play) {
     s32 pad;
     s32 index;
     
-    index = (6 - (u8)CLAMP(((f32)this->actor.colChkInfo.health / GetActorStat_EnemyMaxHealth(6, this->actor.level) * 5 + 0.99999f), 0, 6)) >> 1;
+    index = (6 - (u8)CLAMP(((f32)this->actor.colChkInfo.health / this->actor.maximumHealth * 5 + 0.99999f), 0, 6)) >> 1;
 
     // Leveled Mod - Already does this.
     // SOH [Enhancement] - With enemy health scaling, the Freezards health could cause an index out of bounds for the

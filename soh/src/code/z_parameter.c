@@ -2321,9 +2321,11 @@ u8 Item_Give(PlayState* play, u8 item) {
         s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
         if (!CVarGetInteger(CVAR_ENHANCEMENT("HurtContainer"), 0)) {
             gSaveContext.healthCapacity += 0x10;
+            gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
             gSaveContext.health += heartUnits;
         } else {
             gSaveContext.healthCapacity -= 0x10;
+            gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
             gSaveContext.health -= heartUnits;
         }
         gSaveContext.ship.stats.heartContainers++;
