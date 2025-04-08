@@ -1464,7 +1464,7 @@ void func_80900890(BossGanon2* this, PlayState* play) {
             if (Animation_OnFrame(&this->skelAnime, this->unk_194)) {
                 func_808FFDB0(this, play);
                 if (this->unk_334 == 0) {
-                    this->actor.colChkInfo.health = GetActorStat_EnemyMaxHealth(25, this->actor.level);
+                    this->actor.colChkInfo.health = (u16)(this->actor.maximumHealth * (25.0f / 30.0f));
                 }
                 this->unk_336 = 1;
             }
@@ -1967,7 +1967,7 @@ void func_80902524(BossGanon2* this, PlayState* play) {
                     }
                     ActorDamageNumber_New(&this->actor, damage);
                     temp_v0_4 = this->actor.colChkInfo.health;
-                    if (temp_v0_4 < GetActorStat_EnemyMaxHealth(21, this->actor.level) && this->unk_334 == 0) {
+                    if (temp_v0_4 < (u16)(this->actor.maximumHealth * (21.0f / 30.0f)) && this->unk_334 == 0) {
                         func_80900818(this, play);
                     } else {
                         if (temp_v0_4 <= 0) {
@@ -2010,7 +2010,7 @@ void func_80902524(BossGanon2* this, PlayState* play) {
             ActorDamageNumber_New(&this->actor, phi_v1_2);
 
             temp_v0_4 = this->actor.colChkInfo.health;
-            if ((temp_v0_4 < GetActorStat_EnemyMaxHealth(21, this->actor.level)) && (this->unk_334 == 0)) {
+            if ((temp_v0_4 < (u16)(this->actor.maximumHealth * (21.0f / 30.0f))) && (this->unk_334 == 0)) {
                 func_80900818(this, play);
             } else if ((temp_v0_4 <= 0) && (baseDamage >= 2)) {
                 func_80901020(this, play);
