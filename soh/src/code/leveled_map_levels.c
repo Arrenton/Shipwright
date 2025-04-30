@@ -40,6 +40,7 @@ s8 Leveled_GetSceneLevel(s16 sceneId) {
 	case SCENE_ICE_CAVERN: 
 		return 32; // Ice Cavern
 
+    case SCENE_INSIDE_GANONS_CASTLE: 
 	case SCENE_GANONS_TOWER:
     case SCENE_GANONDORF_BOSS:
 	case SCENE_GANONS_TOWER_COLLAPSE_EXTERIOR:
@@ -47,16 +48,13 @@ s8 Leveled_GetSceneLevel(s16 sceneId) {
         if (CVarGetInteger("gLeveled.Difficulty.Enemy.MaxLevelInGanonCastle", 0) == 1 && gSaveContext.inventory.gsTokens == 100)
 			return 120;
         else
-			return 50;
+			return 52;
 
 	case SCENE_GERUDO_TRAINING_GROUND: 
 		return 43;
 
 	case SCENE_THIEVES_HIDEOUT: 
 		return 42;
-
-	case SCENE_INSIDE_GANONS_CASTLE: 
-		return 52;
 
 	case SCENE_GANONS_TOWER_COLLAPSE_INTERIOR:
     case SCENE_INSIDE_GANONS_CASTLE_COLLAPSE: 

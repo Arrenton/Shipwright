@@ -142,7 +142,7 @@ namespace SohGui {
             .CVar("gLeveled.Difficulty.Enemy.MaxLevelInGanonCastle")
             .Options(CheckboxOptions()
                          .Tooltip("If all tokens are collected, all enemies in Ganon's Casle are level 99.")
-                         .DefaultValue(true));
+                         .DefaultValue(false));
         // Enemy HP
         AddWidget(path, "Enemy HP: %.2fx", WIDGET_CVAR_SLIDER_FLOAT)
             .CVar("gLeveled.Difficulty.Enemy.HPPercent")
