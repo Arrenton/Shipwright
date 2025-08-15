@@ -445,7 +445,7 @@ void DrawGameplayStatsHeader() {
     ImGui::TableSetupColumn("stat", ImGuiTableColumnFlags_WidthStretch);
     // if tag is empty (not a release build)
     if (gGitCommitTag[0] == 0) {
-        GameplayStatsRow("Leveled Mod Version:", "1.1.3");
+        GameplayStatsRow("Leveled Mod Version:", "1.1.3.1");
         GameplayStatsRow("A Mod By Gotest, AKA Arrenton", "");
         GameplayStatsRow("Git Branch:", (char*)gGitBranch);
         GameplayStatsRow("Git Commit Hash:", (char*)gGitCommitHash);
