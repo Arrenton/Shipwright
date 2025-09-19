@@ -2170,26 +2170,51 @@ void FileChoose_SetWindowContentVtx(GameState* thisx) {
 
     phi_t2 += 8;
     // Level count
-    phi_t0 = this->windowPosX + 30;
-    temp_t1 = 24;
-    for (phi_a1 = 0; phi_a1 < 2; phi_a1++, phi_t2 += 4) {
-        this->windowContentVtx[phi_t2].v.ob[0] = this->windowContentVtx[phi_t2 + 2].v.ob[0] = phi_t0;
-        this->windowContentVtx[phi_t2 + 1].v.ob[0] = this->windowContentVtx[phi_t2 + 3].v.ob[0] =
-            this->windowContentVtx[phi_t2].v.ob[0] + 12;
-        this->windowContentVtx[phi_t2].v.ob[1] = this->windowContentVtx[phi_t2 + 1].v.ob[1] = temp_t1;
-        this->windowContentVtx[phi_t2 + 2].v.ob[1] = this->windowContentVtx[phi_t2 + 3].v.ob[1] =
-            this->windowContentVtx[phi_t2].v.ob[1] - 12;
-        phi_t0 += 5;
-    }
-    phi_t0 += 3;
-    for (phi_a1 = 0; phi_a1 < 2; phi_a1++, phi_t2 += 4) {
-        this->windowContentVtx[phi_t2].v.ob[0] = this->windowContentVtx[phi_t2 + 2].v.ob[0] = phi_t0;
-        this->windowContentVtx[phi_t2 + 1].v.ob[0] = this->windowContentVtx[phi_t2 + 3].v.ob[0] =
-            this->windowContentVtx[phi_t2].v.ob[0] + 12;
-        this->windowContentVtx[phi_t2].v.ob[1] = this->windowContentVtx[phi_t2 + 1].v.ob[1] = temp_t1;
-        this->windowContentVtx[phi_t2 + 2].v.ob[1] = this->windowContentVtx[phi_t2 + 3].v.ob[1] =
-            this->windowContentVtx[phi_t2].v.ob[1] - 12;
-        phi_t0 += 9;
+    if (CVarGetInteger(CVAR_ENHANCEMENT("FileSelectMoreInfo"), 0) == 0) {
+        phi_t0 = this->windowPosX + 30;
+        temp_t1 = 24;
+        for (phi_a1 = 0; phi_a1 < 2; phi_a1++, phi_t2 += 4) {
+            this->windowContentVtx[phi_t2].v.ob[0] = this->windowContentVtx[phi_t2 + 2].v.ob[0] = phi_t0;
+            this->windowContentVtx[phi_t2 + 1].v.ob[0] = this->windowContentVtx[phi_t2 + 3].v.ob[0] =
+                this->windowContentVtx[phi_t2].v.ob[0] + 12;
+            this->windowContentVtx[phi_t2].v.ob[1] = this->windowContentVtx[phi_t2 + 1].v.ob[1] = temp_t1;
+            this->windowContentVtx[phi_t2 + 2].v.ob[1] = this->windowContentVtx[phi_t2 + 3].v.ob[1] =
+                this->windowContentVtx[phi_t2].v.ob[1] - 12;
+            phi_t0 += 5;
+        }
+        phi_t0 += 3;
+        for (phi_a1 = 0; phi_a1 < 2; phi_a1++, phi_t2 += 4) {
+            this->windowContentVtx[phi_t2].v.ob[0] = this->windowContentVtx[phi_t2 + 2].v.ob[0] = phi_t0;
+            this->windowContentVtx[phi_t2 + 1].v.ob[0] = this->windowContentVtx[phi_t2 + 3].v.ob[0] =
+                this->windowContentVtx[phi_t2].v.ob[0] + 12;
+            this->windowContentVtx[phi_t2].v.ob[1] = this->windowContentVtx[phi_t2 + 1].v.ob[1] = temp_t1;
+            this->windowContentVtx[phi_t2 + 2].v.ob[1] = this->windowContentVtx[phi_t2 + 3].v.ob[1] =
+                this->windowContentVtx[phi_t2].v.ob[1] - 12;
+            phi_t0 += 9;
+        }
+    } else {
+        phi_t0 = this->windowPosX + 33;
+        temp_t1 = 14;
+        for (phi_a1 = 0; phi_a1 < 2; phi_a1++, phi_t2 += 4) {
+            this->windowContentVtx[phi_t2].v.ob[0] = this->windowContentVtx[phi_t2 + 2].v.ob[0] = phi_t0;
+            this->windowContentVtx[phi_t2 + 1].v.ob[0] = this->windowContentVtx[phi_t2 + 3].v.ob[0] =
+                this->windowContentVtx[phi_t2].v.ob[0] + 12;
+            this->windowContentVtx[phi_t2].v.ob[1] = this->windowContentVtx[phi_t2 + 1].v.ob[1] = temp_t1;
+            this->windowContentVtx[phi_t2 + 2].v.ob[1] = this->windowContentVtx[phi_t2 + 3].v.ob[1] =
+                this->windowContentVtx[phi_t2].v.ob[1] - 12;
+            phi_t0 += 5;
+        }
+        phi_t0 -= 13;
+        temp_t1 -= 10;
+        for (phi_a1 = 0; phi_a1 < 2; phi_a1++, phi_t2 += 4) {
+            this->windowContentVtx[phi_t2].v.ob[0] = this->windowContentVtx[phi_t2 + 2].v.ob[0] = phi_t0;
+            this->windowContentVtx[phi_t2 + 1].v.ob[0] = this->windowContentVtx[phi_t2 + 3].v.ob[0] =
+                this->windowContentVtx[phi_t2].v.ob[0] + 12;
+            this->windowContentVtx[phi_t2].v.ob[1] = this->windowContentVtx[phi_t2 + 1].v.ob[1] = temp_t1;
+            this->windowContentVtx[phi_t2 + 2].v.ob[1] = this->windowContentVtx[phi_t2 + 3].v.ob[1] =
+                this->windowContentVtx[phi_t2].v.ob[1] - 12;
+            phi_t0 += 9;
+        }
     }
 }
 

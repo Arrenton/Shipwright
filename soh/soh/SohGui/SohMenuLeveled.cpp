@@ -3,6 +3,16 @@
 #include <macros.h>
 
 namespace SohGui {
+    enum LeveledUIMagicNumberType {
+        LEVELED_MAGIC_NUMBER_UI_FULL,
+        LEVELED_MAGIC_NUMBER_UI_CURRENT,
+        LEVELED_MAGIC_NUMBER_UI_NONE
+    };
+    static const std::unordered_map<int32_t, const char*> magicNumberTypeList = {
+        { LEVELED_MAGIC_NUMBER_UI_FULL, "Full" },
+        { LEVELED_MAGIC_NUMBER_UI_CURRENT, "Current" },
+        { LEVELED_MAGIC_NUMBER_UI_NONE, "None" }
+    };
 
     extern std::shared_ptr<SohMenu> mSohMenu;
     using namespace UIWidgets;
@@ -11,10 +21,10 @@ namespace SohGui {
         // Add Leveled Menu
         AddMenuEntry("Leveled", CVAR_SETTING("Menu.LeveledSidebarSection"));
 
+        //////////////////////////////////////////////////////////////////////////////////////////
         // UI Settings
         WidgetPath path = { "Leveled", "UI Settings", SECTION_COLUMN_1 };
         AddSidebarEntry("Leveled", path.sidebarName, 1);
-
         // HUD
         AddWidget(path, "HUD", WIDGET_SEPARATOR_TEXT);
         // EXP Next Level
@@ -31,7 +41,26 @@ namespace SohGui {
         AddWidget(path, "Level Up Sound", WIDGET_CVAR_CHECKBOX)
             .CVar("gLeveled.HUD.LevelUpSound")
             .Options(CheckboxOptions().Tooltip("Plays sound when leveling up.").DefaultValue(true));
-        
+
+        // Health Meter Numbers
+        AddWidget(path, "Health Numbers", WIDGET_CVAR_COMBOBOX)
+            .CVar("gLeveled.HUD.HealthNumbersType")
+            .Options(ComboboxOptions()
+                         .ComboMap(magicNumberTypeList)
+                         .DefaultIndex(LEVELED_MAGIC_NUMBER_UI_FULL)
+                         .Tooltip("Sets the numbers displayed on the health meter.")
+                         .Color(THEME_COLOR));
+
+        // Magic Meter Numbers
+        AddWidget(path, "Magic Meter Numbers", WIDGET_CVAR_COMBOBOX)
+            .CVar("gLeveled.HUD.MagicMeterNumbersType")
+            .SameLine(true)
+            .Options(ComboboxOptions()
+                         .ComboMap(magicNumberTypeList)
+                         .DefaultIndex(LEVELED_MAGIC_NUMBER_UI_FULL)
+                         .Tooltip("Sets the numbers displayed on the magic meter.")
+                         .Color(THEME_COLOR));
+        //----------------------------------------------------------------------------------------
         // Floating Numbers
         AddWidget(path, "Floating Numbers", WIDGET_SEPARATOR_TEXT);
         // Enemy Damage
@@ -46,7 +75,7 @@ namespace SohGui {
         AddWidget(path, "EXP Gain", WIDGET_CVAR_CHECKBOX)
             .CVar("gLeveled.HUD.FloatingNumbers.ExpGain")
             .Options(CheckboxOptions().Tooltip("Show floating EXP gain numbers.").DefaultValue(true));
-
+        //----------------------------------------------------------------------------------------
         // Navi Info
         AddWidget(path, "Navi Enemy Info", WIDGET_SEPARATOR_TEXT);
         // Navi Level
@@ -57,7 +86,7 @@ namespace SohGui {
         AddWidget(path, "Navi tells enemy max HP", WIDGET_CVAR_CHECKBOX)
             .CVar("gLeveled.Navi.TellEnemyMaxHP")
             .Options(CheckboxOptions().Tooltip("Navi will tell the enemy's maximum HP.").DefaultValue(true));
-
+        //////////////////////////////////////////////////////////////////////////////////////////
         // Entity Modifications
         path.sidebarName = "Entity Modifications";
         AddSidebarEntry("Leveled", path.sidebarName, 1);
@@ -67,6 +96,7 @@ namespace SohGui {
             .Options(IntSliderOptions().Min(1).Max(32).Format("%d").DefaultValue(9).Tooltip(
                 "Changes Link's Attack and enemy HP multiplier.\nThis doesn't change balance, but rather the size of "
                 "numbers."));
+        //----------------------------------------------------------------------------------------
         AddWidget(path, "Player Modifications", WIDGET_SEPARATOR_TEXT);
         // Level Increases Life
         AddWidget(path, "Level Gives Bonus Hearts", WIDGET_CVAR_CHECKBOX)
@@ -87,6 +117,7 @@ namespace SohGui {
                          .Tooltip("Equipment will alter stats. Such as Goron Tunic providing +3 STR, but gives -3 "
                                   "Defense, Bracelets give +1 STR, Shields, etc.")
                          .DefaultValue(true));
+        //----------------------------------------------------------------------------------------
         AddWidget(path, "Enemy Modifications", WIDGET_SEPARATOR_TEXT);
         // Enemy Level Affects Attack
         AddWidget(path, "Enemy Level Affects Base Attack", WIDGET_CVAR_CHECKBOX)
@@ -96,7 +127,7 @@ namespace SohGui {
                     .Tooltip("Enemies have a fixed attack value. This option scales this up the higher the enemy's "
                              "Strength stat. \nThis will increase difficulty a bit.")
                     .DefaultValue(true));
-
+        //////////////////////////////////////////////////////////////////////////////////////////
         // Difficulty Options
         path.sidebarName = "Difficulty Options";
         AddSidebarEntry("Leveled", path.sidebarName, 1);
@@ -121,7 +152,7 @@ namespace SohGui {
                 IntSliderOptions().LabelPosition(Within).Min(1).Max(32).Format("").DefaultValue(4).Color(THEME_COLOR)
                     .Tooltip("Sets a multiplier for the damage the player takes. Includes ALL sources, even damage while being frozen or burned.\nDamage cannot be reduced below 1."));
         });
-
+        //----------------------------------------------------------------------------------------
         // EXP Options
         AddWidget(path, "EXP Options", WIDGET_SEPARATOR_TEXT);
         // EXP Multiplier
@@ -134,7 +165,7 @@ namespace SohGui {
             .CVar("gLeveled.Difficulty.EXP.TokenRate")
             .Options(FloatSliderOptions().Min(0.0f).Max(10.0f).Format("%.2fx").DefaultValue(1.0f).Tooltip(
                 "Sets the EXP multiplier link gains from gold skulltula tokens."));
-
+        //----------------------------------------------------------------------------------------
         // Enemy Options
         AddWidget(path, "Enemy Options", WIDGET_SEPARATOR_TEXT);
         // Max GS Tokens make Ganon's Castle Enemies Lv99

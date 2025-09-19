@@ -513,6 +513,82 @@ void Leveled_ValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, u8 
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
+void Leveled_OverlayValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 direction, u8 r, u8 g, u8 b, u8 a) {
+    s32 val;
+    u8 digit[] = { 0, 0, 0, 0, 0, 0 };
+    s16 separation = 5;
+
+    u8 digits;
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    val = value;
+
+    if (val > 999999)
+        val = 999999;
+
+    if (val < 0)
+        val = 0;
+
+    gDPPipeSync(OVERLAY_DISP++);
+    gDPSetTextureFilter(OVERLAY_DISP++, G_TF_AVERAGE);
+
+    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, r, g, b, a);
+
+    digits = 1;
+
+    if (val >= 100000)
+        digits += 1;
+    if (val >= 10000)
+        digits += 1;
+    if (val >= 1000)
+        digits += 1;
+    if (val >= 100)
+        digits += 1;
+    if (val >= 10)
+        digits += 1;
+
+    if (direction == 2) {
+        x -= 6 * (digits);
+    }
+    if (direction == 1) {
+        x -= 3 * (digits);
+    }
+
+    s8 j;
+
+    for (j = 0; val >= 100000; j++) {
+        val -= 100000;
+        digit[5] += 1;
+    }
+    for (j = 0; val >= 10000; j++) {
+        val -= 10000;
+        digit[4] += 1;
+    }
+    for (j = 0; val >= 1000; j++) {
+        val -= 1000;
+        digit[3] += 1;
+    }
+    for (j = 0; val >= 100; j++) {
+        val -= 100;
+        digit[2] += 1;
+    }
+    for (j = 0; val >= 10; j++) {
+        val -= 10;
+        digit[1] += 1;
+    }
+    digit[0] = val;
+
+    gDPPipeSync(OVERLAY_DISP++);
+
+    for (s8 i = 0; i < digits; i++) {
+        OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, (u8*)_gAmmoDigit0Tex[digit[i]], 8, 8,
+                                       x - i * 6 + 6 * (digits - 1), y, 8, 8, 1 << 10, 1 << 10);
+    }
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
 void Leveled_BigValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, u8 g, u8 b, u8 a) {
     s32 val;
     u8 digit[] = { 0, 0, 0, 0, 0, 0 };

@@ -646,6 +646,43 @@ void HealthMeter_Draw(PlayState* play) {
 
         FrameInterpolation_RecordCloseChild();
     }
+    
+    // Draw Health Numbers
+    u32 healthNumbersType = CVarGetInteger("gLeveled.HUD.HealthNumbersType", 0);
+    s32 lineLength = CVarGetInteger(CVAR_COSMETIC("HUD.Hearts.LineLength"), 15);
+    s32 numberOffsetX = CLAMP(totalHeartCount, 0, lineLength) * 5;
+    s32 numberPosX = PosX_anchor + numberOffsetX;
+    s32 numberPosY = getHealthMeterYOffset() + 13;
+
+    if (healthNumbersType == 0) {
+        gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
+                          PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
+        if (HealthMeter_IsCritical()) {
+            Leveled_OverlayValueNumberDraw(play, numberPosX + 21, numberPosY, gSaveContext.health, 2, (u16)(255.0 * (1 - sp144 * 0.5)), (u16)(127.0 * (1 - sp144 * 0.5)), 0, (u8)interfaceCtx->magicAlpha);
+        } else {
+            Leveled_OverlayValueNumberDraw(play, numberPosX + 21, numberPosY, gSaveContext.health, 2, 255, 255, 255, (u8)interfaceCtx->magicAlpha);
+        }
+
+        Leveled_OverlayValueNumberDraw(play, numberPosX + 28, numberPosY, gSaveContext.healthCapacity2, 0, 255, 255, 255, (u8)interfaceCtx->magicAlpha);
+
+        extern const char* fontTbl[];
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, interfaceCtx->magicAlpha);
+
+        OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, fontTbl[15], 8, 16, numberPosX + 22, numberPosY, 8, 16, 8 << 7, 16 << 7);
+
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
+
+        OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, fontTbl[15], 8, 16, numberPosX + 22, numberPosY, 8, 16, 8 << 7, 16 << 7);
+    } else if (healthNumbersType == 1) {
+
+        gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
+                          PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
+        if (HealthMeter_IsCritical()) {
+            Leveled_OverlayValueNumberDraw(play, numberPosX + 24, numberPosY, gSaveContext.health, 1, (u16)(255.0 * (1 - sp144 * 0.5)), (u16)(127.0 * (1 - sp144 * 0.5)), 0, (u8)interfaceCtx->magicAlpha);
+        } else {
+            Leveled_OverlayValueNumberDraw(play, numberPosX + 24, numberPosY, gSaveContext.health, 1, 255, 255, 255, (u8)interfaceCtx->magicAlpha);
+        }
+    }
 
     CLOSE_DISPS(gfxCtx);
 }

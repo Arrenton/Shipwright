@@ -3614,6 +3614,32 @@ void Interface_DrawMagicBar(PlayState* play) {
                                     (rMagicFillX + gSaveContext.magic) << 2, (magicBarY + 10) << 2, G_TX_RENDERTILE, 0,
                                     0, 1 << 10, 1 << 10);
         }
+
+        // Draw Magic Numbers
+        u32 magicNumbersType = CVarGetInteger("gLeveled.HUD.MagicMeterNumbersType", 0);
+
+        if (magicNumbersType == 0) {
+            gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
+                              PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
+            Leveled_OverlayValueNumberDraw(play, rMagicFillX + (gSaveContext.magicCapacity >> 1) - 3, magicBarY + 1, gSaveContext.magic, 2, sMagicBorder.r, sMagicBorder.g, sMagicBorder.b, (u8)interfaceCtx->magicAlpha);
+            Leveled_OverlayValueNumberDraw(play, rMagicFillX + (gSaveContext.magicCapacity >> 1) + 3, magicBarY + 1, gSaveContext.magicCapacity, 0, sMagicBorder.r, sMagicBorder.g, sMagicBorder.b, (u8)interfaceCtx->magicAlpha);
+
+            extern const char* fontTbl[];
+            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, interfaceCtx->magicAlpha);
+
+            OVERLAY_DISP =
+                Gfx_TextureI8(OVERLAY_DISP, fontTbl[15], 8, 16, rMagicFillX + (gSaveContext.magicCapacity >> 1) - 2, magicBarY + 1, 8, 16, 8 << 7, 16 << 7);
+
+            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
+
+            OVERLAY_DISP =
+                Gfx_TextureI8(OVERLAY_DISP, fontTbl[15], 8, 16, rMagicFillX + (gSaveContext.magicCapacity >> 1) - 2, magicBarY + 1, 8, 16, 8 << 7, 16 << 7);
+        } else if (magicNumbersType == 1) {
+            gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
+                              PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
+
+            Leveled_OverlayValueNumberDraw(play, rMagicFillX + (gSaveContext.magicCapacity >> 1), magicBarY + 1, gSaveContext.magic, 1, sMagicBorder.r, sMagicBorder.g, sMagicBorder.b, (u8)interfaceCtx->magicAlpha);
+        }
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
