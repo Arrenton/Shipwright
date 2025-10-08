@@ -6,7 +6,9 @@
 #include "textures/icon_item_24_static/icon_item_24_static.h"
 #include "textures/message_static/message_static.h"
 #include "textures/nes_font_static/nes_font_static.h"
+#include "soh/frame_interpolation.h"
 
+#include "soh/ShipUtils.h"
 
 
 Gfx* Gfx_Texture32(Gfx* displayListHead, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
@@ -21,9 +23,21 @@ Gfx* Gfx_Texture32(Gfx* displayListHead, void* texture, s16 textureWidth, s16 te
     return displayListHead;
 }
 
-Gfx* Gfx_Texture4b(Gfx* displayListHead, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
+Gfx* Gfx_TextureIA4(Gfx* displayListHead, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
                    s16 rectWidth, s16 rectHeight, u16 dsdx, u16 dtdy) {
     gDPLoadTextureBlock_4b(displayListHead++, texture, G_IM_FMT_IA, textureWidth, textureHeight, 0,
+                           G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
+                           G_TX_NOLOD);
+
+    gSPWideTextureRectangle(displayListHead++, rectLeft << 2, rectTop << 2, (rectLeft + rectWidth) << 2,
+                            (rectTop + rectHeight) << 2, G_TX_RENDERTILE, 0, 0, dsdx, dtdy);
+
+    return displayListHead;
+}
+
+Gfx* Gfx_TextureI4(Gfx* displayListHead, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
+                    s16 rectWidth, s16 rectHeight, u16 dsdx, u16 dtdy) {
+    gDPLoadTextureBlock_4b(displayListHead++, texture, G_IM_FMT_I, textureWidth, textureHeight, 0,
                            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
                            G_TX_NOLOD);
 
@@ -62,6 +76,21 @@ void Leveled_DrawTexIA8(PlayState* play, void* texture, s16 textureWidth, s16 te
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
+void Leveled_DrawTexI4(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
+                        s16 rectWidth, s16 rectHeight, u8 r, u8 g, u8 b) {
+
+    OPEN_DISPS(play->state.gfxCtx);
+    gDPPipeSync(POLY_OPA_DISP++);
+    gDPSetTextureFilter(POLY_OPA_DISP++, G_TF_AVERAGE);
+    gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, r, g, b, play->pauseCtx.alpha);
+
+    POLY_OPA_DISP = Gfx_TextureI4(POLY_OPA_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, textureWidth,
+                                   textureHeight, (s32)(1024 * (f32)textureWidth / rectWidth),
+                                   (s32)(1024 * (f32)textureHeight / rectHeight));
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
 void Leveled_DrawTex32(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft,
                        s16 rectTop, s16 rectWidth, s16 rectHeight) {
 
@@ -84,7 +113,7 @@ void Leveled_DrawTex4b(PlayState* play, void* texture, s16 textureWidth, s16 tex
     gDPSetTextureFilter(POLY_OPA_DISP++, G_TF_AVERAGE);
     gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, 255, 255, 255, play->pauseCtx.alpha);
 
-    POLY_OPA_DISP = Gfx_Texture4b(POLY_OPA_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, textureWidth, textureHeight, (s32)(2048 * (f32)textureWidth / rectWidth),
+    POLY_OPA_DISP = Gfx_TextureIA4(POLY_OPA_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, textureWidth, textureHeight, (s32)(2048 * (f32)textureWidth / rectWidth),
                                   (s32)(2048 * (f32)textureHeight / rectHeight));
 
     CLOSE_DISPS(play->state.gfxCtx);
@@ -98,7 +127,7 @@ void Leveled_OverlayDrawTex4b(PlayState* play, void* texture, s16 textureWidth, 
     gDPSetTextureFilter(OVERLAY_DISP++, G_TF_AVERAGE);
     gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, alpha);
 
-    OVERLAY_DISP = Gfx_Texture4b(OVERLAY_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, rectWidth,
+    OVERLAY_DISP = Gfx_TextureIA4(OVERLAY_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, rectWidth,
                                   rectHeight, 1 << 10, 1 << 10);
 
     CLOSE_DISPS(play->state.gfxCtx);
@@ -109,10 +138,10 @@ void ActorDamageNumber_New(Actor* actor, u16 damage) {
         return;
 
     Vec2f position = { 0, 0 };
-    Vec2f velocity = { 0, -8 };
+    Vec2f velocity = { 0, -11 };
 
     actor->floatingNumber[0] = damage;
-    actor->floatingNumberLife[0] = 30;
+    actor->floatingNumberLife[0] = 18;
     actor->floatingNumberPosition[0] = position;
     actor->floatingNumberVelocity[0] = velocity;
 }
@@ -264,16 +293,20 @@ void ActorExperienceNumber_Draw(PlayState* play, Actor* actor) {
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
+// Vertex / Matrix code taken mostly from the Health Bar code.
+static Vtx sLeveledDamageNumberVtx[16];
 
 void ActorDamageNumber_Draw(PlayState* play, Actor* actor) {
 
     extern const char* digitTextures[];
+    u8 textureWidth = 8;
+    u8 textureHeight = 16;
     s16 val = actor->floatingNumber[0];
     u8 digit[] = { 0, 0, 0, 0 };
     u8 digits = 1;
-    u8 width = 8;
-    Vec3f spBC;
-    f32 spB4;
+    Vec3f projActorCenter;
+    f32 projActorCappedInvW;
+    s16 numbers_actorOffset = -20;
     s32 j;
 
     if (actor->floatingNumberLife[0] <= 0)
@@ -313,7 +346,7 @@ void ActorDamageNumber_Draw(PlayState* play, Actor* actor) {
     actor->floatingNumberPosition[0].x += actor->floatingNumberVelocity[0].x;
     actor->floatingNumberPosition[0].y += actor->floatingNumberVelocity[0].y;
 
-    actor->floatingNumberVelocity[0].y += 2.0f;
+    actor->floatingNumberVelocity[0].y += 1.15f;
     if (actor->floatingNumberPosition[0].y >= 0) {
         actor->floatingNumberPosition[0].y = 0;
         actor->floatingNumberVelocity[0].y = -actor->floatingNumberVelocity[0].y * 0.5f;
@@ -325,30 +358,47 @@ void ActorDamageNumber_Draw(PlayState* play, Actor* actor) {
     actor->floatingNumberLife[0]--;
 
     // Position
-    func_8002BE04(play, &actor->world.pos, &spBC, &spB4);
+    func_8002BE04(play, &actor->focus.pos, &projActorCenter, &projActorCappedInvW);
 
-    spBC.x = (160 * (spBC.x * spB4)) * 1.0f + 157 + actor->floatingNumberPosition[0].x + (digits - 1) * width / 2;
-    spBC.x = CLAMP(spBC.x, -320.0f, 320.0f);
+    projActorCenter.x = (SCREEN_WIDTH / 2) * (projActorCenter.x * projActorCappedInvW) + actor->floatingNumberPosition[0].x - (digits - 1) * textureWidth / 2;
+    projActorCenter.x = projActorCenter.x * (CVarGetInteger(CVAR_ENHANCEMENT("MirroredWorld"), 0) ? -1 : 1);
+    projActorCenter.x = CLAMP(projActorCenter.x, (-SCREEN_WIDTH / 2), (SCREEN_WIDTH / 2));
 
-    spBC.y = (120 * (spBC.y * spB4)) * -1.0f + 90 + actor->floatingNumberPosition[0].y;
-    spBC.y = CLAMP(spBC.y, -240.0f, 240.0f);
+    projActorCenter.y = (SCREEN_HEIGHT / 2) * (projActorCenter.y * projActorCappedInvW);
+    projActorCenter.y = projActorCenter.y + numbers_actorOffset - actor->floatingNumberPosition[0].y;
+    projActorCenter.y = CLAMP(projActorCenter.y, (-SCREEN_HEIGHT / 2), (SCREEN_HEIGHT / 2));
 
-    spBC.z = spBC.z * 1.0f;
+    // Setup DL for overlay disp
+    Gfx_SetupDL_39Overlay(play->state.gfxCtx);
+
+    Matrix_Translate(projActorCenter.x, projActorCenter.y, 0, MTXMODE_NEW);
+    Matrix_Scale(1.0f, -1.0, 1.0f, MTXMODE_APPLY);
+    Matrix_ToMtx(&actor->floatingDamageNumberMtx, __FILE__, __LINE__);
+    gSPMatrix(OVERLAY_DISP++, &actor->floatingDamageNumberMtx, G_MTX_MODELVIEW | G_MTX_LOAD);
 
     // Color
+    gDPSetEnvColor(OVERLAY_DISP++, 0, 0, 20, 255);
     if (actor->category == ACTORCAT_PLAYER) {
-        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 100, 0, 255);
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 100, 0, CLAMP(actor->floatingNumberLife[0] / 8.0 * 255, 0, 255));
     } else {
-        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, 255);
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, CLAMP(actor->floatingNumberLife[0] / 8.0 * 255, 0, 255));
     }
 
-    // Draw
-    gDPSetCombineLERP(OVERLAY_DISP++, 0, 0, 0, PRIMITIVE, TEXEL0, 0, PRIMITIVE, 0, 0, 0, 0, PRIMITIVE, TEXEL0, 0,
-                      PRIMITIVE, 0);
+    gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0, PRIMITIVE,
+                      ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
 
     for (u8 i = 0; i < digits; i++) {
-        OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16, (s16)spBC.x - i * width - (digits - 1) * width * 0.5f, (s16)spBC.y,
-                                        8, 16, 1 << 10, 1 << 10);
+        Ship_CreateQuadVertexGroup(&sLeveledDamageNumberVtx[4 * i], -textureWidth * i, 0, textureWidth, textureHeight, 0);
+
+        gDPPipeSync(OVERLAY_DISP++);
+
+        gSPVertex(OVERLAY_DISP++, sLeveledDamageNumberVtx, 16, 0);
+
+        gDPLoadTextureBlock(OVERLAY_DISP++, digitTextures[digit[i]], G_IM_FMT_I, G_IM_SIZ_8b, textureWidth,
+                            textureHeight, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
+                            G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+
+        gSP1Quadrangle(OVERLAY_DISP++, 0 + 4 * i, 2 + 4 * i, 3 + 4 * i, 1 + 4 * i, 0);
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
@@ -687,8 +737,8 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
 
     // Values and Icons
     // Level
-    Leveled_DrawTexI8(play, dgMsgChar4CLatinCapitalLetterLTex, 8, 16, statX + 2, statY - 2, 10, 11, 255, 255, 255);
-    Leveled_DrawTexI8(play, dgMsgChar76LatinSmallLetterVTex, 8, 16, statX + 5, statY - 2, 10, 11, 255, 255, 255);
+    Leveled_DrawTexI4(play, dgMsgChar4CLatinCapitalLetterLTex, 16, 16, statX + 2, statY - 2, 10, 11, 255, 255, 255);
+    Leveled_DrawTexI4(play, dgMsgChar76LatinSmallLetterVTex, 16, 16, statX + 5, statY - 2, 10, 11, 255, 255, 255);
 
     Leveled_BigValueNumberDraw(play, statX + 10, statY - 6, player->actor.level, 255, 255, 255, 255);
     statY += 10;
@@ -700,7 +750,7 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     } else {
         Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.health, 255, 255, 255);
     }
-    Leveled_DrawTexI8(play, dgMsgChar2FSolidusTex, 8, 16, statX + 23 + healthValX, statY - 1, 8, 9, 255, 255, 255);
+    Leveled_DrawTexI4(play, dgMsgChar2FSolidusTex, 16, 16, statX + 22 + healthValX, statY - 1, 12, 9, 255, 255, 255);
     Leveled_ValueNumberDraw(play, statX + 28 + healthValX, statY, gSaveContext.healthCapacity2, 120, 255, 0);
     statY += 8;
     // Magic
@@ -708,7 +758,7 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
         healthValX = gSaveContext.magicCapacity >= 100 ? 6 : 0;
         Leveled_DrawTex32(play, dgQuestIconMagicJarBigTex, 24, 24, statX + 2, statY, 14, 14);
         Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.magic, 255, 255, 255);
-        Leveled_DrawTexI8(play, dgMsgChar2FSolidusTex, 8, 16, statX + 23 + healthValX, statY - 1, 8, 9, 255, 255, 255);
+        Leveled_DrawTexI4(play, dgMsgChar2FSolidusTex, 16, 16, statX + 22 + healthValX, statY - 1, 12, 9, 255, 255, 255);
         Leveled_ValueNumberDraw(play, statX + 28 + healthValX, statY, gSaveContext.magicCapacity, 120, 255, 0);
         statY += 8;
     }

@@ -279,6 +279,7 @@ typedef struct Actor {
     u8 floatingNumberLife[7];
     Vec2f floatingNumberPosition[7];
     Vec2f floatingNumberVelocity[7];
+    Mtx floatingDamageNumberMtx;
     bool ignoreExpReward; // Actor handles exp reward differently
 } Actor; // size = 0x14C
 

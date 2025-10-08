@@ -668,11 +668,18 @@ void HealthMeter_Draw(PlayState* play) {
         extern const char* fontTbl[];
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, interfaceCtx->magicAlpha);
 
-        OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, fontTbl[15], 8, 16, numberPosX + 22, numberPosY, 8, 16, 8 << 7, 16 << 7);
+        gDPLoadTextureBlock_4b(OVERLAY_DISP++, fontTbl[15], G_IM_FMT_I, 16, 16, 0, G_TX_NOMIRROR | G_TX_WRAP,
+                               G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+        gSPWideTextureRectangle(OVERLAY_DISP++, numberPosX + 22 << 2, numberPosY << 2, (numberPosX + 22 + 8) << 2,
+                                (numberPosY + 16) << 2, G_TX_RENDERTILE, 0, 0, 16 << 7, 16 << 7);
 
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
 
-        OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, fontTbl[15], 8, 16, numberPosX + 22, numberPosY, 8, 16, 8 << 7, 16 << 7);
+        gDPLoadTextureBlock_4b(OVERLAY_DISP++, fontTbl[15], G_IM_FMT_I, 16, 16, 0,
+                            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
+                            G_TX_NOLOD);
+        gSPWideTextureRectangle(OVERLAY_DISP++, numberPosX + 22 << 2, numberPosY << 2, (numberPosX + 22 + 8) << 2,
+                                (numberPosY + 16) << 2, G_TX_RENDERTILE, 0, 0, 16 << 7, 16 << 7);
     } else if (healthNumbersType == 1) {
 
         gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
