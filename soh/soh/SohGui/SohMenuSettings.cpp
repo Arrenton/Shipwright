@@ -215,6 +215,9 @@ void SohMenu::AddMenuSettings() {
 
     AddWidget(path, "About", WIDGET_SEPARATOR_TEXT);
     AddWidget(path, "Ship Of Harkinian", WIDGET_TEXT);
+
+    AddWidget(path, "Leveled Mod Version: 1.1.4", WIDGET_TEXT);
+    AddWidget(path, "A Mod By Gotest, AKA Arrenton", WIDGET_TEXT);
     if (gGitCommitTag[0] != 0) {
         AddWidget(path, gBuildVersion, WIDGET_TEXT);
     } else {
