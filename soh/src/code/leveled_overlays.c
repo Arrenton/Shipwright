@@ -721,7 +721,7 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     extern const char* digitTextures[];
     Player* player = GET_PLAYER(play);
     u16 statX = 88;
-    u16 statY = 72;
+    u16 statY = 70;
     u8 attack = 1;
     Color_RGBA8 textColor = { 255, 255, 255, 255 };
 
@@ -741,7 +741,6 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     Leveled_DrawTexI4(play, dgMsgChar76LatinSmallLetterVTex, 16, 16, statX + 5, statY - 2, 10, 11, 255, 255, 255);
 
     Leveled_BigValueNumberDraw(play, statX + 10, statY - 6, player->actor.level, 255, 255, 255, 255);
-    statY -= 2;
     if (gSaveContext.magicCapacity > 0) {
         statY -= 4;
     }
@@ -768,10 +767,6 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     }
     statX = 88;
     statY = 84;
-    // Attack
-    Leveled_DrawTex32(play, dgItemIconSwordKokiriTex, 32, 32, statX, statY - 1, 22, 20);
-    Leveled_ValueNumberDraw(play, statX + 9, statY, GetActorStat_Attack(attack, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255)), 255, 255, 255);
-    statX += 32;
     // Power
     if (player->actor.powerModifier > 0) {
         textColor.r = 120;
@@ -801,8 +796,14 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     }
     Leveled_DrawTex32(play, dgItemIconShieldHylianTex, 32, 32, statX + 2, statY, 16, 16);
     Leveled_ValueNumberDraw(play, statX + 10, statY, CLAMP(player->actor.courage + player->actor.courageModifier, 0, 255), textColor.r, textColor.g, textColor.b);
+    statX += 22;
+    // Attack
+    Leveled_DrawTex32(play, dgItemIconSwordKokiriTex, 32, 32, statX, statY - 1, 22, 20);
+    Leveled_ValueNumberDraw(play, statX + 9, statY, GetActorStat_Attack(attack, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255)), 255, 255, 255);
     statX = 86;
     statY = 170;
+    
+    
     // EXP
     Leveled_DrawTex32(play, dgItemIconGoronsBraceletTex, 32, 32, statX + 4, statY, 13, 16);
     Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.experience, 255, 255, 255);
