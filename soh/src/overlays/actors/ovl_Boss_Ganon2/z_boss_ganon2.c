@@ -170,7 +170,7 @@ void BossGanon2_Init(Actor* thisx, PlayState* play) {
     }
 
     this->actor.colChkInfo.mass = MASS_IMMOVABLE;
-    this->actor.colChkInfo.health = GetActorStat_EnemyMaxHealth(30, this->actor.level);
+    this->actor.colChkInfo.health = 30;
     Collider_InitJntSph(play, &this->unk_424);
     Collider_SetJntSph(play, &this->unk_424, &this->actor, &sJntSphInit1, this->unk_464);
     Collider_InitJntSph(play, &this->unk_444);

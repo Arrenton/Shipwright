@@ -720,8 +720,8 @@ void Leveled_BigValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, 
 void Leveled_KaleidoEquip_Stats(PlayState* play) {
     extern const char* digitTextures[];
     Player* player = GET_PLAYER(play);
-    u16 statX = 92;
-    u16 statY = 76;
+    u16 statX = 88;
+    u16 statY = 72;
     u8 attack = 1;
     Color_RGBA8 textColor = { 255, 255, 255, 255 };
 
@@ -741,31 +741,37 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     Leveled_DrawTexI4(play, dgMsgChar76LatinSmallLetterVTex, 16, 16, statX + 5, statY - 2, 10, 11, 255, 255, 255);
 
     Leveled_BigValueNumberDraw(play, statX + 10, statY - 6, player->actor.level, 255, 255, 255, 255);
-    statY += 10;
+    statY -= 2;
+    if (gSaveContext.magicCapacity > 0) {
+        statY -= 4;
+    }
+    statX = 116;
     // Health
-    Leveled_DrawTexIA8(play, dgHeartFullTex, 16, 16, statX + 2, statY, 8, 8, 255, 70, 0);
+    Leveled_DrawTexIA8(play, dgHeartFullTex, 16, 16, statX, statY, 8, 8, 255, 70, 0);
     u8 healthValX = gSaveContext.healthCapacity2 >= 1000 ? 12 : gSaveContext.healthCapacity2 >= 100 ? 6 : 0;
     if (HealthMeter_IsCritical()) {
-        Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.health, 255, 127, 0);
+        Leveled_ValueNumberDraw(play, statX + 8, statY, gSaveContext.health, 255, 127, 0);
     } else {
-        Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.health, 255, 255, 255);
+        Leveled_ValueNumberDraw(play, statX + 8, statY, gSaveContext.health, 255, 255, 255);
     }
-    Leveled_DrawTexI4(play, dgMsgChar2FSolidusTex, 16, 16, statX + 22 + healthValX, statY - 1, 12, 9, 255, 255, 255);
-    Leveled_ValueNumberDraw(play, statX + 28 + healthValX, statY, gSaveContext.healthCapacity2, 120, 255, 0);
+    Leveled_DrawTexI4(play, dgMsgChar2FSolidusTex, 16, 16, statX + 18 + healthValX, statY - 1, 12, 9, 255, 255, 255);
+    Leveled_ValueNumberDraw(play, statX + 24 + healthValX, statY, gSaveContext.healthCapacity2, 120, 255, 0);
     statY += 8;
     // Magic
     if (gSaveContext.magicCapacity > 0) {
         healthValX = gSaveContext.magicCapacity >= 100 ? 6 : 0;
-        Leveled_DrawTex32(play, dgQuestIconMagicJarBigTex, 24, 24, statX + 2, statY, 14, 14);
-        Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.magic, 255, 255, 255);
-        Leveled_DrawTexI4(play, dgMsgChar2FSolidusTex, 16, 16, statX + 22 + healthValX, statY - 1, 12, 9, 255, 255, 255);
-        Leveled_ValueNumberDraw(play, statX + 28 + healthValX, statY, gSaveContext.magicCapacity, 120, 255, 0);
-        statY += 8;
+        Leveled_DrawTex32(play, dgQuestIconMagicJarBigTex, 24, 24, statX, statY, 14, 14);
+        Leveled_ValueNumberDraw(play, statX + 8, statY, gSaveContext.magic, 255, 255, 255);
+        Leveled_DrawTexI4(play, dgMsgChar2FSolidusTex, 16, 16, statX + 18 + healthValX, statY - 1, 12, 9, 255, 255, 255);
+        Leveled_ValueNumberDraw(play, statX + 24 + healthValX, statY, gSaveContext.magicCapacity, 120, 255, 0);
+        
     }
+    statX = 88;
+    statY = 84;
     // Attack
     Leveled_DrawTex32(play, dgItemIconSwordKokiriTex, 32, 32, statX, statY - 1, 22, 20);
-    Leveled_ValueNumberDraw(play, statX + 10, statY, GetActorStat_Attack(attack, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255)), 255, 255, 255);
-    statY += 8;
+    Leveled_ValueNumberDraw(play, statX + 9, statY, GetActorStat_Attack(attack, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255)), 255, 255, 255);
+    statX += 32;
     // Power
     if (player->actor.powerModifier > 0) {
         textColor.r = 120;
@@ -778,7 +784,7 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     }
     Leveled_DrawTex32(play, dgItemIconSilverGauntletsTex, 32, 32, statX + 2, statY, 16, 16);
     Leveled_ValueNumberDraw(play, statX + 10, statY, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255), textColor.r, textColor.g, textColor.b);
-    statY += 8;
+    statX += 22;
     // Courage
     if (player->actor.courageModifier > 0) {
         textColor.r = 120;
@@ -795,8 +801,8 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     }
     Leveled_DrawTex32(play, dgItemIconShieldHylianTex, 32, 32, statX + 2, statY, 16, 16);
     Leveled_ValueNumberDraw(play, statX + 10, statY, CLAMP(player->actor.courage + player->actor.courageModifier, 0, 255), textColor.r, textColor.g, textColor.b);
-    statX = 90;
-    statY += 60;
+    statX = 86;
+    statY += 96;
     if (gSaveContext.magicCapacity > 0) {
         statY -= 8;
     }
