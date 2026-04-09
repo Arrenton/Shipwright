@@ -802,10 +802,7 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     Leveled_DrawTex32(play, dgItemIconShieldHylianTex, 32, 32, statX + 2, statY, 16, 16);
     Leveled_ValueNumberDraw(play, statX + 10, statY, CLAMP(player->actor.courage + player->actor.courageModifier, 0, 255), textColor.r, textColor.g, textColor.b);
     statX = 86;
-    statY += 96;
-    if (gSaveContext.magicCapacity > 0) {
-        statY -= 8;
-    }
+    statY = 170;
     // EXP
     Leveled_DrawTex32(play, dgItemIconGoronsBraceletTex, 32, 32, statX + 4, statY, 13, 16);
     Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.experience, 255, 255, 255);
