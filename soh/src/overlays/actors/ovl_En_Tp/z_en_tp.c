@@ -160,7 +160,7 @@ void EnTp_Init(Actor* thisx, PlayState* play2) {
 
         for (i = 0; i <= 6; i++) {
             next = (EnTp*)Actor_Spawn(&play->actorCtx, play, ACTOR_EN_TP, this->actor.world.pos.x,
-                                      this->actor.world.pos.y, this->actor.world.pos.z, 0, 0, 0, 0 * i, true);
+                                      this->actor.world.pos.y, this->actor.world.pos.z, 0, 0, 0, 0 * i);
 
             if (0 * i) {} // Very fake, but needed to get the s registers right
             if (next != NULL) {
@@ -322,9 +322,9 @@ void EnTp_Die(EnTp* this, PlayState* play) {
             Item_DropCollectibleRandom(play, &this->actor, &this->actor.world.pos, 0x50);
         } else {
             for (i = 0; i < 1; i++) {
-                now = (EnTp*)Actor_Spawn(&play->actorCtx, play, ACTOR_EN_TP, this->actor.world.pos.x,
-                                         this->actor.world.pos.y, this->actor.world.pos.z, 0, 0, 0,
-                                         TAILPASARAN_FRAGMENT, true);
+                now =
+                    (EnTp*)Actor_Spawn(&play->actorCtx, play, ACTOR_EN_TP, this->actor.world.pos.x,
+                                       this->actor.world.pos.y, this->actor.world.pos.z, 0, 0, 0, TAILPASARAN_FRAGMENT);
 
                 if (now != NULL) {
                     Actor_SetScale(&now->actor, this->actor.scale.z * 0.5f);
@@ -601,6 +601,7 @@ void EnTp_UpdateDamage(EnTp* this, PlayState* play) {
 
                 if (head->actor.params <= TAILPASARAN_HEAD) {
                     EnTp_SetupDie(head);
+                    Player_GainExperience(play, this->actor.exp);
                     head->damageEffect = this->actor.colChkInfo.damageEffect;
                     head->actor.params = TAILPASARAN_HEAD_DYING;
                 }

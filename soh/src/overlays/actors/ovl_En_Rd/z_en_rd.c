@@ -730,6 +730,7 @@ void func_80AE3ECC(EnRd* this, PlayState* play) {
         if (this->actor.colChkInfo.health == 0) {
             func_80AE2630(play, &this->actor, 1);
             func_80AE3C20(this);
+            Player_GainExperience(play, this->actor.exp);
             Item_DropCollectibleRandom(play, &this->actor, &this->actor.world.pos, 0x90);
         } else {
             func_80AE3A8C(this);
@@ -801,6 +802,7 @@ void func_80AE4114(EnRd* this, PlayState* play) {
                 if (this->actor.colChkInfo.health == 0) {
                     func_80AE2630(play, &this->actor, 1);
                     func_80AE3C20(this);
+                    Player_GainExperience(play, this->actor.exp);
                     Item_DropCollectibleRandom(play, 0, &this->actor.world.pos, 0x90);
                 } else {
                     func_80AE3A8C(this);

@@ -153,7 +153,7 @@ void EnFloormas_Init(Actor* thisx, PlayState* play2) {
         // spawn first small floormaster
         this->actor.parent =
             Actor_Spawn(&play->actorCtx, play, ACTOR_EN_FLOORMAS, this->actor.world.pos.x, this->actor.world.pos.y,
-                        this->actor.world.pos.z, 0, 0, 0, invisble + SPAWN_SMALL, true);
+                        this->actor.world.pos.z, 0, 0, 0, invisble + SPAWN_SMALL);
         if (this->actor.parent == NULL) {
             Actor_Kill(&this->actor);
             return;
@@ -161,7 +161,7 @@ void EnFloormas_Init(Actor* thisx, PlayState* play2) {
         // spawn 2nd small floormaster
         this->actor.child =
             Actor_Spawn(&play->actorCtx, play, ACTOR_EN_FLOORMAS, this->actor.world.pos.x, this->actor.world.pos.y,
-                        this->actor.world.pos.z, 0, 0, 0, invisble + SPAWN_SMALL, true);
+                        this->actor.world.pos.z, 0, 0, 0, invisble + SPAWN_SMALL);
         if (this->actor.child == NULL) {
             Actor_Kill(this->actor.parent);
             Actor_Kill(&this->actor);
@@ -740,6 +740,11 @@ void EnFloormas_SmDecideAction(EnFloormas* this, PlayState* play) {
 void EnFloormas_SmShrink(EnFloormas* this, PlayState* play) {
     if (Math_StepToF(&this->actor.scale.x, 0.0f, 0.0015f)) {
         EnFloormas_SetupSmWait(this);
+        EnFloormas* parent = (EnFloormas*)this->actor.parent;
+        EnFloormas* child = (EnFloormas*)this->actor.child;
+        if ((parent->actionFunc == EnFloormas_SmWait) && (child->actionFunc == EnFloormas_SmWait)) {
+            Player_GainExperience(play, this->actor.exp);
+        }
     }
     this->actor.scale.z = this->actor.scale.x;
     this->actor.scale.y = this->actor.scale.x;

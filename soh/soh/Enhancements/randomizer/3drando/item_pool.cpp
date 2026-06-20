@@ -7,6 +7,7 @@
 #include "pool_functions.hpp"
 #include "random.hpp"
 #include "spoiler_log.hpp"
+#include "soh/Enhancements/randomizer/Traps.h"
 #include "z64item.h"
 #include <spdlog/spdlog.h>
 
@@ -68,11 +69,10 @@ void AddFixedItemToPool(RandomizerGet item, int count = 1, bool iceTrapModel = t
 }
 
 RandomizerGet GetJunkItem() {
-    auto ctx = Rando::Context::GetInstance();
-    if (ctx->GetOption(RSK_ICE_TRAP_PERCENT).IsNot(0) &&
-        (ctx->GetOption(RSK_ICE_TRAP_PERCENT).Is(100) || Random(0, 100) < ctx->GetOption(RSK_ICE_TRAP_PERCENT).Get())) {
+    if (Rando::Traps::ShouldJunkItemBeTrap()) {
         return RG_ICE_TRAP;
     }
+
     return RandomElement(JunkPoolItems);
 }
 
@@ -149,6 +149,7 @@ static void PlaceItemsForType(RandomizerCheckType rctype, bool overworldActive =
 void GenerateItemPool() {
     // RANDOTODO proper removal of items not in pool or logically relevant instead of dummy checks.
     auto ctx = Rando::Context::GetInstance();
+    ctx->possibleIceTrapModels.clear();
     itemPool.clear();
     junkPool.clear();
     plentifulPool.clear();
@@ -169,11 +170,11 @@ void GenerateItemPool() {
     AddItemToPool(RG_ICE_ARROWS, 2, 1, 1, 1);
     AddItemToPool(RG_LIGHT_ARROWS, 2, 1, 1, 1);
     AddItemToPool(RG_DINS_FIRE, 2, 1, 1, 1);
-    AddItemToPool(RG_NAYRUS_LOVE, 2, 1, 0, 0);
+    AddItemToPool(RG_FARORES_WIND, 2, 1, 1, 0);
+    AddItemToPool(RG_NAYRUS_LOVE, 2, 1, 1, 0);
     AddItemToPool(RG_GREG_RUPEE, 1, 1, 1, 1);
     AddItemToPool(RG_PROGRESSIVE_HOOKSHOT, 2, 2, 2, 2);
     AddItemToPool(RG_HYLIAN_SHIELD, 1, 1, 1, 1);
-    AddItemToPool(RG_PROGRESSIVE_STRENGTH, 4, 3, 3, 3);
     AddItemToPool(RG_DOUBLE_DEFENSE, 2, 1, 0, 0);
     AddItemToPool(RG_BIGGORON_SWORD, 2, 1, 1, 0);
     bool isScrubs = ctx->GetOption(RSK_SHUFFLE_SCRUBS).Is(RO_SCRUBS_ALL);
@@ -385,18 +386,43 @@ void GenerateItemPool() {
         AddFixedItemToPool(RG_SKELETON_KEY, 1);
     }
 
+    if (ctx->GetOption(RSK_MASK_QUEST).Is(RO_MASK_QUEST_SHUFFLE)) {
+        AddItemToPool(RG_KEATON_MASK, 2, 1, 1, 1);
+        AddItemToPool(RG_SKULL_MASK, 2, 1, 1, 1);
+        AddItemToPool(RG_SPOOKY_MASK, 2, 1, 1, 1);
+        AddItemToPool(RG_BUNNY_HOOD, 2, 1, 1, 1);
+        AddItemToPool(RG_GORON_MASK, 2, 1, 1, 1);
+        AddItemToPool(RG_ZORA_MASK, 2, 1, 1, 1);
+        AddItemToPool(RG_GERUDO_MASK, 2, 1, 1, 1);
+        AddItemToPool(RG_MASK_OF_TRUTH, 2, 1, 1, 1);
+    }
+
     if (ctx->GetOption(RSK_ROCS_FEATHER)) {
         AddItemToPool(RG_ROCS_FEATHER, 2, 1, 1, 1);
     }
 
     int bronzeScale = ctx->GetOption(RSK_SHUFFLE_SWIM) ? 1 : 0;
     AddItemToPool(RG_PROGRESSIVE_SCALE, 3 + bronzeScale, 2 + bronzeScale, 2 + bronzeScale, 2 + bronzeScale);
+    int powerBracelet = ctx->GetOption(RSK_SHUFFLE_GRAB) ? 1 : 0;
+    AddItemToPool(RG_PROGRESSIVE_STRENGTH, 4 + powerBracelet, 3 + powerBracelet, 3 + powerBracelet, 3 + powerBracelet);
 
+    if (ctx->GetOption(RSK_SHUFFLE_CLIMB)) {
+        AddItemToPool(RG_CLIMB, 2, 1, 1, 1);
+    }
     if (ctx->GetOption(RSK_SHUFFLE_CRAWL)) {
         AddItemToPool(RG_CRAWL, 2, 1, 1, 1);
     }
     if (ctx->GetOption(RSK_SHUFFLE_OPEN_CHEST)) {
         AddItemToPool(RG_OPEN_CHEST, 2, 1, 1, 1);
+    }
+
+    if (ctx->GetOption(RSK_SHUFFLE_SPEAK)) {
+        AddItemToPool(RG_SPEAK_DEKU, 2, 1, 1, 1);
+        AddItemToPool(RG_SPEAK_GERUDO, 2, 1, 1, 1);
+        AddItemToPool(RG_SPEAK_GORON, 2, 1, 1, 1);
+        AddItemToPool(RG_SPEAK_HYLIAN, 2, 1, 1, 1);
+        AddItemToPool(RG_SPEAK_KOKIRI, 2, 1, 1, 1);
+        AddItemToPool(RG_SPEAK_ZORA, 2, 1, 1, 1);
     }
 
     if (ctx->GetOption(RSK_SHUFFLE_BEEHIVES)) {
@@ -525,7 +551,7 @@ void GenerateItemPool() {
     }
 
     if (ctx->GetOption(RSK_SHUFFLE_BEAN_SOULS)) {
-        ctx->possibleIceTrapModels.insert(RG_DEATH_MOUNTAIN_CRATER_BEAN_SOUL); // ice traps reroll this into a random bean soul
+        ctx->possibleIceTrapModels.insert(RG_DEATH_MOUNTAIN_CRATER_BEAN_SOUL); // ice traps reroll this into a random bean soul in Rando::Traps::GetTrapTrickModel
         AddItemToPool(RG_DEATH_MOUNTAIN_CRATER_BEAN_SOUL, 2, 1, 1, 1, false);
         AddItemToPool(RG_DEATH_MOUNTAIN_TRAIL_BEAN_SOUL, 2, 1, 1, 1, false);
         AddItemToPool(RG_DESERT_COLOSSUS_BEAN_SOUL, 2, 1, 1, 1, false);
@@ -610,7 +636,7 @@ void GenerateItemPool() {
     // Keys
     if (ctx->GetOption(RSK_LOCK_OVERWORLD_DOORS)) {
         // only 1 is added to the ice trap pool, to avoid the pool being filled with them.
-        // a random one is chosen in CreateItemOverrides
+        // a random one is chosen in Rando::Traps::GetTrapTrickModel
         AddItemToPool(RG_GUARD_HOUSE_KEY, 2, 1, 1, 1);
         AddItemToPool(RG_MARKET_BAZAAR_KEY, 2, 1, 1, 1, false);
         AddItemToPool(RG_MARKET_POTION_SHOP_KEY, 2, 1, 1, 1, false);
@@ -794,7 +820,7 @@ void GenerateItemPool() {
         bottleCount--;
     }
 
-    ctx->possibleIceTrapModels.insert(RG_EMPTY_BOTTLE); // ice traps reroll this into a random normal bottle
+    ctx->possibleIceTrapModels.insert(RG_EMPTY_BOTTLE); // ice traps reroll this into a random normal bottle in Rando::Traps::GetTrapTrickModel
     for (uint8_t i = 0; i < bottleCount; i++) {
         AddFixedItemToPool(RandomElement(Rando::StaticData::normalBottles), 1, false);
     }
@@ -811,11 +837,11 @@ void GenerateItemPool() {
     } else if (ctx->GetOption(RSK_SHUFFLE_MAPANDCOMPASS).IsNot(RO_DUNGEON_ITEM_LOC_STARTWITH)) {
         for (auto dungeon : ctx->GetDungeons()->GetDungeonList()) {
             if (dungeon->GetMap() != RG_NONE) {
-                AddFixedItemToPool(dungeon->GetMap(), false);
+                AddFixedItemToPool(dungeon->GetMap(), 1, false);
             }
 
             if (dungeon->GetCompass() != RG_NONE) {
-                AddFixedItemToPool(dungeon->GetCompass(), false);
+                AddFixedItemToPool(dungeon->GetCompass(), 1, false);
             }
         }
     }
@@ -846,7 +872,7 @@ void GenerateItemPool() {
                     break;
                 case RO_ITEM_POOL_BALANCED: {
                     int heartsToPlace = maxHearts - startingHearts;
-                    int halfHearts = maxHearts >> 2;
+                    int halfHearts = heartsToPlace / 2;
                     AddFixedItemToPool(RG_HEART_CONTAINER, heartsToPlace - halfHearts, false);
                     AddFixedItemToPool(RG_PIECE_OF_HEART, halfHearts * 4, false);
                     break;

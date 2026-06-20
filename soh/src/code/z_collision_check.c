@@ -2,6 +2,7 @@
 #include "vt.h"
 #include "overlays/effects/ovl_Effect_Ss_HitMark/z_eff_ss_hitmark.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
+#include "leveled_stat_math.h"
 #include <assert.h>
 
 typedef s32 (*ColChkResetFunc)(PlayState*, Collider*);
@@ -3024,7 +3025,29 @@ void CollisionCheck_ApplyDamage(PlayState* play, CollisionCheckContext* colChkCt
         collider->actor->colChkInfo.damageEffect = tbl->table[i] >> 4 & 0xF;
     }
     if (!(collider->acFlags & AC_HARD)) {
-        collider->actor->colChkInfo.damage += damage;
+        Actor* attacker = collider->ac;
+        // True source of the hit (player for melee, projectile actor otherwise) before the player
+        // override below; used to credit the right weapon/item with EXP.
+        Actor* expSource = collider->ac;
+
+        if (collider->actor->category != ACTORCAT_PLAYER) {
+            damage *= Leveled_GetHealthAttackMultiplier();
+        } else {
+            damage *= (1 << CVarGetInteger(CVAR_ENHANCEMENT("DamageMult"), 0));
+        }
+
+        if (info->acHit->atFlags & AT_TYPE_PLAYER)
+            attacker = &GET_PLAYER(play)->actor;
+
+        damage = (u16)Leveled_DamageModify(collider->actor, attacker, damage);
+        // Leveled mod: scale damage by the striking weapon/projectile's own level (1.0x if it doesn't
+        // scale damage). colChkInfo.damage is u16, so clamp the product.
+        damage = CLAMP(damage * Leveled_GetWeaponDamageMult(expSource, GET_PLAYER(play)), 0.0f, 65535.0f);
+        collider->actor->colChkInfo.damage += (u16)damage;
+
+        // Leveled mod: the weapon/projectile that struck this enemy earns item EXP. The mapping inside
+        // ignores non-player sources, so enemy-on-enemy and enemy-on-player hits award nothing.
+        Leveled_AwardWeaponExpOnHit(collider->actor, expSource, play);
     }
 
     if (CVarGetInteger(CVAR_ENHANCEMENT("IvanCoopModeEnabled"), 0)) {

@@ -22,10 +22,20 @@ extern "C"
 void gSPSegment(void* value, int segNum, uintptr_t target);
 void gSPSegmentLoadRes(void* value, int segNum, uintptr_t target);
 void gSPDisplayList(Gfx* pkt, Gfx* dl);
+void gDPSetTileSizeInterp(Gfx* pkt, int t, float uls, float ult, float lrs, float lrt);
 void gSPDisplayListOffset(Gfx* pkt, Gfx* dl, int offset);
 void gSPVertex(Gfx* pkt, uintptr_t v, int n, int v0);
 void gSPInvalidateTexCache(Gfx* pkt, uintptr_t texAddr);
 
+void Actor_RefreshLeveledStats(Actor* actor, Player* player);
+void Player_GainExperience(PlayState* play, u16 experience);
+// Leveled mod: these HUD texture helpers are defined in z_parameter.c and reused by leveled_overlays.c.
+// Without a visible prototype the C compiler assumes an int (32-bit) return, truncating the 64-bit Gfx*
+// pointer and corrupting the display list head -> crash in Gfx_TextureI8 (0xc0000005). See leveled_overlays.c.
+Gfx* Gfx_TextureIA8(Gfx* displayListHead, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
+                    s16 rectWidth, s16 rectHeight, u16 dsdx, u16 dtdy);
+Gfx* Gfx_TextureI8(Gfx* displayListHead, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
+                   s16 rectWidth, s16 rectHeight, u16 dsdx, u16 dtdy);
 
 void cleararena(void);
 void bootproc(void);
@@ -490,7 +500,7 @@ void func_80031A28(PlayState* play, ActorContext* actorCtx);
 void func_80031B14(PlayState* play, ActorContext* actorCtx);
 void func_80031C3C(ActorContext* actorCtx, PlayState* play);
 Actor* Actor_Spawn(ActorContext* actorCtx, PlayState* play, s16 actorId, f32 posX, f32 posY, f32 posZ,
-                   s16 rotX, s16 rotY, s16 rotZ, s16 params, s16 canRandomize);
+                   s16 rotX, s16 rotY, s16 rotZ, s16 params);
 Actor* Actor_SpawnAsChild(ActorContext* actorCtx, Actor* parent, PlayState* play, s16 actorId, f32 posX,
                           f32 posY, f32 posZ, s16 rotX, s16 rotY, s16 rotZ, s16 params);
 void Actor_SpawnTransitionActors(PlayState* play, ActorContext* actorCtx);
@@ -547,7 +557,7 @@ s32 func_800354B4(PlayState* play, Actor* actor, f32 range, s16 arg3, s16 arg4, 
 void func_8003555C(PlayState* play, Vec3f* pos, Vec3f* velocity, Vec3f* accel);
 void func_800355B8(PlayState* play, Vec3f* pos);
 u8 func_800355E4(PlayState* play, Collider* collider);
-u8 Actor_ApplyDamage(Actor* actor);
+u16 Actor_ApplyDamage(Actor* actor);
 void Actor_SetDropFlag(Actor* actor, ColliderInfo* colBody, s32 freezeFlag);
 void Actor_SetDropFlagJntSph(Actor* actor, ColliderJntSph* colBody, s32 freezeFlag);
 void func_80035844(Vec3f* arg0, Vec3f* arg1, Vec3s* arg2, s32 arg3);
@@ -1127,6 +1137,7 @@ Player* Player_UnsetMask(PlayState* play);
 s32 Player_HasMirrorShieldEquipped(PlayState* play);
 s32 Player_HasMirrorShieldSetToDraw(PlayState* play);
 s32 Player_ActionToMagicSpell(Player* player, s32 actionParam);
+void Player_DrawHookshotReticle(PlayState* play, Player* player, f32 hookshotRange);
 s32 Player_HoldsHookshot(Player* player);
 s32 Player_HoldsBow(Player* player);
 s32 Player_HoldsSlingshot(Player* player);
@@ -1219,10 +1230,15 @@ void Gfx_SetupDL_56Ptr(Gfx** gfxp);
 Gfx* Gfx_BranchTexScroll(Gfx** gfxp, u32 x, u32 y, s32 width, s32 height);
 Gfx* func_80094E78(GraphicsContext* gfxCtx, u32 x, u32 y);
 Gfx* Gfx_TexScroll(GraphicsContext* gfxCtx, u32 x, u32 y, s32 width, s32 height);
+Gfx* Gfx_TexScrollEx(GraphicsContext* gfxCtx, u32 x, u32 y, s32 width, s32 height, s32 xStep, s32 yStep);
 Gfx* Gfx_TwoTexScroll(GraphicsContext* gfxCtx, s32 tile1, u32 x1, u32 y1, s32 width1, s32 height1, s32 tile2, u32 x2,
                       u32 y2, s32 width2, s32 height2);
+Gfx* Gfx_TwoTexScrollEx(GraphicsContext* gfxCtx, s32 tile1, u32 x1, u32 y1, s32 width1, s32 height1, s32 tile2, u32 x2,
+                        u32 y2, s32 width2, s32 height2, s32 xStep1, s32 yStep1, s32 xStep2, s32 yStep2);
 Gfx* Gfx_TwoTexScrollEnvColor(GraphicsContext* gfxCtx, s32 tile1, u32 x1, u32 y1, s32 width1, s32 height1, s32 tile2,
                               u32 x2, u32 y2, s32 width2, s32 height2, s32 r, s32 g, s32 b, s32 a);
+Gfx* Gfx_TwoTexScrollEnvColorEx(GraphicsContext* gfxCtx, s32 tile1, u32 x1, u32 y1, s32 width1, s32 height1, s32 tile2,
+                              u32 x2, u32 y2, s32 width2, s32 height2, s32 r, s32 g, s32 b, s32 a, s32 xStep1, s32 yStep1, s32 xStep2, s32 yStep2);
 Gfx* Gfx_EnvColor(GraphicsContext* gfxCtx, s32 r, s32 g, s32 b, s32 a);
 void Gfx_SetupFrame(GraphicsContext* gfxCtx, u8 r, u8 g, u8 b);
 void func_80095974(GraphicsContext* gfxCtx);

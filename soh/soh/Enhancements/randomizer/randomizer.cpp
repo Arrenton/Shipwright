@@ -9,38 +9,31 @@
 #include <textures/icon_item_static/icon_item_static.h>
 #include <textures/icon_item_24_static/icon_item_24_static.h>
 #include "3drando/rando_main.hpp"
-#include "3drando/random.hpp"
 #include "soh/ResourceManagerHelpers.h"
 #include "soh/SohGui/SohGui.hpp"
-#include "3drando/custom_messages.hpp"
 #include <imgui.h>
 #include <imgui_internal.h>
-#include "../custom-message/CustomMessageTypes.h"
-#include "../item-tables/ItemTableManager.h"
-#include "../Presets/Presets.h"
 #include "../../../src/overlays/actors/ovl_En_GirlA/z_en_girla.h"
-#include <stdexcept>
 #include "randomizer_check_objects.h"
-#include "randomizer_check_tracker.h"
 #include <sstream>
 #include <tuple>
-#include <functional>
 #include "draw.h"
 #include "soh/OTRGlobals.h"
 #include <ship/window/FileDropMgr.h>
-#include "soh/SohGui/UIWidgets.hpp"
 #include "static_data.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
-#include "savefile.h"
-#include "entrance.h"
-#include "dungeon.h"
 #include "trial.h"
 #include "settings.h"
 #include "soh/util.h"
-#include "fishsanity.h"
 #include "randomizerTypes.h"
 #include "soh/Notification/Notification.h"
 #include "soh/ObjectExtension/ObjectExtension.h"
+
+extern "C" {
+#include "src/overlays/actors/ovl_Obj_Bean/z_obj_bean.h"
+
+extern void func_80B8FE00(ObjBean*); // trigger planting
+}
 
 static ObjectExtension::Register<CheckIdentity> RegisterIdentity;
 
@@ -53,8 +46,6 @@ std::unordered_map<std::string, RandomizerCheckArea> SpoilerfileAreaNameToEnum;
 std::unordered_map<std::string, HintType> SpoilerfileHintTypeNameToEnum;
 std::set<RandomizerCheck> excludedLocations;
 std::set<RandomizerCheck> spoilerExcludedLocations;
-std::set<RandomizerTrick> enabledTricks;
-std::set<RandomizerTrick> enabledGlitches;
 
 u8 generated;
 char* seedString;
@@ -120,46 +111,52 @@ std::unordered_map<std::string, SceneID> spoilerFileDungeonToScene = {
     { "Ganon's Castle", SCENE_INSIDE_GANONS_CASTLE }
 };
 
-std::unordered_map<s16, s16> getItemIdToItemId = {
-    { GI_BOW, ITEM_BOW },
-    { GI_ARROW_FIRE, ITEM_ARROW_FIRE },
-    { GI_DINS_FIRE, ITEM_DINS_FIRE },
-    { GI_SLINGSHOT, ITEM_SLINGSHOT },
-    { GI_OCARINA_FAIRY, ITEM_OCARINA_FAIRY },
-    { GI_OCARINA_OOT, ITEM_OCARINA_TIME },
-    { GI_HOOKSHOT, ITEM_HOOKSHOT },
-    { GI_LONGSHOT, ITEM_LONGSHOT },
-    { GI_ARROW_ICE, ITEM_ARROW_ICE },
-    { GI_FARORES_WIND, ITEM_FARORES_WIND },
-    { GI_BOOMERANG, ITEM_BOOMERANG },
-    { GI_LENS, ITEM_LENS },
-    { GI_HAMMER, ITEM_HAMMER },
-    { GI_ARROW_LIGHT, ITEM_ARROW_LIGHT },
-    { GI_NAYRUS_LOVE, ITEM_NAYRUS_LOVE },
-    { GI_BOTTLE, ITEM_BOTTLE },
-    { GI_POTION_RED, ITEM_POTION_RED },
-    { GI_POTION_GREEN, ITEM_POTION_GREEN },
-    { GI_POTION_BLUE, ITEM_POTION_BLUE },
-    { GI_FAIRY, ITEM_FAIRY },
-    { GI_FISH, ITEM_FISH },
-    { GI_MILK_BOTTLE, ITEM_MILK_BOTTLE },
-    { GI_LETTER_RUTO, ITEM_LETTER_RUTO },
-    { GI_BLUE_FIRE, ITEM_BLUE_FIRE },
-    { GI_BUGS, ITEM_BUG },
-    { GI_BIG_POE, ITEM_BIG_POE },
-    { GI_POE, ITEM_POE },
-    { GI_WEIRD_EGG, ITEM_WEIRD_EGG },
-    { GI_LETTER_ZELDA, ITEM_LETTER_ZELDA },
-    { GI_POCKET_EGG, ITEM_POCKET_EGG },
-    { GI_COJIRO, ITEM_COJIRO },
-    { GI_ODD_MUSHROOM, ITEM_ODD_MUSHROOM },
-    { GI_ODD_POTION, ITEM_ODD_POTION },
-    { GI_SAW, ITEM_SAW },
-    { GI_SWORD_BROKEN, ITEM_SWORD_BROKEN },
-    { GI_PRESCRIPTION, ITEM_PRESCRIPTION },
-    { GI_FROG, ITEM_FROG },
-    { GI_EYEDROPS, ITEM_EYEDROPS },
-    { GI_CLAIM_CHECK, ITEM_CLAIM_CHECK },
+// used for items that only set a rand inf when obtained
+std::unordered_map<RandomizerGet, RandomizerInf> randomizerGetToRandInf = {
+    { RG_FISHING_POLE, RAND_INF_FISHING_POLE_FOUND },
+    { RG_BRONZE_SCALE, RAND_INF_CAN_SWIM },
+    { RG_POWER_BRACELET, RAND_INF_CAN_GRAB },
+    { RG_CLIMB, RAND_INF_CAN_CLIMB },
+    { RG_CRAWL, RAND_INF_CAN_CRAWL },
+    { RG_OPEN_CHEST, RAND_INF_CAN_OPEN_CHEST },
+    { RG_SPEAK_DEKU, RAND_INF_CAN_SPEAK_DEKU },
+    { RG_SPEAK_GERUDO, RAND_INF_CAN_SPEAK_GERUDO },
+    { RG_SPEAK_GORON, RAND_INF_CAN_SPEAK_GORON },
+    { RG_SPEAK_HYLIAN, RAND_INF_CAN_SPEAK_HYLIAN },
+    { RG_SPEAK_KOKIRI, RAND_INF_CAN_SPEAK_KOKIRI },
+    { RG_SPEAK_ZORA, RAND_INF_CAN_SPEAK_ZORA },
+    { RG_QUIVER_INF, RAND_INF_HAS_INFINITE_QUIVER },
+    { RG_BOMB_BAG_INF, RAND_INF_HAS_INFINITE_BOMB_BAG },
+    { RG_BULLET_BAG_INF, RAND_INF_HAS_INFINITE_BULLET_BAG },
+    { RG_STICK_UPGRADE_INF, RAND_INF_HAS_INFINITE_STICK_UPGRADE },
+    { RG_NUT_UPGRADE_INF, RAND_INF_HAS_INFINITE_NUT_UPGRADE },
+    { RG_MAGIC_INF, RAND_INF_HAS_INFINITE_MAGIC_METER },
+    { RG_BOMBCHU_INF, RAND_INF_HAS_INFINITE_BOMBCHUS },
+    { RG_WALLET_INF, RAND_INF_HAS_INFINITE_MONEY },
+    { RG_OCARINA_A_BUTTON, RAND_INF_HAS_OCARINA_A },
+    { RG_OCARINA_C_UP_BUTTON, RAND_INF_HAS_OCARINA_C_UP },
+    { RG_OCARINA_C_DOWN_BUTTON, RAND_INF_HAS_OCARINA_C_DOWN },
+    { RG_OCARINA_C_LEFT_BUTTON, RAND_INF_HAS_OCARINA_C_LEFT },
+    { RG_OCARINA_C_RIGHT_BUTTON, RAND_INF_HAS_OCARINA_C_RIGHT },
+    { RG_DEATH_MOUNTAIN_CRATER_BEAN_SOUL, RAND_INF_DEATH_MOUNTAIN_CRATER_BEAN_SOUL },
+    { RG_DEATH_MOUNTAIN_TRAIL_BEAN_SOUL, RAND_INF_DEATH_MOUNTAIN_TRAIL_BEAN_SOUL },
+    { RG_DESERT_COLOSSUS_BEAN_SOUL, RAND_INF_DESERT_COLOSSUS_BEAN_SOUL },
+    { RG_GERUDO_VALLEY_BEAN_SOUL, RAND_INF_GERUDO_VALLEY_BEAN_SOUL },
+    { RG_GRAVEYARD_BEAN_SOUL, RAND_INF_GRAVEYARD_BEAN_SOUL },
+    { RG_KOKIRI_FOREST_BEAN_SOUL, RAND_INF_KOKIRI_FOREST_BEAN_SOUL },
+    { RG_LAKE_HYLIA_BEAN_SOUL, RAND_INF_LAKE_HYLIA_BEAN_SOUL },
+    { RG_LOST_WOODS_BRIDGE_BEAN_SOUL, RAND_INF_LOST_WOODS_BRIDGE_BEAN_SOUL },
+    { RG_LOST_WOODS_BEAN_SOUL, RAND_INF_LOST_WOODS_BEAN_SOUL },
+    { RG_ZORAS_RIVER_BEAN_SOUL, RAND_INF_ZORAS_RIVER_BEAN_SOUL },
+    { RG_GOHMA_SOUL, RAND_INF_GOHMA_SOUL },
+    { RG_KING_DODONGO_SOUL, RAND_INF_KING_DODONGO_SOUL },
+    { RG_BARINADE_SOUL, RAND_INF_BARINADE_SOUL },
+    { RG_PHANTOM_GANON_SOUL, RAND_INF_PHANTOM_GANON_SOUL },
+    { RG_VOLVAGIA_SOUL, RAND_INF_VOLVAGIA_SOUL },
+    { RG_MORPHA_SOUL, RAND_INF_MORPHA_SOUL },
+    { RG_BONGO_BONGO_SOUL, RAND_INF_BONGO_BONGO_SOUL },
+    { RG_TWINROVA_SOUL, RAND_INF_TWINROVA_SOUL },
+    { RG_GANON_SOUL, RAND_INF_GANON_SOUL },
 };
 
 #ifdef _MSC_VER
@@ -299,6 +296,10 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerCheck(Randomizer
 }
 
 ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGet randoGet) {
+    if (randomizerGetToRandInf.find(randoGet) != randomizerGetToRandInf.end()) {
+        return Flags_GetRandomizerInf(randomizerGetToRandInf.find(randoGet)->second) ? CANT_OBTAIN_ALREADY_HAVE
+                                                                                     : CAN_OBTAIN;
+    }
 
     // This is needed since Plentiful item pool also adds a third progressive wallet
     // but we should not get Tycoon's Wallet from it if it is off.
@@ -421,7 +422,7 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGe
             return OTRGlobals::Instance->gRandoContext->GetOption(RSK_BOMBCHU_BAG).Is(RO_BOMBCHU_BAG_NONE)
                        ? CAN_OBTAIN
                        : (INV_CONTENT(ITEM_BOMBCHU) != ITEM_NONE ? CAN_OBTAIN : CANT_OBTAIN_NEED_UPGRADE);
-        case RG_PROGRESSIVE_BOMBCHU_BAG: // RANDOTODO Do we want bombchu refills to exist separatly from bombchu bags?
+        case RG_PROGRESSIVE_BOMBCHU_BAG: // RANDOTODO Do we want bombchu refills to exist separately from bombchu bags?
                                          // If so, this needs changing.
             switch (OTRGlobals::Instance->gRandoContext->GetOption(RSK_BOMBCHU_BAG).Get()) {
                 case RO_BOMBCHU_BAG_NONE:
@@ -448,6 +449,8 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGe
                         }
                     }
             }
+            assert(false);
+            return CAN_OBTAIN;
         case RG_PROGRESSIVE_HOOKSHOT:
             switch (INV_CONTENT(ITEM_HOOKSHOT)) {
                 case ITEM_NONE:
@@ -701,18 +704,6 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGe
             return !CHECK_QUEST_ITEM(QUEST_MEDALLION_SHADOW) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
         case RG_LIGHT_MEDALLION:
             return !CHECK_QUEST_ITEM(QUEST_MEDALLION_LIGHT) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
-
-        // Ocarina Buttons
-        case RG_OCARINA_A_BUTTON:
-            return Flags_GetRandomizerInf(RAND_INF_HAS_OCARINA_A) ? CANT_OBTAIN_ALREADY_HAVE : CAN_OBTAIN;
-        case RG_OCARINA_C_LEFT_BUTTON:
-            return Flags_GetRandomizerInf(RAND_INF_HAS_OCARINA_C_LEFT) ? CANT_OBTAIN_ALREADY_HAVE : CAN_OBTAIN;
-        case RG_OCARINA_C_RIGHT_BUTTON:
-            return Flags_GetRandomizerInf(RAND_INF_HAS_OCARINA_C_RIGHT) ? CANT_OBTAIN_ALREADY_HAVE : CAN_OBTAIN;
-        case RG_OCARINA_C_UP_BUTTON:
-            return Flags_GetRandomizerInf(RAND_INF_HAS_OCARINA_C_UP) ? CANT_OBTAIN_ALREADY_HAVE : CAN_OBTAIN;
-        case RG_OCARINA_C_DOWN_BUTTON:
-            return Flags_GetRandomizerInf(RAND_INF_HAS_OCARINA_C_DOWN) ? CANT_OBTAIN_ALREADY_HAVE : CAN_OBTAIN;
 
         case RG_RECOVERY_HEART:
         case RG_GREEN_RUPEE:
@@ -1177,8 +1168,8 @@ std::map<RandomizerCheck, RandomizerInf> rcToRandomizerInf = {
     { RC_DEKU_TREE_LOBBY_GRASS_1, RAND_INF_DEKU_TREE_LOBBY_GRASS_1 },
     { RC_DEKU_TREE_LOBBY_GRASS_2, RAND_INF_DEKU_TREE_LOBBY_GRASS_2 },
     { RC_DEKU_TREE_LOBBY_GRASS_3, RAND_INF_DEKU_TREE_LOBBY_GRASS_3 },
-    { RC_DEKU_TREE_LOBBY_GRASS_4, RAND_INF_DEKU_TREE_LOBBY_GRASS_4 },
-    { RC_DEKU_TREE_LOBBY_GRASS_5, RAND_INF_DEKU_TREE_LOBBY_GRASS_5 },
+    { RC_DEKU_TREE_2F_GRASS_1, RAND_INF_DEKU_TREE_2F_GRASS_1 },
+    { RC_DEKU_TREE_2F_GRASS_2, RAND_INF_DEKU_TREE_2F_GRASS_2 },
     { RC_DEKU_TREE_SLINGSHOT_GRASS_1, RAND_INF_DEKU_TREE_SLINGSHOT_GRASS_1 },
     { RC_DEKU_TREE_SLINGSHOT_GRASS_2, RAND_INF_DEKU_TREE_SLINGSHOT_GRASS_2 },
     { RC_DEKU_TREE_SLINGSHOT_GRASS_3, RAND_INF_DEKU_TREE_SLINGSHOT_GRASS_3 },
@@ -1222,8 +1213,8 @@ std::map<RandomizerCheck, RandomizerInf> rcToRandomizerInf = {
     { RC_DEKU_TREE_MQ_LOBBY_GRASS_3, RAND_INF_DEKU_TREE_MQ_LOBBY_GRASS_3 },
     { RC_DEKU_TREE_MQ_LOBBY_GRASS_4, RAND_INF_DEKU_TREE_MQ_LOBBY_GRASS_4 },
     { RC_DEKU_TREE_MQ_LOBBY_GRASS_5, RAND_INF_DEKU_TREE_MQ_LOBBY_GRASS_5 },
-    { RC_DEKU_TREE_MQ_LOBBY_GRASS_6, RAND_INF_DEKU_TREE_MQ_LOBBY_GRASS_6 },
-    { RC_DEKU_TREE_MQ_LOBBY_GRASS_7, RAND_INF_DEKU_TREE_MQ_LOBBY_GRASS_7 },
+    { RC_DEKU_TREE_MQ_2F_GRASS_1, RAND_INF_DEKU_TREE_MQ_2F_GRASS_1 },
+    { RC_DEKU_TREE_MQ_2F_GRASS_2, RAND_INF_DEKU_TREE_MQ_2F_GRASS_2 },
     { RC_DEKU_TREE_MQ_SLINGSHOT_GRASS_1, RAND_INF_DEKU_TREE_MQ_SLINGSHOT_GRASS_1 },
     { RC_DEKU_TREE_MQ_SLINGSHOT_GRASS_2, RAND_INF_DEKU_TREE_MQ_SLINGSHOT_GRASS_2 },
     { RC_DEKU_TREE_MQ_SLINGSHOT_GRASS_3, RAND_INF_DEKU_TREE_MQ_SLINGSHOT_GRASS_3 },
@@ -3472,7 +3463,7 @@ void GenerateRandomizerImgui(std::string seed = "") {
     // RANDOTODO proper UI for selecting if a spoiler loaded should be used for settings
     Rando::Settings::GetInstance()->SetAllToContext();
 
-    // todo: this efficently when we build out cvar array support
+    // todo: this efficiently when we build out cvar array support
     std::set<RandomizerCheck> excludedLocations;
     std::stringstream excludedLocationStringStream(CVarGetString(CVAR_RANDOMIZER_SETTING("ExcludedLocations"), ""));
     std::string excludedLocationString;
@@ -3486,7 +3477,9 @@ void GenerateRandomizerImgui(std::string seed = "") {
     std::stringstream enabledTrickStringStream(CVarGetString(CVAR_RANDOMIZER_SETTING("EnabledTricks"), ""));
     std::string enabledTrickString;
     while (getline(enabledTrickStringStream, enabledTrickString, ',')) {
-        enabledTricks.insert((RandomizerTrick)std::stoi(enabledTrickString));
+        if (Rando::StaticData::trickToEnum.contains(enabledTrickString)) {
+            enabledTricks.insert(Rando::StaticData::trickToEnum[enabledTrickString]);
+        }
     }
 
     // Update the visibilitiy before removing conflicting excludes (in case the locations tab wasn't viewed)
@@ -3643,46 +3636,6 @@ void Randomizer_GameplayStats_SetTimestamp(uint16_t item) {
 }
 
 extern "C" u8 Return_Item_Entry(GetItemEntry itemEntry, u8 returnItem);
-
-// used for items that only set a rand inf when obtained
-std::map<RandomizerGet, RandomizerInf> randomizerGetToRandInf = {
-    { RG_FISHING_POLE, RAND_INF_FISHING_POLE_FOUND },
-    { RG_BRONZE_SCALE, RAND_INF_CAN_SWIM },
-    { RG_CRAWL, RAND_INF_CAN_CRAWL },
-    { RG_OPEN_CHEST, RAND_INF_CAN_OPEN_CHEST },
-    { RG_QUIVER_INF, RAND_INF_HAS_INFINITE_QUIVER },
-    { RG_BOMB_BAG_INF, RAND_INF_HAS_INFINITE_BOMB_BAG },
-    { RG_BULLET_BAG_INF, RAND_INF_HAS_INFINITE_BULLET_BAG },
-    { RG_STICK_UPGRADE_INF, RAND_INF_HAS_INFINITE_STICK_UPGRADE },
-    { RG_NUT_UPGRADE_INF, RAND_INF_HAS_INFINITE_NUT_UPGRADE },
-    { RG_MAGIC_INF, RAND_INF_HAS_INFINITE_MAGIC_METER },
-    { RG_BOMBCHU_INF, RAND_INF_HAS_INFINITE_BOMBCHUS },
-    { RG_WALLET_INF, RAND_INF_HAS_INFINITE_MONEY },
-    { RG_OCARINA_A_BUTTON, RAND_INF_HAS_OCARINA_A },
-    { RG_OCARINA_C_UP_BUTTON, RAND_INF_HAS_OCARINA_C_UP },
-    { RG_OCARINA_C_DOWN_BUTTON, RAND_INF_HAS_OCARINA_C_DOWN },
-    { RG_OCARINA_C_LEFT_BUTTON, RAND_INF_HAS_OCARINA_C_LEFT },
-    { RG_OCARINA_C_RIGHT_BUTTON, RAND_INF_HAS_OCARINA_C_RIGHT },
-    { RG_DEATH_MOUNTAIN_CRATER_BEAN_SOUL, RAND_INF_DEATH_MOUNTAIN_CRATER_BEAN_SOUL },
-    { RG_DEATH_MOUNTAIN_TRAIL_BEAN_SOUL, RAND_INF_DEATH_MOUNTAIN_TRAIL_BEAN_SOUL },
-    { RG_DESERT_COLOSSUS_BEAN_SOUL, RAND_INF_DESERT_COLOSSUS_BEAN_SOUL },
-    { RG_GERUDO_VALLEY_BEAN_SOUL, RAND_INF_GERUDO_VALLEY_BEAN_SOUL },
-    { RG_GRAVEYARD_BEAN_SOUL, RAND_INF_GRAVEYARD_BEAN_SOUL },
-    { RG_KOKIRI_FOREST_BEAN_SOUL, RAND_INF_KOKIRI_FOREST_BEAN_SOUL },
-    { RG_LAKE_HYLIA_BEAN_SOUL, RAND_INF_LAKE_HYLIA_BEAN_SOUL },
-    { RG_LOST_WOODS_BRIDGE_BEAN_SOUL, RAND_INF_LOST_WOODS_BRIDGE_BEAN_SOUL },
-    { RG_LOST_WOODS_BEAN_SOUL, RAND_INF_LOST_WOODS_BEAN_SOUL },
-    { RG_ZORAS_RIVER_BEAN_SOUL, RAND_INF_ZORAS_RIVER_BEAN_SOUL },
-    { RG_GOHMA_SOUL, RAND_INF_GOHMA_SOUL },
-    { RG_KING_DODONGO_SOUL, RAND_INF_KING_DODONGO_SOUL },
-    { RG_BARINADE_SOUL, RAND_INF_BARINADE_SOUL },
-    { RG_PHANTOM_GANON_SOUL, RAND_INF_PHANTOM_GANON_SOUL },
-    { RG_VOLVAGIA_SOUL, RAND_INF_VOLVAGIA_SOUL },
-    { RG_MORPHA_SOUL, RAND_INF_MORPHA_SOUL },
-    { RG_BONGO_BONGO_SOUL, RAND_INF_BONGO_BONGO_SOUL },
-    { RG_TWINROVA_SOUL, RAND_INF_TWINROVA_SOUL },
-    { RG_GANON_SOUL, RAND_INF_GANON_SOUL },
-};
 
 extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
     if (giEntry.modIndex != MOD_RANDOMIZER) {
@@ -3887,6 +3840,12 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
         Flags_SetRandomizerInf(
             (RandomizerInf)((int)RAND_INF_GUARD_HOUSE_UNLOCKED + ((item - RG_GUARD_HOUSE_KEY) * 2) + 1));
         return Return_Item_Entry(giEntry, RG_NONE);
+    } else if (item >= RG_KEATON_MASK && item <= RG_MASK_OF_TRUTH) {
+        Flags_SetRandomizerInf((RandomizerInf)((int)RAND_INF_CHILD_TRADES_HAS_MASK_KEATON + (item - RG_KEATON_MASK)));
+        if (INV_CONTENT(ITEM_TRADE_CHILD) == ITEM_NONE) {
+            INV_CONTENT(ITEM_TRADE_CHILD) = (int)ITEM_MASK_KEATON + (item - RG_KEATON_MASK);
+        }
+        return Return_Item_Entry(giEntry, RG_NONE);
     }
 
     switch (item) {
@@ -3908,18 +3867,6 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
             if (INV_CONTENT(ITEM_BEAN) == ITEM_NONE) {
                 INV_CONTENT(ITEM_BEAN) = ITEM_BEAN;
                 AMMO(ITEM_BEAN) = 10;
-                if (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_SKIP_PLANTING_BEANS)) {
-                    gSaveContext.sceneFlags[SCENE_DEATH_MOUNTAIN_CRATER].swch |= (1 << 3);
-                    gSaveContext.sceneFlags[SCENE_DEATH_MOUNTAIN_TRAIL].swch |= (1 << 6);
-                    gSaveContext.sceneFlags[SCENE_DESERT_COLOSSUS].swch |= (1 << 24);
-                    gSaveContext.sceneFlags[SCENE_GERUDO_VALLEY].swch |= (1 << 3);
-                    gSaveContext.sceneFlags[SCENE_GRAVEYARD].swch |= (1 << 3);
-                    gSaveContext.sceneFlags[SCENE_KOKIRI_FOREST].swch |= (1 << 9);
-                    gSaveContext.sceneFlags[SCENE_LAKE_HYLIA].swch |= (1 << 1);
-                    gSaveContext.sceneFlags[SCENE_LOST_WOODS].swch |= (1 << 4) | (1 << 18);
-                    gSaveContext.sceneFlags[SCENE_ZORAS_RIVER].swch |= (1 << 3);
-                    AMMO(ITEM_BEAN) = 0;
-                }
             }
             break;
         case RG_DOUBLE_DEFENSE:

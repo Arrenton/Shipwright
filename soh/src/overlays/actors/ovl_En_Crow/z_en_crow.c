@@ -223,7 +223,9 @@ void EnCrow_SetupRespawn(EnCrow* this) {
     Math_Vec3f_Copy(&this->actor.world.pos, &this->actor.home.pos);
     this->actor.shape.rot.x = 0;
     this->actor.shape.rot.z = 0;
-    this->timer = 300;
+    // Guay Spawn Rate: delay before a killed Guay respawns. 0 = vanilla 300 frames.
+    int32_t guaySpawnRate = CVarGetInteger(CVAR_ENHANCEMENT("GuaySpawnRate"), 0);
+    this->timer = guaySpawnRate ? (20 * guaySpawnRate) : 300;
     this->actor.shape.yOffset = 2000;
     this->actor.targetArrowOffset = 2000.0f;
     this->actor.draw = NULL;

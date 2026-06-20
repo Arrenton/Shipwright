@@ -665,6 +665,7 @@ void EnDodongo_SetupDeath(EnDodongo* this, PlayState* play) {
     Animation_MorphToPlayOnce(&this->skelAnime, &gDodongoDieAnim, -8.0f);
     this->timer = 0;
     Audio_PlayActorSound2(&this->actor, NA_SE_EN_DODO_J_DEAD);
+    Player_GainExperience(play, this->actor.exp);
     this->actionState = DODONGO_DEATH;
     this->actor.flags &= ~ACTOR_FLAG_ATTENTION_ENABLED;
     this->actor.speedXZ = 0.0f;
@@ -685,7 +686,7 @@ void EnDodongo_Death(EnDodongo* this, PlayState* play) {
     if (SkelAnime_Update(&this->skelAnime) != 0) {
         if (this->timer == 0) {
             bomb = (EnBom*)Actor_Spawn(&play->actorCtx, play, ACTOR_EN_BOM, this->actor.world.pos.x,
-                                       this->actor.world.pos.y, this->actor.world.pos.z, 0, 0, 6, BOMB_BODY, true);
+                                       this->actor.world.pos.y, this->actor.world.pos.z, 0, 0, 6, BOMB_BODY);
             if (bomb != NULL) {
                 bomb->timer = 0;
                 this->timer = 8;

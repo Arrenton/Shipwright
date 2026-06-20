@@ -351,7 +351,15 @@ typedef struct {
     /* 0x1422 */ s16 sunsSongState; // controls the effects of suns song
     /* 0x1424 */ s16 healthAccumulator;
     /*        */ ShipSaveContextData ship;
-} SaveContext; // size = 0x1428
+    // Leveled mod fields
+    u32 experience;
+    s16 heartContainers;
+    s16 healthCapacity2;
+    u8 magicUnits;
+    s16 showNeededExpTimer;
+    u8 itemLevels[32]; // Leveled mod: per-item level (1-99), indexed by LeveledItemId (<= 32 items)
+    u32 itemExp[32];   // Leveled mod: per-item EXP toward the next level
+} SaveContext;
 
 typedef enum {
     /* 00 */ QUEST_NORMAL,

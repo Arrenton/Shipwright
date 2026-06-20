@@ -278,6 +278,10 @@ std::shared_ptr<GetItemEntry> Item::GetGIEntry() const { // NOLINT(*-no-recursio
             }
             break;
         case RG_PROGRESSIVE_STRENGTH:
+            if (!logic->CheckRandoInf(RAND_INF_CAN_GRAB)) {
+                actual = RG_POWER_BRACELET;
+                break;
+            }
             switch (logic->CurrentUpgrade(UPG_STRENGTH)) {
                 case 0:
                     actual = RG_GORONS_BRACELET;
@@ -483,6 +487,24 @@ const HintText& Item::GetHint() const {
 
 GetItemCategory Item::GetCategory() {
     return category;
+}
+
+Item Item::CustomIcon(const char* customIcon_, CustomIconSize iconSize_) {
+    customIcon = customIcon_;
+    iconSize = iconSize_;
+    return *this;
+}
+
+const char* Item::GetCustomIcon() {
+    return customIcon;
+}
+
+CustomIconSize Item::GetCustomIconSize() {
+    return iconSize;
+}
+
+bool Item::HasCustomIcon() {
+    return customIcon != nullptr;
 }
 
 bool Item::operator==(const Item& right) const {

@@ -11,13 +11,15 @@
 #include "soh/ObjectExtension/ActorListIndex.h"
 #include "soh/frame_interpolation.h"
 #include "soh/Enhancements/cosmetics/cosmeticsTypes.h"
-#include "soh/Enhancements/enemyrandomizer.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/Enhancements/nametag.h"
 
 #include "soh/ActorDB.h"
 #include "soh/OTRGlobals.h"
+#include "leveled_stat_math.h"
+#include "leveled_actor_level_table.h"
+#include "leveled_overlays.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -1238,12 +1240,42 @@ void Actor_SetObjectDependency(PlayState* play, Actor* actor) {
     gSegments[6] = VIRTUAL_TO_PHYSICAL(play->objectCtx.status[actor->objBankIndex].segment);
 }
 
+void Actor_RefreshLeveledStats(Actor* actor, Player* player) {
+    if (!CVarGetInteger("gLeveled.Master", 1)) {
+        return; // Master off: no leveled stat modifications (player handled in Player_GainExperience)
+    }
+    if (actor->category == ACTORCAT_PLAYER) {
+        actor->power = GetActorStat_PlayerPower(actor->level);
+        actor->courage = GetActorStat_PlayerCourage(actor->level);
+        gSaveContext.healthCapacity2 =
+            GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, actor->level);
+        if (gSaveContext.healthCapacity2 > 0 && gSaveContext.health > gSaveContext.healthCapacity2)
+            gSaveContext.health = gSaveContext.healthCapacity2;
+        gSaveContext.magicUnits = GetPlayerStat_MagicUnits(actor->level);
+        if (player != NULL) {
+            Leveled_SetPlayerModifiedStats(player);
+        }
+    } else {
+        actor->power = GetActorStat_Power(actor->level);
+        actor->powerModifier = 1;
+        actor->courage = GetActorStat_Courage(actor->level);
+        actor->courageModifier = 0;
+    }
+}
+
 void Actor_Init(Actor* actor, PlayState* play) {
     Actor_SetWorldToHome(actor);
     Actor_SetShapeRotToWorld(actor);
     Actor_SetFocus(actor, 0.0f);
     Math_Vec3f_Copy(&actor->prevPos, &actor->world.pos);
     Actor_SetScale(actor, 0.01f);
+    actor->level = 0;
+    actor->exp = 0;
+    actor->ignoreExpReward = false;
+    for (u8 i = 0; i < 7; i++) {
+        actor->floatingNumber[i] = 0;
+        actor->floatingNumberLife[i] = 0;
+    }
     actor->targetMode = 3;
     actor->minVelocityY = -20.0f;
     actor->xyzDistToPlayerSq = FLT_MAX;
@@ -1261,7 +1293,19 @@ void Actor_Init(Actor* actor, PlayState* play) {
             actor->init(actor, play);
             actor->init = NULL;
 
+            if (actor->category != ACTORCAT_PLAYER) {
+                Actor_GetLevelAndExperience(play, actor, 0);
+                actor->colChkInfo.health = GetActorStat_EnemyMaxHealth(actor->colChkInfo.health, actor->level);
+            }
+
             GameInteractor_ExecuteOnActorInit(actor);
+
+            // For enemy health bar we need to know the max health during init
+            if (actor->category != ACTORCAT_PLAYER) {
+                actor->maximumHealth = actor->colChkInfo.health;
+            }
+
+            Actor_RefreshLeveledStats(actor, GET_PLAYER(play));
         } else {
             actor->init = NULL;
             Actor_Kill(actor);
@@ -2212,8 +2256,12 @@ s32 Actor_NotMounted(PlayState* play, Actor* horse) {
 
 void func_8002F698(PlayState* play, Actor* actor, f32 arg2, s16 arg3, f32 arg4, u32 arg5, u32 arg6) {
     Player* player = GET_PLAYER(play);
+    u16 damage = arg6;
+    if (actor != NULL && damage != 0) {
+        damage = Leveled_DamageModify(&player->actor, actor, arg6);
+    }
 
-    player->knockbackDamage = arg6;
+    player->knockbackDamage = damage;
     player->knockbackType = arg5;
     player->knockbackRot = arg3;
     player->knockbackSpeed = arg2;
@@ -2607,7 +2655,7 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
         refActor = &GET_PLAYER(play)->actor;
         KREG(0) = 0;
         Actor_Spawn(&play->actorCtx, play, ACTOR_EN_CLEAR_TAG, refActor->world.pos.x, refActor->world.pos.y + 100.0f,
-                    refActor->world.pos.z, 0, 0, 0, 1, true);
+                    refActor->world.pos.z, 0, 0, 0, 1);
     }
 
     sp80 = &D_80116068[0];
@@ -2639,7 +2687,18 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
                         actor->init(actor, play);
                         actor->init = NULL;
 
+                        if (actor->category != ACTORCAT_PLAYER) {
+                            Actor_GetLevelAndExperience(play, actor, 0);
+                            actor->colChkInfo.health = GetActorStat_EnemyMaxHealth(actor->colChkInfo.health, actor->level);
+                        }
+
                         GameInteractor_ExecuteOnActorInit(actor);
+
+                        if (actor->category != ACTORCAT_PLAYER) {
+                            actor->maximumHealth = actor->colChkInfo.health;
+                        }
+
+                        Actor_RefreshLeveledStats(actor, GET_PLAYER(play));
                     } else {
                         actor->init = NULL;
                         Actor_Kill(actor);
@@ -3319,18 +3378,7 @@ void Actor_FreeOverlay(ActorDBEntry* dbEntry) {
 int gMapLoading = 0;
 
 Actor* Actor_Spawn(ActorContext* actorCtx, PlayState* play, s16 actorId, f32 posX, f32 posY, f32 posZ, s16 rotX,
-                   s16 rotY, s16 rotZ, s16 params, s16 canRandomize) {
-
-    uint8_t tryRandomizeEnemy = canRandomize && CVarGetInteger(CVAR_ENHANCEMENT("RandomizedEnemies"), 0) &&
-                                ((gSaveContext.fileNum >= 0 && gSaveContext.fileNum <= 2) ||
-                                 (gSaveContext.fileNum == 0xFF && gSaveContext.gameMode == GAMEMODE_NORMAL));
-
-    if (tryRandomizeEnemy) {
-        if (!GetRandomizedEnemy(play, &actorId, &posX, &posY, &posZ, &rotX, &rotY, &rotZ, &params)) {
-            return NULL;
-        }
-    }
-
+                   s16 rotY, s16 rotZ, s16 params) {
     Actor* actor;
     s32 objBankIndex;
     u32 temp;
@@ -3425,7 +3473,7 @@ Actor* Actor_Spawn(ActorContext* actorCtx, PlayState* play, s16 actorId, f32 pos
 
 Actor* Actor_SpawnAsChild(ActorContext* actorCtx, Actor* parent, PlayState* play, s16 actorId, f32 posX, f32 posY,
                           f32 posZ, s16 rotX, s16 rotY, s16 rotZ, s16 params) {
-    Actor* spawnedActor = Actor_Spawn(actorCtx, play, actorId, posX, posY, posZ, rotX, rotY, rotZ, params, true);
+    Actor* spawnedActor = Actor_Spawn(actorCtx, play, actorId, posX, posY, posZ, rotX, rotY, rotZ, params);
 
     if (spawnedActor == NULL) {
         return NULL;
@@ -3433,7 +3481,7 @@ Actor* Actor_SpawnAsChild(ActorContext* actorCtx, Actor* parent, PlayState* play
 
     // The following enemies break when the parent actor isn't the same as what would happen in authentic gameplay.
     // As such, don't assign a parent to them at all when spawned with Enemy Randomizer.
-    // Gohma (z_boss_goma.c), the Stalchildren spawner (z_en_encount1.c) and the falling platform spawning Stalfos in
+    // Gohma (z_boss_goma.c) and the falling platform spawning Stalfos in
     // Forest Temple (z_bg_mori_bigst.c) that normally rely on this behaviour are changed when
     // Enemy Rando is on so they still work properly even without assigning a parent.
     if (CVarGetInteger(CVAR_ENHANCEMENT("RandomizedEnemies"), 0) &&
@@ -3469,7 +3517,7 @@ void Actor_SpawnTransitionActors(PlayState* play, ActorContext* actorCtx) {
                   (transitionActor->sides[1].room == play->roomCtx.prevRoom.num)))) {
                 Actor_Spawn(actorCtx, play, (s16)(transitionActor->id & 0x1FFF), transitionActor->pos.x,
                             transitionActor->pos.y, transitionActor->pos.z, 0, transitionActor->rotY, 0,
-                            (i << 0xA) + transitionActor->params, true);
+                            (i << 0xA) + transitionActor->params);
 
                 transitionActor->id = -transitionActor->id;
                 numActors = play->transiActorCtx.numActors;
@@ -3481,8 +3529,13 @@ void Actor_SpawnTransitionActors(PlayState* play, ActorContext* actorCtx) {
 
 Actor* Actor_SpawnEntry(ActorContext* actorCtx, ActorEntry* actorEntry, PlayState* play) {
     gMapLoading = 1;
-    Actor* ret = Actor_Spawn(actorCtx, play, actorEntry->id, actorEntry->pos.x, actorEntry->pos.y, actorEntry->pos.z,
-                             actorEntry->rot.x, actorEntry->rot.y, actorEntry->rot.z, actorEntry->params, true);
+    Actor* ret;
+
+    if (GameInteractor_Should(VB_SPAWN_ACTOR_ENTRY, true, actorCtx, actorEntry, play, &ret)) {
+        ret = Actor_Spawn(actorCtx, play, actorEntry->id, actorEntry->pos.x, actorEntry->pos.y, actorEntry->pos.z,
+                          actorEntry->rot.x, actorEntry->rot.y, actorEntry->rot.z, actorEntry->params);
+    }
+
     gMapLoading = 0;
 
     return ret;
@@ -3497,12 +3550,6 @@ Actor* Actor_Delete(ActorContext* actorCtx, Actor* actor, PlayState* play) {
 
     // Execute before actor memory is freed
     GameInteractor_ExecuteOnActorDestroy(actor);
-
-    dbEntry = ActorDB_Retrieve(actor->id);
-
-    if (HREG(20) != 0) {
-        osSyncPrintf("アクタークラス削除 [%s]\n", dbEntry->name); // "Actor class deleted [%s]"
-    }
 
     if ((player != NULL) && (actor == player->focusActor)) {
         Player_ReleaseLockOn(player);
@@ -3523,6 +3570,12 @@ Actor* Actor_Delete(ActorContext* actorCtx, Actor* actor, PlayState* play) {
 
     Audio_StopSfxByPos(&actor->projectedPos);
     Actor_Destroy(actor, play);
+
+    dbEntry = ActorDB_Retrieve(actor->id);
+
+    if (HREG(20) != 0) {
+        osSyncPrintf("アクタークラス削除 [%s]\n", dbEntry->name); // "Actor class deleted [%s]"
+    }
 
     newHead = Actor_RemoveFromCategory(play, actorCtx, actor);
 
@@ -3667,6 +3720,9 @@ Actor* Actor_Find(ActorContext* actorCtx, s32 actorId, s32 actorCategory) {
  */
 void Enemy_StartFinishingBlow(PlayState* play, Actor* actor) {
     play->actorCtx.freezeFlashTimer = 5;
+    if (!actor->ignoreExpReward) {
+        Player_GainExperience(play, actor->exp);
+    }
     SoundSource_PlaySfxAtFixedWorldPos(play, &actor->world.pos, 20, NA_SE_EN_LAST_DAMAGE);
 }
 
@@ -4258,6 +4314,11 @@ void Actor_SetColorFilter(Actor* actor, s16 colorFlag, s16 colorIntensityMax, s1
         Audio_PlayActorSound2(actor, NA_SE_EN_LIGHT_ARROW_HIT);
     }
 
+    // Leveled mod: a stun (blue, 0x4000) caused by a leveled Deku Nut / Boomerang / Hookshot lasts longer.
+    if (colorFlag & 0x4000) {
+        duration = Leveled_ScaleStunDuration(actor, duration);
+    }
+
     actor->colorFilterParams = colorFlag | xluFlag | ((colorIntensityMax & 0xF8) << 5) | duration;
     actor->colorFilterTimer = duration;
 }
@@ -4779,11 +4840,14 @@ u8 func_800355E4(PlayState* play, Collider* collider) {
     }
 }
 
-u8 Actor_ApplyDamage(Actor* actor) {
+u16 Actor_ApplyDamage(Actor* actor) {
     if (actor->colChkInfo.damage >= actor->colChkInfo.health) {
         actor->colChkInfo.health = 0;
     } else {
         actor->colChkInfo.health -= actor->colChkInfo.damage;
+    }
+    if (actor->colChkInfo.damage > 0) {
+        ActorDamageNumber_New(actor, actor->colChkInfo.damage);
     }
 
     return actor->colChkInfo.health;

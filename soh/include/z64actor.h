@@ -55,14 +55,14 @@ typedef struct {
 } DamageTable;
 
 typedef struct {
-    /* 0x00 */ u8 health;
+    /* 0x00 */ u16 health;
     /* 0x02 */ s16 cylRadius;
     /* 0x04 */ s16 cylHeight;
     /* 0x06 */ u8 mass;
 } CollisionCheckInfoInit;
 
 typedef struct {
-    /* 0x00 */ u8 health;
+    /* 0x00 */ u16 health;
     /* 0x02 */ s16 cylRadius;
     /* 0x04 */ s16 cylHeight;
     /* 0x06 */ s16 cylYShift;
@@ -76,12 +76,12 @@ typedef struct {
     /* 0x12 */ s16 cylHeight; // Used for various purposes
     /* 0x14 */ s16 cylYShift; // Unused. Purpose inferred from Cylinder16 and CollisionCheck_CylSideVsLineSeg
     /* 0x16 */ u8 mass; // Used to compute displacement for OC collisions
-    /* 0x17 */ u8 health; // Note: some actors may use their own health variable instead of this one
-    /* 0x18 */ u8 damage; // Amount to decrement health by
+    /* 0x17 */ u16 health; // Note: some actors may use their own health variable instead of this one
+    /* 0x18 */ u16 damage; // Amount to decrement health by
     /* 0x19 */ u8 damageEffect; // Stores what effect should occur when hit by a weapon
     /* 0x1A */ u8 atHitEffect; // Stores what effect should occur when AT connects with an AC
     /* 0x1B */ u8 acHitEffect; // Stores what effect should occur when AC is touched by an AT
-} CollisionCheckInfo; // size = 0x1C
+} CollisionCheckInfo;
 
 typedef struct {
     /* 0x00 */ Vec3s rot; // Current actor shape rotation
@@ -266,7 +266,21 @@ typedef struct Actor {
     /* 0x134 */ ActorFunc draw; // Draw Routine. Called by `Actor_Draw`
     /* 0x138 */ ActorResetFunc reset;
     /* 0x13C */ char dbgPad[0x10]; // Padding that only exists in the debug rom
-} Actor; // size = 0x14C
+    // Leveled mod fields
+    u16 maximumHealth;
+    u16 exp;
+    u8 level;
+    u8 power;
+    u8 courage;
+    s8 powerModifier;
+    s8 courageModifier;
+    u16 floatingNumber[7];
+    u8 floatingNumberLife[7];
+    Vec2f floatingNumberPosition[7];
+    Vec2f floatingNumberVelocity[7];
+    Mtx floatingDamageNumberMtx;
+    bool ignoreExpReward;
+} Actor;
 
 typedef enum {
     /* 0 */ FOOT_LEFT,

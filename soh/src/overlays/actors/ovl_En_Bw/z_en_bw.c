@@ -675,6 +675,7 @@ void func_809D0424(EnBw* this, PlayState* play) {
                 this->unk_230 = 1;
             }
             Item_DropCollectibleRandom(play, &this->actor, &this->actor.world.pos, 0x90);
+            Player_GainExperience(play, this->actor.exp);
             func_809D00F4(this);
         }
     }
@@ -718,6 +719,7 @@ void func_809D0584(EnBw* this, PlayState* play) {
                         this->unk_230 = 1;
                     }
                     Item_DropCollectibleRandom(play, &this->actor, &this->actor.world.pos, 0x90);
+                    Player_GainExperience(play, this->actor.exp);
                     func_809D00F4(this);
                 }
             } else if ((this->unk_220 != 1) && (this->unk_220 != 6)) {
@@ -815,8 +817,9 @@ s32 EnBw_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* po
     EnBw* this = (EnBw*)thisx;
 
     if (limbIndex == 1) {
-        gSPSegment((*gfx)++, 0x09,
-                   Gfx_TwoTexScroll(play->state.gfxCtx, 0, 0, 0, 0x20, 0x20, 1, 0, this->unk_23A, 0x20, 0x20));
+        gSPSegment(
+            (*gfx)++, 0x09,
+            Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, 0, 0, 0x20, 0x20, 1, 0, this->unk_23A, 0x20, 0x20, 0, 0, 0, 1));
         if ((this->unk_220 == 1) || (this->unk_220 == 5)) {
             Matrix_Push();
             Matrix_Scale(1.0f, 1.0f, 1.0f, MTXMODE_APPLY);
@@ -883,8 +886,8 @@ void EnBw_Draw(Actor* thisx, PlayState* play2) {
     gDPSetEnvColor(POLY_XLU_DISP++, 255, 0, 0, 0);
 
     gSPSegment(POLY_XLU_DISP++, 0x08,
-               Gfx_TwoTexScroll(play->state.gfxCtx, 0, 0, 0, 0x20, 0x40, 1, 0, (play->gameplayFrames * -20) % 0x200,
-                                0x20, 0x80));
+               Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, 0, 0, 0x20, 0x40, 1, 0, (play->gameplayFrames * -20) % 0x200,
+                                  0x20, 0x80, 0, 0, 0, -20));
     gDPSetPrimColor(POLY_XLU_DISP++, 0x80, 0x80, 255, 255, 0, 255);
     Matrix_Scale(this->unk_248 * 0.01f, this->unk_248 * 0.01f, this->unk_248 * 0.01f, MTXMODE_APPLY);
     Matrix_ReplaceRotation(&play->billboardMtxF);

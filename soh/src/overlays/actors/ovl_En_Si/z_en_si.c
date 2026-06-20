@@ -7,7 +7,7 @@
 #include "z_en_si.h"
 #include "soh/Enhancements/custom-message/CustomMessageTypes.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/OTRGlobals.h"
+#include "leveled_stat_math.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOOKSHOT_PULLS_ACTOR)
 
@@ -142,6 +142,10 @@ void func_80AFB950(EnSi* this, PlayState* play) {
         player->actor.freezeTimer = 10;
     } else {
         SET_GS_FLAGS((this->actor.params & 0x1F00) >> 8, this->actor.params & 0xFF);
+        {
+            u16 experience = Leveled_GoldSkulltulaExperience(gSaveContext.inventory.gsTokens);
+            Player_GainExperience(play, experience);
+        }
         GameInteractor_ExecuteOnFlagSet(FLAG_GS_TOKEN, this->actor.params);
         Actor_Kill(&this->actor);
     }

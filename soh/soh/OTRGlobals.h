@@ -160,10 +160,14 @@ void Gfx_TextureCacheDelete(const uint8_t* addr);
 void SaveManager_ThreadPoolWait();
 void CheckTracker_OnMessageClose();
 void CheckTracker_RecalculateAvailableChecks();
+int GetLeveledNaviEnemyInfo(char* buffer, char* src, const int maxBufferSize, Actor* actor);
 
 GetItemID RetrieveGetItemIDFromItemID(ItemID itemID);
 RandomizerGet RetrieveRandomizerGetFromItemID(ItemID itemID);
 void Messagebox_ShowErrorBox(char* title, char* body);
+
+uint32_t Ship_GetInterpolationFPS();
+uint32_t Ship_GetInterpolationFrameCount();
 #endif
 
 #ifdef __cplusplus
