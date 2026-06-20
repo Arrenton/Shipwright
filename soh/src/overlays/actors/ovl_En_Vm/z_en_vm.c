@@ -388,6 +388,7 @@ void EnVm_Die(EnVm* this, PlayState* play) {
             bomb->timer = 0;
         }
 
+        Player_GainExperience(play, this->actor.exp);
         Item_DropCollectibleRandom(play, &this->actor, &this->actor.world.pos, 0xA0);
         Actor_Kill(&this->actor);
     }

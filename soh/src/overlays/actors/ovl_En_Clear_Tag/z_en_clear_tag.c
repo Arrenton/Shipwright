@@ -376,6 +376,7 @@ void EnClearTag_Update(Actor* thisx, PlayState* play2) {
                     if ((s8)this->actor.colChkInfo.health <= 0) {
                         this->state = CLEAR_TAG_STATE_CRASHING;
                         this->actor.velocity.y = 0.0f;
+                        Player_GainExperience(play, this->actor.exp);
                         GameInteractor_ExecuteOnEnemyDefeat(&this->actor);
                         goto state_crashing;
                     }

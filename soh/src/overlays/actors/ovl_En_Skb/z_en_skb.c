@@ -147,6 +147,7 @@ void EnSkb_Init(Actor* thisx, PlayState* play) {
     EnSkb* this = (EnSkb*)thisx;
     s16 paramOffsetBody;
     s16 paramOffsetArm;
+    s16 sizeParams;
 
     Actor_ProcessInitChain(&this->actor, sInitChain);
     this->actor.colChkInfo.damageTable = &sDamageTable;
@@ -161,12 +162,24 @@ void EnSkb_Init(Actor* thisx, PlayState* play) {
 
     Collider_InitJntSph(play, &this->collider);
     Collider_SetJntSph(play, &this->collider, &this->actor, &sJntSphInit, this->colliderItem);
-    Actor_SetScale(&this->actor, ((this->actor.params * 0.1f) + 1.0f) * 0.01f);
+    // Clamp ONLY the params value that drives physical size (model scale + both collider spheres).
+    // The En_Encount1 spawner enlarges Stalchildren every 10 kills via params = (killCount / 10) * 5,
+    // and killCount only resets at dawn, so an extended night timescale lets them grow far past vanilla.
+    // The hitbox stays proportional to the model, but on a very large model the hittable limb spheres
+    // sit so high that ground-level sword swings whiff - so cap the visual/collision size. 15 == the
+    // 3rd big-Stalchild iteration (5/10/15/20/25). actor.params itself is left untouched, so the
+    // Leveled mod's level/EXP scaling still uses the full, uncapped value.
+    sizeParams = this->actor.params;
+    if (sizeParams > 15) {
+        sizeParams = 15;
+    }
 
-    paramOffsetBody = this->actor.params + 0xA;
+    Actor_SetScale(&this->actor, ((sizeParams * 0.1f) + 1.0f) * 0.01f);
+
+    paramOffsetBody = sizeParams + 0xA;
     this->collider.elements[0].dim.worldSphere.radius = paramOffsetBody;
     this->collider.elements[0].dim.modelSphere.radius = paramOffsetBody;
-    paramOffsetArm = (this->actor.params * 2) + 0x14;
+    paramOffsetArm = (sizeParams * 2) + 0x14;
     this->collider.elements[1].dim.worldSphere.radius = paramOffsetArm;
     this->collider.elements[1].dim.modelSphere.radius = paramOffsetArm;
     this->actor.home.pos = this->actor.world.pos;
@@ -420,6 +433,7 @@ void func_80AFD7B4(EnSkb* this, PlayState* play) {
     this->unk_283 |= 4;
     EffectSsDeadSound_SpawnStationary(play, &this->actor.projectedPos, NA_SE_EN_STALKID_DEAD, 1, 1, 0x28);
     EnSkb_SetupAction(this, func_80AFD880);
+    Player_GainExperience(play, this->actor.exp);
     GameInteractor_ExecuteOnEnemyDefeat(&this->actor);
 }
 

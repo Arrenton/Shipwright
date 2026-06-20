@@ -927,9 +927,11 @@ void Environment_Update(PlayState* play, EnvironmentContext* envCtx, LightContex
                     (play->transitionMode == TRANS_MODE_OFF || ((void)0, gSaveContext.gameMode) != GAMEMODE_NORMAL)) {
 
                     if (IS_DAY || gTimeIncrement >= 0x190) {
-                        gSaveContext.dayTime += gTimeIncrement;
+                        gSaveContext.dayTime += (u16)(gTimeIncrement *
+                            CVarGetFloat(CVAR_CHEAT("DayTimeSpeed"), 1.0f));
                     } else {
-                        gSaveContext.dayTime += gTimeIncrement * 2; // time moves twice as fast at night
+                        gSaveContext.dayTime += (u16)(gTimeIncrement *
+                            CVarGetFloat(CVAR_CHEAT("NightTimeSpeed"), 2.0f));
                     }
                 }
             }

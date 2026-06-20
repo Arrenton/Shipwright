@@ -4,16 +4,16 @@
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 
 struct ActorMaximumHealth {
-    u8 maximumHealth = 0;
+    u16 maximumHealth = 0; // u16: leveled enemies can exceed 255 HP; a u8 truncated it and broke the health bar
 };
 static ObjectExtension::Register<ActorMaximumHealth> ActorMaximumHealthRegister;
 
-u8 GetActorMaximumHealth(const Actor* actor) {
+u16 GetActorMaximumHealth(const Actor* actor) {
     const ActorMaximumHealth* maxHealth = ObjectExtension::GetInstance().Get<ActorMaximumHealth>(actor);
     return maxHealth != nullptr ? maxHealth->maximumHealth : ActorMaximumHealth{}.maximumHealth;
 }
 
-void SetActorMaximumHealth(const Actor* actor, u8 maximumHealth) {
+void SetActorMaximumHealth(const Actor* actor, u16 maximumHealth) {
     ObjectExtension::GetInstance().Set<ActorMaximumHealth>(actor, ActorMaximumHealth{ maximumHealth });
 }
 

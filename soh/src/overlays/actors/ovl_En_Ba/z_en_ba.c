@@ -408,6 +408,7 @@ void func_809B75A0(EnBa* this, PlayState* play2) {
         Matrix_MultVec3f(&sp74, &this->unk_158[i + 1]);
     }
     this->unk_31A = 15;
+    Player_GainExperience(play, this->actor.exp);
     EnBa_SetupAction(this, EnBa_Die);
 }
 

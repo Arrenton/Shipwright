@@ -10,6 +10,8 @@
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/Enhancements/randomizer/draw.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "leveled_stat_math.h"
+#include "leveled_overlays.h"
 
 #include <stdlib.h>
 
@@ -683,6 +685,7 @@ void Player_SetEquipmentData(PlayState* play, Player* this) {
         this->currentSwordItemId = B_BTN_ITEM;
         Player_SetModelGroup(this, Player_ActionToModelGroup(this, this->heldItemAction));
         Player_SetBootData(play, this);
+        Leveled_SetPlayerModifiedStats(this);
     }
 }
 
@@ -786,6 +789,84 @@ s32 Player_GetStrength(void) {
         return PLAYER_STR_BRACELET;
     } else {
         return PLAYER_STR_NONE;
+    }
+}
+
+void Player_GainExperience(PlayState* play, u16 experience) {
+    Player* player = GET_PLAYER(play);
+
+    if (player == NULL)
+        return;
+
+    if (!CVarGetInteger("gLeveled.Master", 1)) {
+        // Master off: keep Link at vanilla stats - no EXP, no levels, vanilla health/magic capacity.
+        player->actor.level = 0;
+        gSaveContext.healthCapacity2 = gSaveContext.healthCapacity;
+        gSaveContext.magicUnits = 48; // vanilla magic units (0x30)
+        gSaveContext.magicCapacity = gSaveContext.magicLevel * 48;
+        return;
+    }
+
+    experience = (u16)(CLAMP(round((f32)experience * CVarGetFloat("gLeveled.Difficulty.EXP.Rate", (f32)1.0)), 0, 0xffff));
+
+    // Leveled mod: passive equipment (worn tunic & boots, plus Nayru's Love if active) levels off each
+    // defeated enemy's EXP. Runs even at player level 99, which returns early below.
+    Leveled_AwardOnEnemyDefeated(player, experience);
+
+    bool levelUp = false;
+    u8 prevPower = player->actor.power;
+    u8 prevCourage = player->actor.courage;
+    u16 prevHealthCapacity = gSaveContext.healthCapacity2;
+    u16 prevMagicUnits = gSaveContext.magicUnits;
+
+    if (player->actor.level == 99)
+        return;
+
+    u32 maxExp = Leveled_GetPlayerMaxExp();
+    if (gSaveContext.experience < maxExp) {
+        if (experience > 0)
+            gSaveContext.showNeededExpTimer = 60;
+
+        gSaveContext.experience += experience;
+        ActorExperienceNumber_New(&player->actor, experience);
+        if (gSaveContext.experience > maxExp)
+            gSaveContext.experience = maxExp;
+    }
+
+    // Cap the player's level: the Break-Cap setting raises the ceiling (99 or 255), and the optional
+    // progress-based Level Limits can lower it based on dungeons cleared.
+    u8 maxLevel = Leveled_GetPlayerMaxLevel();
+    if (CVarGetInteger("gLeveled.LevelLimit.Enabled", 0)) {
+        u8 progressCap = Leveled_GetProgressLevelCap();
+        if (progressCap < maxLevel) {
+            maxLevel = progressCap;
+        }
+    }
+
+    while (player->actor.level < maxLevel && gSaveContext.experience >= GetCumulativeExp(player->actor.level)) {
+        player->actor.level += 1;
+        if (experience > 0) {
+            levelUp = true;
+        }
+    }
+    if (player->actor.level > maxLevel) {
+        player->actor.level = maxLevel; // enforce a lowered cap (e.g. a progress limit) downward
+    }
+
+    Actor_RefreshLeveledStats(&player->actor, player);
+
+    if (gSaveContext.magicLevel == 0) {
+        prevMagicUnits = gSaveContext.magicUnits;
+    }
+
+    if (levelUp) {
+        gSaveContext.magicCapacity = gSaveContext.magicLevel * gSaveContext.magicUnits;
+        if (CVarGetInteger("gLeveled.HUD.LevelUp", 1) == 1) {
+            ActorLevelUp_New(&player->actor, player->actor.power - prevPower, player->actor.courage - prevCourage, gSaveContext.healthCapacity2 - prevHealthCapacity, gSaveContext.magicUnits - prevMagicUnits);
+        }
+        if (CVarGetInteger("gLeveled.HUD.LevelUpSound", 1) == 1) {
+            Audio_PlayFanfare(NA_BGM_ITEM_GET);
+        }
     }
 }
 

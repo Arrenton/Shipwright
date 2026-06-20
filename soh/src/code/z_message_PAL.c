@@ -13,6 +13,7 @@
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/OTRGlobals.h"
 #include "soh/SaveManager.h"
+#include "leveled_stat_math.h"
 #include "soh/ResourceManagerHelpers.h"
 
 // #region SOH [NTSC] - Allows custom messages to work on japanese
@@ -2833,6 +2834,12 @@ void Message_OpenText(PlayState* play, u16 textId) {
             }
         }
         msgCtx->msgLength = font->msgLength = GetEquipNowMessage(font->msgBuf, font->msgOffset, sizeof(font->msgBuf));
+    } else if ((CVarGetInteger("gLeveled.Navi.TellEnemyLevel", 1) ||
+                CVarGetInteger("gLeveled.Navi.TellEnemyMaxHP", 1)) &&
+               (textId > 0x0600 && textId < 0x06FF) && play->actorCtx.targetCtx.targetedActor != NULL) {
+        Message_FindMessage(play, textId);
+        msgCtx->msgLength = font->msgLength = GetLeveledNaviEnemyInfo(
+            font->msgBuf, font->msgOffset, sizeof(font->msgBuf), play->actorCtx.targetCtx.targetedActor);
     } else {
         if (gSaveContext.language == LANGUAGE_JPN) {
             Message_FindMessageJPN(play, textId);
@@ -4686,9 +4693,15 @@ void Message_Update(PlayState* play) {
             }
             if ((s32)(gSaveContext.inventory.questItems & 0xF0000000) == 0x40000000) {
                 gSaveContext.inventory.questItems ^= 0x40000000;
-                if (GameInteractor_Should(VB_HEARTS_INCREASE_WITH_CONTAINERS, true)) {
-                    gSaveContext.healthCapacity += FULL_HEART_HEALTH;
-                    gSaveContext.health += FULL_HEART_HEALTH;
+                s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
+                if (!CVarGetInteger(CVAR_ENHANCEMENT("HurtContainer"), 0)) {
+                    gSaveContext.healthCapacity += 0x10;
+                    gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+                    gSaveContext.health += heartUnits;
+                } else {
+                    gSaveContext.healthCapacity -= 0x10;
+                    gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+                    gSaveContext.health += heartUnits;
                 }
             }
             if (msgCtx->ocarinaAction != OCARINA_ACTION_CHECK_NOWARP_DONE) {

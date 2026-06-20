@@ -1,4 +1,5 @@
 #include "z_kaleido_scope.h"
+#include "leveled_overlays.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -2159,6 +2160,10 @@ void KaleidoScope_DrawInfoPanel(PlayState* play) {
     gDPSetCombineLERP(POLY_OPA_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0, PRIMITIVE,
                       ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
     gDPSetEnvColor(POLY_OPA_DISP++, 20, 30, 40, 0);
+
+    // Leveled mod: highlighted item's level / EXP / EXP-to-next. Drawn unconditionally here (not tied to the
+    // name display) so it stays visible when the panel switches to the "press to equip" prompt.
+    Leveled_KaleidoItem_Level(play);
 
     if ((pauseCtx->state == 6) && (pauseCtx->namedItem != PAUSE_ITEM_NONE) && (pauseCtx->nameDisplayTimer < WREG(89)) &&
         (!pauseCtx->unk_1E4 || (pauseCtx->unk_1E4 == 2) || ((pauseCtx->unk_1E4 >= 4) && (pauseCtx->unk_1E4 <= 7)) ||

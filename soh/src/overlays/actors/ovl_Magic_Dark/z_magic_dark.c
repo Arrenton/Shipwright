@@ -6,6 +6,7 @@
 
 #include "z_magic_dark.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
+#include "leveled_stat_math.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_UPDATE_DURING_OCARINA)
 
@@ -82,7 +83,8 @@ void MagicDark_DiamondUpdate(Actor* thisx, PlayState* play) {
         return;
     }
 
-    if (nayrusLoveTimer >= 1200) {
+    // Leveled mod: Nayru's Love protects for longer as it levels up (1200 frames * its duration multiplier).
+    if (nayrusLoveTimer >= (s16)(1200.0f * Leveled_GetItemEffectMult(LEVELED_ITEM_NAYRUS_LOVE, ".DurationCap", 2.0f))) {
         player->invincibilityTimer = 0;
         gSaveContext.nayrusLoveTimer = 0;
         Actor_Kill(thisx);

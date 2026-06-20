@@ -20,6 +20,7 @@
 #include "overlays/misc/ovl_kaleido_scope/z_kaleido_scope.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "objects/object_link_child/object_link_child.h"
+#include "leveled_stat_math.h"
 #include <soh/Enhancements/custom-message/CustomMessageTypes.h>
 #include "soh/Enhancements/item-tables/ItemTableTypes.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
@@ -2693,7 +2694,10 @@ s32 func_8083442C(Player* this, PlayState* play) {
                     if ((magicArrowType >= 0) && (magicArrowType <= 2)) {
                         if (GameInteractor_Should(VB_PLAYER_ARROW_MAGIC_CONSUMPTION, true, this, magicArrowType,
                                                   &arrowType)) {
-                            if (!Magic_RequestChange(play, sMagicArrowCosts[magicArrowType], MAGIC_CONSUME_NOW)) {
+                            // Leveled mod: fire/ice/light arrows cost less magic as they level up.
+                            if (!Magic_RequestChange(
+                                    play, Leveled_ModifyMagicArrowCost(magicArrowType, sMagicArrowCosts[magicArrowType]),
+                                    MAGIC_CONSUME_NOW)) {
                                 arrowType = ARROW_NORMAL;
                             }
                         }
@@ -3474,7 +3478,8 @@ void Player_UseItem(PlayState* play, Player* this, s32 item) {
                 // Handle magic spells
                 if (((itemAction == PLAYER_IA_FARORES_WIND) && (gSaveContext.respawn[RESPAWN_MODE_TOP].data > 0)) ||
                     ((gSaveContext.magicCapacity != 0) && (gSaveContext.magicState == MAGIC_STATE_IDLE) &&
-                     (gSaveContext.magic >= sMagicSpellCosts[temp]))) {
+                     // Leveled mod: check against the level-reduced cost so the discount is usable at low magic.
+                     (gSaveContext.magic >= Leveled_ModifyMagicSpellCost(temp, sMagicSpellCosts[temp])))) {
                     this->itemAction = itemAction;
                     this->unk_6AD = 4;
                 } else {
@@ -4797,6 +4802,12 @@ s32 func_808382DC(Player* this, PlayState* play) {
         } else {
             sp64 = (this->shieldQuad.base.acFlags & AC_BOUNCED) != 0;
 
+            // Leveled mod: a successful shield bounce earns the equipped shield EXP (5% of the
+            // attacker's reward). shieldQuad.base.ac is the actor whose attack was deflected.
+            if (sp64) {
+                Leveled_AwardShieldBlockExp(this, this->shieldQuad.base.ac);
+            }
+
             //! @bug The second set of conditions here seems intended as a way for Link to "block" hits by rolling.
             // However, `Collider.atFlags` is a byte so the flag check at the end is incorrect and cannot work.
             // Additionally, `Collider.atHit` can never be set while already colliding as AC, so it's also bugged.
@@ -5931,7 +5942,9 @@ void func_8083AF44(PlayState* play, Player* this, s32 magicSpell) {
     //! When `MAGIC_STATE_CONSUME_SETUP` is set in `Player_Action_808507F4`, magic will eventually be
     //! consumed to a stale target value. If that stale target value is higher than the current
     //! magic value, it will be consumed to zero.
-    Magic_RequestChange(play, sMagicSpellCosts[magicSpell], MAGIC_CONSUME_WAIT_PREVIEW);
+    // Leveled mod: Farore's Wind / Nayru's Love / Din's Fire cost less magic as they level up.
+    Magic_RequestChange(play, Leveled_ModifyMagicSpellCost(magicSpell, sMagicSpellCosts[magicSpell]),
+                        MAGIC_CONSUME_WAIT_PREVIEW);
 
     u8 isFastFarores = CVarGetInteger(CVAR_ENHANCEMENT("FastFarores"), 0) && this->itemAction == PLAYER_IA_FARORES_WIND;
 
@@ -9109,10 +9122,14 @@ s32 func_80842AC4(PlayState* play, Player* this) {
     if ((this->heldItemAction == PLAYER_IA_DEKU_STICK) && (this->unk_85C > 0.5f)) {
 
         if (GameInteractor_Should(VB_DEKU_STICK_BREAK, AMMO(ITEM_STICK) != 0)) {
-            EffectSsStick_Spawn(play, &this->bodyPartsPos[PLAYER_BODYPART_R_HAND], this->actor.shape.rot.y + 0x8000);
-            this->unk_85C = 0.5f;
-            func_80842A88(play, this);
-            Player_PlaySfx(this, NA_SE_IT_WOODSTICK_BROKEN);
+            this->unk_85C = 0.5f; // end the charged swing whether or not the stick survives
+            // Leveled mod: a leveled Deku Stick has a chance to survive the hit instead of breaking.
+            if (!Leveled_DekuStickSurvives()) {
+                EffectSsStick_Spawn(play, &this->bodyPartsPos[PLAYER_BODYPART_R_HAND],
+                                    this->actor.shape.rot.y + 0x8000);
+                func_80842A88(play, this);
+                Player_PlaySfx(this, NA_SE_IT_WOODSTICK_BROKEN);
+            }
         }
 
         return 1;
@@ -10778,6 +10795,7 @@ void Player_InitCommon(Player* this, PlayState* play, FlexSkeletonHeader* skelHe
     Collider_SetQuad(play, &this->meleeWeaponQuads[1], &this->actor, &D_80854650);
     Collider_InitQuad(play, &this->shieldQuad);
     Collider_SetQuad(play, &this->shieldQuad, &this->actor, &D_808546A0);
+    Player_GainExperience(play, 0);
 
     this->ivanDamageMultiplier = 1;
 }
@@ -11161,7 +11179,9 @@ s32 Player_UpdateHoverBoots(Player* this) {
 
     if (this->actor.bgCheckFlags & 1) {
         if (!canHoverOnGround) {
-            this->hoverBootsTimer = 19;
+            // Leveled mod: Hover Boots float for longer as they level up (19 frames * duration multiplier).
+            this->hoverBootsTimer =
+                (u8)CLAMP(19.0f * Leveled_GetItemEffectMult(LEVELED_ITEM_HOVER_BOOTS, ".DurationCap", 3.0f), 0.0f, 255.0f);
         }
         return false;
     } else {

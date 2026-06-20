@@ -670,6 +670,11 @@ void SaveManager::InitFileNormal() {
     gSaveContext.healthCapacity = STARTING_HEALTH;
     gSaveContext.health = STARTING_HEALTH;
     gSaveContext.magicLevel = 0;
+    gSaveContext.experience = 0; // Leveled mod: new files start at 0 EXP (level 0)
+    for (size_t i = 0; i < ARRAY_COUNT(gSaveContext.itemLevels); i++) {
+        gSaveContext.itemLevels[i] = 1; // Leveled mod: every item starts at level 1...
+        gSaveContext.itemExp[i] = 0;    // ...with no EXP toward the next level
+    }
     gSaveContext.magic = MAGIC_NORMAL_METER;
     gSaveContext.rupees = 0;
     gSaveContext.swordHealth = 0;
@@ -1975,6 +1980,15 @@ void SaveManager::LoadBaseVersion3() {
 }
 
 void SaveManager::LoadBaseVersion4() {
+    // Leveled mod: total EXP that drives the player's level. Defaults to 0 for saves that
+    // predate the mod (and for non-leveled saves), which correctly yields level 0.
+    SaveManager::Instance->LoadData("experience", gSaveContext.experience);
+    // Leveled mod: per-item level/EXP. Absent in pre-mod saves, which leaves the InitFileNormal
+    // defaults (level 1 / 0 EXP) intact.
+    SaveManager::Instance->LoadArray("itemLevels", ARRAY_COUNT(gSaveContext.itemLevels),
+                                     [](size_t i) { SaveManager::Instance->LoadData("", gSaveContext.itemLevels[i]); });
+    SaveManager::Instance->LoadArray("itemExp", ARRAY_COUNT(gSaveContext.itemExp),
+                                     [](size_t i) { SaveManager::Instance->LoadData("", gSaveContext.itemExp[i]); });
     SaveManager::Instance->LoadData("entranceIndex", gSaveContext.entranceIndex);
     SaveManager::Instance->LoadData("linkAge", gSaveContext.linkAge);
     SaveManager::Instance->LoadData("cutsceneIndex", gSaveContext.cutsceneIndex);
@@ -2167,6 +2181,16 @@ void SaveManager::SaveBase(SaveContext* saveContext, int sectionID, bool fullSav
     SaveManager::Instance->SaveData("health", saveContext->health);
     SaveManager::Instance->SaveData("magicLevel", saveContext->magicLevel);
     SaveManager::Instance->SaveData("magic", saveContext->magic);
+    // Leveled mod: persist total EXP. The player's level and derived stats (power, courage,
+    // health capacity, magic units) are recomputed from this on spawn via Player_GainExperience.
+    SaveManager::Instance->SaveData("experience", saveContext->experience);
+    // Leveled mod: per-item level/EXP (weapons & equipment each have their own EXP bar).
+    SaveManager::Instance->SaveArray("itemLevels", ARRAY_COUNT(saveContext->itemLevels), [&](size_t i) {
+        SaveManager::Instance->SaveData("", saveContext->itemLevels[i]);
+    });
+    SaveManager::Instance->SaveArray("itemExp", ARRAY_COUNT(saveContext->itemExp), [&](size_t i) {
+        SaveManager::Instance->SaveData("", saveContext->itemExp[i]);
+    });
     SaveManager::Instance->SaveData("rupees", saveContext->rupees);
     SaveManager::Instance->SaveData("swordHealth", saveContext->swordHealth);
     SaveManager::Instance->SaveData("naviTimer", saveContext->naviTimer);

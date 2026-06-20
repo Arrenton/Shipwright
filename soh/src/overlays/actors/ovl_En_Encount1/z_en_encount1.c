@@ -107,13 +107,18 @@ void EnEncount1_SpawnLeevers(EnEncount1* this, PlayState* play) {
     this->outOfRangeTimer = 0;
     spawnPos = this->actor.world.pos;
 
+    s16 leeverCount = CVarGetInteger(CVAR_ENHANCEMENT("LeeverSpawnCount"), 5);
+    if (leeverCount < 2) {
+        leeverCount = 2;
+    }
+
     if ((this->timer == 0) && (play->csCtx.state == CS_STATE_IDLE) && (this->curNumSpawn <= this->maxCurSpawns) &&
-        (this->curNumSpawn < 5)) {
+        (this->curNumSpawn < leeverCount)) {
         floorType = func_80041D4C(&play->colCtx, player->actor.floorPoly, player->actor.floorBgId);
         if ((floorType != 4) && (floorType != 7) && (floorType != 12)) {
             this->numLeeverSpawns = 0;
         } else if (!(this->reduceLeevers && (this->actor.xzDistToPlayer > 1300.0f))) {
-            spawnLimit = 5;
+            spawnLimit = leeverCount;
             if (this->reduceLeevers) {
                 spawnLimit = 3;
             }
@@ -158,7 +163,8 @@ void EnEncount1_SpawnLeevers(EnEncount1* this, PlayState* play) {
                         this->bigLeever = leever;
                     }
                     if (!this->reduceLeevers) {
-                        this->maxCurSpawns = (s16)Rand_ZeroFloat(3.99f) + 2;
+                        // Scale the random per-wave target up to the configured count (vanilla is 2-5).
+                        this->maxCurSpawns = (s16)Rand_ZeroFloat((f32)leeverCount - 1.01f) + 2;
                     } else {
                         this->maxCurSpawns = (s16)Rand_ZeroFloat(2.99f) + 1;
                     }
@@ -260,24 +266,24 @@ void EnEncount1_SpawnStalchildOrWolfos(EnEncount1* this, PlayState* play) {
                     break;
                 }
                 if (this->fieldSpawnTimer == 60) {
-                    this->maxCurSpawns = 2;
+                    this->maxCurSpawns = CVarGetInteger(CVAR_ENHANCEMENT("StalchildSpawnCount"), 2);
                 }
                 if (this->fieldSpawnTimer != 0) {
                     this->fieldSpawnTimer--;
                     break;
                 }
 
-                spawnDist = Rand_CenteredFloat(40.0f) + 200.0f;
-                spawnAngle = player->actor.shape.rot.y;
-                if (this->curNumSpawn != 0) {
-                    spawnAngle = -spawnAngle;
-                    spawnDist = Rand_CenteredFloat(40.0f) + 100.0f;
-                }
+                // Spread the group evenly around the player so larger packs close in from all sides
+                // instead of just front/back. Each spawn takes the next slot of a full circle
+                // (0x10000 binary-angle units) offset from the player's facing, plus a little jitter.
+                spawnDist = Rand_CenteredFloat(40.0f) + 150.0f;
+                spawnAngle = player->actor.shape.rot.y +
+                             (s16)(0x10000 / (this->maxCurSpawns > 0 ? this->maxCurSpawns : 1)) * this->curNumSpawn;
                 spawnPos.x =
-                    player->actor.world.pos.x + (Math_SinS(spawnAngle) * spawnDist) + Rand_CenteredFloat(40.0f);
+                    player->actor.world.pos.x + (Math_SinS(spawnAngle) * spawnDist) + Rand_CenteredFloat(30.0f);
                 spawnPos.y = player->actor.floorHeight + 120.0f;
                 spawnPos.z =
-                    player->actor.world.pos.z + (Math_CosS(spawnAngle) * spawnDist) + Rand_CenteredFloat(40.0f);
+                    player->actor.world.pos.z + (Math_CosS(spawnAngle) * spawnDist) + Rand_CenteredFloat(30.0f);
                 floorY = BgCheck_EntityRaycastFloor4(&play->colCtx, &floorPoly, &bgId, &this->actor, &spawnPos);
                 if (floorY <= BGCHECK_Y_MIN) {
                     break;
@@ -316,7 +322,9 @@ void EnEncount1_SpawnStalchildOrWolfos(EnEncount1* this, PlayState* play) {
                                    0, 0, spawnParams) != NULL) {
                 this->curNumSpawn++;
                 if (this->curNumSpawn >= this->maxCurSpawns) {
-                    this->fieldSpawnTimer = 100;
+                    // Stalchild Spawn Rate: delay between batches. 0 = vanilla 100 frames.
+                    int32_t stalchildSpawnRate = CVarGetInteger(CVAR_ENHANCEMENT("StalchildSpawnRate"), 0);
+                    this->fieldSpawnTimer = stalchildSpawnRate ? (20 * stalchildSpawnRate) : 100;
                 }
                 if (play->sceneNum != SCENE_HYRULE_FIELD) {
                     this->totalNumSpawn++;

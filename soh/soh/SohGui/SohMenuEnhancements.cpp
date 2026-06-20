@@ -1359,10 +1359,46 @@ void SohMenu::AddMenuEnhancements() {
         .CVar(CVAR_ENHANCEMENT("LeeverSpawnRate"))
         .Options(IntSliderOptions()
                      .Min(0)
-                     .Max(10)
+                     .Max(30)
                      .DefaultValue(0)
                      .Format("%d seconds")
-                     .Tooltip("The time between groups of Leevers spawning."));
+                     .Tooltip("The time between groups of Leevers spawning. Higher = slower. "
+                              "0 = vanilla timing."));
+    AddWidget(path, "Leever Spawn Count: %d", WIDGET_CVAR_SLIDER_INT)
+        .CVar(CVAR_ENHANCEMENT("LeeverSpawnCount"))
+        .Options(IntSliderOptions()
+                     .Min(2)
+                     .Max(10)
+                     .DefaultValue(5)
+                     .Format("%d")
+                     .Tooltip("Maximum number of Leevers active at once. Vanilla is 5."));
+    AddWidget(path, "Stalchild Spawn Rate: %d seconds", WIDGET_CVAR_SLIDER_INT)
+        .CVar(CVAR_ENHANCEMENT("StalchildSpawnRate"))
+        .Options(IntSliderOptions()
+                     .Min(0)
+                     .Max(30)
+                     .DefaultValue(0)
+                     .Format("%d seconds")
+                     .Tooltip("The time between batches of Stalchildren spawning in the Hyrule Field night "
+                              "encounter. Higher = slower. 0 = vanilla timing (~5s)."));
+    AddWidget(path, "Stalchild Spawn Count: %d", WIDGET_CVAR_SLIDER_INT)
+        .CVar(CVAR_ENHANCEMENT("StalchildSpawnCount"))
+        .Options(IntSliderOptions()
+                     .Min(1)
+                     .Max(10)
+                     .DefaultValue(2)
+                     .Format("%d")
+                     .Tooltip("Maximum number of Stalchildren active at once during the Hyrule Field night "
+                              "encounter. Larger groups close in from all sides. Vanilla is 2."));
+    AddWidget(path, "Guay Spawn Rate: %d seconds", WIDGET_CVAR_SLIDER_INT)
+        .CVar(CVAR_ENHANCEMENT("GuaySpawnRate"))
+        .Options(IntSliderOptions()
+                     .Min(0)
+                     .Max(30)
+                     .DefaultValue(0)
+                     .Format("%d seconds")
+                     .Tooltip("How long a defeated Guay (crow) takes to respawn. Higher = slower. "
+                              "0 = vanilla timing (~15s)."));
 
     // Minigames
     path.sidebarName = "Minigames";
@@ -1784,6 +1820,14 @@ void SohMenu::AddMenuEnhancements() {
     AddWidget(path, "Freeze Time", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_CHEAT("FreezeTime"))
         .Options(CheckboxOptions().Tooltip("Freezes the time of day."));
+    AddWidget(path, "Day Time Speed: %.2fx", WIDGET_CVAR_SLIDER_FLOAT)
+        .CVar(CVAR_CHEAT("DayTimeSpeed"))
+        .Options(FloatSliderOptions().Min(0.0f).Max(5.0f).DefaultValue(1.0f).Format("%.2fx")
+            .Tooltip("Adjusts how fast time passes during the day. 1.0 is normal speed."));
+    AddWidget(path, "Night Time Speed: %.2fx", WIDGET_CVAR_SLIDER_FLOAT)
+        .CVar(CVAR_CHEAT("NightTimeSpeed"))
+        .Options(FloatSliderOptions().Min(0.0f).Max(5.0f).DefaultValue(2.0f).Format("%.2fx")
+            .Tooltip("Adjusts how fast time passes at night. Vanilla is 2.0x. Matches day speed at 1.0x."));
     AddWidget(path, "Time Sync", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_CHEAT("TimeSync"))
         .Options(CheckboxOptions().Tooltip("Syncs the in-game time with the real world time."));

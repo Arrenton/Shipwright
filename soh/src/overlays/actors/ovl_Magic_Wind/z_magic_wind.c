@@ -6,6 +6,7 @@
 
 #include "z_magic_wind.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "leveled_stat_math.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_UPDATE_DURING_OCARINA)
 
@@ -46,6 +47,9 @@ void MagicWind_SetupAction(MagicWind* this, MagicWindFunc actionFunc) {
 void MagicWind_Init(Actor* thisx, PlayState* play) {
     MagicWind* this = (MagicWind*)thisx;
     Player* player = GET_PLAYER(play);
+
+    // Leveled mod: Farore's Wind earns a flat amount of EXP each time it is cast.
+    Leveled_AwardStaticExp(LEVELED_ITEM_FARORES_WIND, ".StaticExp", 30);
 
     if (SkelCurve_Init(play, &this->skelCurve, &sSkel, &sAnim) == 0) {
         // "Magic_Wind_Actor_ct (): Construct failed"
