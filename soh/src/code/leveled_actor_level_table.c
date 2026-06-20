@@ -1,5 +1,6 @@
 #include "global.h"
 #include "leveled_actor_level_table.h"
+#include "leveled_stat_math.h"
 #include <string.h>
 
 typedef struct {
