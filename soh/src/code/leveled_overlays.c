@@ -722,7 +722,7 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     Player* player = GET_PLAYER(play);
     u16 statX = 88;
     u16 statY = 70;
-    u8 attack = 1;
+    u8 attack = 1; 
     Color_RGBA8 textColor = { 255, 255, 255, 255 };
 
     if (CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD) == 1)
