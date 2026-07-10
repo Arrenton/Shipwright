@@ -837,7 +837,8 @@ void TimeSaverOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_li
             EnIk* ik = va_arg(args, EnIk*);
             if (CVarGetInteger(CVAR_ENHANCEMENT("TimeSavers.SkipCutscene.QuickBossDeaths"), IS_RANDO)) {
                 // Because no CS in rando, we hide the death of the knuckle by spawning flames and kill the actor
-                if ((ik->actor.colChkInfo.health <= 10)) {
+                u16 healthCheck = GetActorStat_EnemyMaxHealth(10, ik->actor.level);
+                if ((ik->actor.colChkInfo.health <= healthCheck)) {
                     s32 i;
                     Vec3f pos;
                     Vec3f sp7C = { 0.0f, 0.5f, 0.0f };
@@ -850,6 +851,7 @@ void TimeSaverOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_li
                         EffectSsDeadDb_Spawn(gPlayState, &pos, &sp7C, &sp7C, 100, 0, 255, 255, 255, 255, 0, 0, 255, 1,
                                              9, true);
                     }
+                    Player_GainExperience(gPlayState, ik->actor.exp);
                     Actor_Kill(&ik->actor);
                 }
                 *should = false;

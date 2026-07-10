@@ -2318,19 +2318,23 @@ u8 Item_Give(PlayState* play, u8 item) {
         gSaveContext.ship.stats.heartPieces++;
         return Return_Item(item, MOD_NONE, ITEM_NONE);
     } else if (item == ITEM_HEART_CONTAINER) {
+        s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
         if (!CVarGetInteger(CVAR_ENHANCEMENT("HurtContainer"), 0)) {
             gSaveContext.healthCapacity += 0x10;
-            gSaveContext.health += 0x10;
+            gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+            gSaveContext.health += heartUnits;
         } else {
             gSaveContext.healthCapacity -= 0x10;
-            gSaveContext.health -= 0x10;
+            gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+            gSaveContext.health -= heartUnits;
         }
         gSaveContext.ship.stats.heartContainers++;
         return Return_Item(item, MOD_NONE, ITEM_NONE);
     } else if (item == ITEM_HEART) {
         osSyncPrintf("回復ハート回復ハート回復ハート\n"); // "Recovery Heart"
         if (play != NULL) {
-            Health_ChangeBy(play, 0x10);
+            s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
+            Health_ChangeBy(play, heartUnits);
         }
         return Return_Item(item, MOD_NONE, item);
     } else if (item == ITEM_MAGIC_SMALL) {
@@ -2897,14 +2901,21 @@ s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
             healthChange *= abs(giDefenseModifier);
         }
     }
+    
+    if (healthChange < 0) {
+        healthChange = (f32)healthChange * (f32)CVarGetInteger("gLeveled.Difficulty.Player.DamageMultiplier", 4) / 4.0f;
+        if (healthChange >= 0)
+            healthChange = -1;
+        ActorDamageNumber_New(GET_PLAYER(play), -healthChange);
+    }
 
     gSaveContext.health += healthChange;
 
-    if (gSaveContext.health > gSaveContext.healthCapacity) {
-        gSaveContext.health = gSaveContext.healthCapacity;
+    if (gSaveContext.health > gSaveContext.healthCapacity2) {
+        gSaveContext.health = gSaveContext.healthCapacity2;
     }
 
-    heartCount = gSaveContext.health % 0x10;
+    heartCount = gSaveContext.health / CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
 
     healthLevel = heartCount;
     if (heartCount != 0) {
@@ -3041,7 +3052,7 @@ void Inventory_ChangeAmmo(s16 item, s16 ammoChange) {
 void Magic_Fill(PlayState* play) {
     if (gSaveContext.isMagicAcquired) {
         gSaveContext.prevMagicState = gSaveContext.magicState;
-        gSaveContext.magicFillTarget = (gSaveContext.isDoubleMagicAcquired + 1) * MAGIC_NORMAL_METER;
+        gSaveContext.magicFillTarget = (gSaveContext.isDoubleMagicAcquired + 1) * gSaveContext.magicUnits;
         gSaveContext.magicState = MAGIC_STATE_FILL;
     }
 }
@@ -3197,7 +3208,7 @@ void Interface_UpdateMagicBar(PlayState* play) {
 
     switch (gSaveContext.magicState) {
         case MAGIC_STATE_STEP_CAPACITY:
-            temp = gSaveContext.magicLevel * MAGIC_NORMAL_METER;
+            temp = gSaveContext.magicLevel * gSaveContext.magicUnits;
             if (gSaveContext.magicCapacity != temp) {
                 if (gSaveContext.magicCapacity < temp) {
                     gSaveContext.magicCapacity += 8;
@@ -3225,6 +3236,9 @@ void Interface_UpdateMagicBar(PlayState* play) {
 
             // "Storage  MAGIC_NOW=%d (%d)"
             osSyncPrintf("蓄電  MAGIC_NOW=%d (%d)\n", gSaveContext.magic, gSaveContext.magicFillTarget);
+            if (gSaveContext.magicFillTarget > gSaveContext.magicCapacity) {
+                gSaveContext.magicFillTarget = gSaveContext.magicCapacity;
+            }
             if (gSaveContext.magic >= gSaveContext.magicFillTarget) {
                 gSaveContext.magic = gSaveContext.magicFillTarget;
                 gSaveContext.magicState = gSaveContext.prevMagicState;
@@ -3464,7 +3478,7 @@ void Interface_DrawMagicBar(PlayState* play) {
         s16 rMagicBarX;
         s16 PosX_MidEnd;
         s16 rMagicFillX;
-        s32 lineLength = CVarGetInteger(CVAR_COSMETIC("HUD.Hearts.LineLength"), 10);
+        s32 lineLength = CVarGetInteger(CVAR_COSMETIC("HUD.Hearts.LineLength"), 15);
         if (CVarGetInteger(CVAR_COSMETIC("HUD.MagicBar.PosType"), 0) != ORIGINAL_LOCATION) {
             magicBarY = CVarGetInteger(CVAR_COSMETIC("HUD.MagicBar.PosY"), 0) + Y_Margins;
             if (CVarGetInteger(CVAR_COSMETIC("HUD.MagicBar.PosType"), 0) == ANCHOR_LEFT) {
@@ -3504,7 +3518,8 @@ void Interface_DrawMagicBar(PlayState* play) {
             } else if (CVarGetInteger(CVAR_COSMETIC("HUD.MagicBar.PosType"), 0) == ANCHOR_TO_LIFE_METER) {
                 magicBarY =
                     R_MAGIC_BAR_SMALL_Y - 2 +
-                    magicDrop * (lineLength == 0 ? 0 : (gSaveContext.healthCapacity - 1) / (0x10 * lineLength)) +
+                    magicDrop * (lineLength == 0 ? 0 : (gSaveContext.healthCapacity2 - 1) / 
+                        ((CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2) * lineLength)) +
                     CVarGetInteger(CVAR_COSMETIC("HUD.MagicBar.PosY"), 0) + getHealthMeterYOffset();
                 s16 xPushover =
                     CVarGetInteger(CVAR_COSMETIC("HUD.MagicBar.PosX"), 0) + getHealthMeterXOffset() + R_MAGIC_BAR_X - 1;
@@ -3515,10 +3530,10 @@ void Interface_DrawMagicBar(PlayState* play) {
                               R_MAGIC_FILL_X - 1;
             }
         } else {
-            if ((gSaveContext.healthCapacity - 1) / 0x10 >= lineLength && lineLength != 0) {
+            if ((gSaveContext.healthCapacity2 - 1) / (CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2) >= lineLength && lineLength != 0) {
                 magicBarY =
                     magicBarY_original_l +
-                    magicDrop * (lineLength == 0 ? 0 : ((gSaveContext.healthCapacity - 1) / (0x10 * lineLength) - 1));
+                    magicDrop * (lineLength == 0 ? 0 : ((gSaveContext.healthCapacity2 - 1) / ((CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2) * lineLength) - 1));
             } else {
                 magicBarY = magicBarY_original_s;
             }
@@ -3598,6 +3613,32 @@ void Interface_DrawMagicBar(PlayState* play) {
             gSPWideTextureRectangle(OVERLAY_DISP++, rMagicFillX << 2, (magicBarY + 3) << 2,
                                     (rMagicFillX + gSaveContext.magic) << 2, (magicBarY + 10) << 2, G_TX_RENDERTILE, 0,
                                     0, 1 << 10, 1 << 10);
+        }
+
+        // Draw Magic Numbers
+        u32 magicNumbersType = CVarGetInteger("gLeveled.HUD.MagicMeterNumbersType", 0);
+
+        if (magicNumbersType == 0) {
+            gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
+                              PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
+            Leveled_OverlayValueNumberDraw(play, rMagicFillX + (gSaveContext.magicCapacity >> 1) - 3, magicBarY + 1, gSaveContext.magic, 2, sMagicBorder.r, sMagicBorder.g, sMagicBorder.b, (u8)interfaceCtx->magicAlpha);
+            Leveled_OverlayValueNumberDraw(play, rMagicFillX + (gSaveContext.magicCapacity >> 1) + 3, magicBarY + 1, gSaveContext.magicCapacity, 0, sMagicBorder.r, sMagicBorder.g, sMagicBorder.b, (u8)interfaceCtx->magicAlpha);
+
+            extern const char* fontTbl[];
+            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, interfaceCtx->magicAlpha);
+
+            OVERLAY_DISP =
+                Gfx_TextureI8(OVERLAY_DISP, fontTbl[15], 8, 16, rMagicFillX + (gSaveContext.magicCapacity >> 1) - 2, magicBarY + 1, 8, 16, 8 << 7, 16 << 7);
+
+            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
+
+            OVERLAY_DISP =
+                Gfx_TextureI8(OVERLAY_DISP, fontTbl[15], 8, 16, rMagicFillX + (gSaveContext.magicCapacity >> 1) - 2, magicBarY + 1, 8, 16, 8 << 7, 16 << 7);
+        } else if (magicNumbersType == 1) {
+            gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
+                              PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
+
+            Leveled_OverlayValueNumberDraw(play, rMagicFillX + (gSaveContext.magicCapacity >> 1), magicBarY + 1, gSaveContext.magic, 1, sMagicBorder.r, sMagicBorder.g, sMagicBorder.b, (u8)interfaceCtx->magicAlpha);
         }
     }
 
@@ -5154,7 +5195,7 @@ void Interface_Draw(PlayState* play) {
     if (pauseCtx->debugState == 0) {
         Interface_InitVertices(play);
         func_8008A994(interfaceCtx);
-        if (fullUi || gSaveContext.health != gSaveContext.healthCapacity) {
+        if (fullUi || gSaveContext.health != gSaveContext.healthCapacity2) {
             HealthMeter_Draw(play);
         }
 
@@ -5412,6 +5453,49 @@ void Interface_Draw(PlayState* play) {
                           G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
             }
 
+            // Draw Damage
+            Actor* currAct = play->actorCtx.actorLists[ACTORCAT_ENEMY].head;
+            if (currAct != NULL) {
+                while (currAct != NULL) {
+                    ActorDamageNumber_Draw(play, currAct);
+                    currAct = currAct->next;
+                }
+            }
+
+            currAct = play->actorCtx.actorLists[ACTORCAT_MISC].head;
+            if (currAct != NULL) {
+                while (currAct != NULL) {
+                    if (currAct->id == ACTOR_EN_REEBA)
+                        ActorDamageNumber_Draw(play, currAct);
+                    currAct = currAct->next;
+                }
+            }
+
+            currAct = play->actorCtx.actorLists[ACTORCAT_NPC].head;
+            if (currAct != NULL) {
+                while (currAct != NULL) {
+                    ActorDamageNumber_Draw(play, currAct);
+                    currAct = currAct->next;
+                }
+            }
+
+            currAct = play->actorCtx.actorLists[ACTORCAT_BOSS].head;
+            if (currAct != NULL) {
+                while (currAct != NULL) {
+                    ActorDamageNumber_Draw(play, currAct);
+                    currAct = currAct->next;
+                }
+            }
+
+            ActorDamageNumber_Draw(play, GET_PLAYER(play));
+
+            // Draw Experience Gain
+
+            ActorExperienceNumber_Draw(play, GET_PLAYER(play));
+
+            // Draw Level Up
+            Actor_LevelUpDraw(play, GET_PLAYER(play));
+
             // Render enemy health bar after Z-target to leverage set variables
             if (CVarGetInteger(CVAR_ENHANCEMENT("EnemyHealthBar"), 0)) {
                 Interface_DrawEnemyHealthBar(&play->actorCtx.targetCtx, play);
@@ -5515,6 +5599,8 @@ void Interface_Draw(PlayState* play) {
         }
 
         gDPPipeSync(OVERLAY_DISP++);
+
+        Leveled_Interface_DrawNextLevel(play); // Draw next level
 
         // C-Left Button Icon & Ammo Count
         if (gSaveContext.equips.buttonItems[1] < 0xF0) {
@@ -5948,7 +6034,8 @@ void Interface_Draw(PlayState* play) {
                 case 1:
                     D_8015FFE2 = 20;
                     D_8015FFE0 = 20;
-                    gSaveContext.timerSeconds = gSaveContext.health >> 1;
+                    u8 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
+                    gSaveContext.timerSeconds = (s32)((f32)gSaveContext.health / heartUnits * 8);
                     gSaveContext.timerState = 2;
                     break;
                 case 2:
@@ -6628,18 +6715,19 @@ void Interface_Update(PlayState* play) {
     Map_Update(play);
 
     if (gSaveContext.healthAccumulator != 0) {
-        gSaveContext.healthAccumulator -= 4;
-        gSaveContext.health += 4;
+        s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
+        gSaveContext.healthAccumulator -= heartUnits >> 2;
+        gSaveContext.health += heartUnits >> 2;
 
-        if ((gSaveContext.health & 0xF) < 4) {
+        if ((gSaveContext.health % (heartUnits)) < heartUnits >> 2) {
             Audio_PlaySoundGeneral(NA_SE_SY_HP_RECOVER, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
                                    &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
 
         osSyncPrintf("now_life=%d  max_life=%d\n", gSaveContext.health, gSaveContext.healthCapacity);
 
-        if (gSaveContext.health >= gSaveContext.healthCapacity) {
-            gSaveContext.health = gSaveContext.healthCapacity;
+        if (gSaveContext.health >= gSaveContext.healthCapacity2) {
+            gSaveContext.health = gSaveContext.healthCapacity2;
             osSyncPrintf("S_Private.now_life=%d  S_Private.max_life=%d\n", gSaveContext.health,
                          gSaveContext.healthCapacity);
             gSaveContext.healthAccumulator = 0;
@@ -6786,7 +6874,8 @@ void Interface_Update(PlayState* play) {
     }
 
     if (gSaveContext.timerState == 0) {
-        if (((D_80125A58 == 1) || (D_80125A58 == 2) || (D_80125A58 == 4)) && ((gSaveContext.health >> 1) != 0)) {
+        u8 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
+        if (((D_80125A58 == 1) || (D_80125A58 == 2) || (D_80125A58 == 4)) && (((s32)((f32)gSaveContext.health / heartUnits * 8)) != 0)) {
             gSaveContext.timerState = 1;
             gSaveContext.timerX[0] = 140;
             gSaveContext.timerY[0] = 80;

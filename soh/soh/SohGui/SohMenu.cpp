@@ -85,6 +85,7 @@ void SohMenu::InitElement() {
     AddMenuSettings();
     AddMenuEnhancements();
     AddMenuRandomizer();
+    AddMenuLeveled();
 #ifdef ENABLE_REMOTE_CONTROL
     AddMenuNetwork();
 #endif

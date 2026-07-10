@@ -212,7 +212,8 @@ void UpdatePermanentHeartLossState() {
 
         uint8_t newCapacity = startingHealth + (heartContainers * 16) + ((heartPieces - (heartPieces % 4)) * 4);
         gSaveContext.healthCapacity = MAX(newCapacity, gSaveContext.healthCapacity);
-        gSaveContext.health = MIN(gSaveContext.health, gSaveContext.healthCapacity);
+        gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+        gSaveContext.health = MIN(gSaveContext.health, gSaveContext.healthCapacity2);
         hasAffectedHealth = false;
     }
 }
@@ -227,9 +228,11 @@ void RegisterPermanentHeartLoss() {
         if (!CVarGetInteger(CVAR_ENHANCEMENT("PermanentHeartLoss"), 0) || !GameInteractor::IsSaveLoaded())
             return;
 
-        if (gSaveContext.healthCapacity > 16 && gSaveContext.healthCapacity - gSaveContext.health >= 16) {
+        s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
+        if (gSaveContext.healthCapacity > 16 && gSaveContext.healthCapacity2 - gSaveContext.health >= heartUnits) {
             gSaveContext.healthCapacity -= 16;
-            gSaveContext.health = MIN(gSaveContext.health, gSaveContext.healthCapacity);
+            gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+            gSaveContext.health = MIN(gSaveContext.health, gSaveContext.healthCapacity2);
             hasAffectedHealth = true;
         }
     });
@@ -827,6 +830,7 @@ void UpdateHurtContainerModeState(bool newState) {
     } else {
         gSaveContext.healthCapacity = 48 + ((getHeartPieces + getHeartContainers) * 16);
     }
+    gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
 }
 
 void RegisterHurtContainerModeHandler() {
@@ -879,9 +883,11 @@ void RegisterRandomizedEnemySizes() {
             // Scale the health based on a smaller factor than randomScale
             float healthScalingFactor = 0.8f; // Adjust this factor as needed
             float scaledHealth = actor->colChkInfo.health * (randomScale * healthScalingFactor);
+            float scaledExp = actor->exp * (randomScale * healthScalingFactor);
 
             // Ensure the scaled health doesn't go below zero
             actor->colChkInfo.health = fmax(scaledHealth, 1.0f);
+            actor->exp = fmax(scaledExp, 1.0f);
         } else {
             return;
         }

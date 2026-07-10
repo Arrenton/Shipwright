@@ -390,12 +390,19 @@ void HealthMeter_Draw(PlayState* play) {
     f32 temp2;
     f32 temp3;
     f32 temp4;
+    u8 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
+    if (heartUnits < 4) {
+        heartUnits = 4;
+        CVarSetInteger("gLeveled.Difficulty.HeartUnits", 1);
+    }
     InterfaceContext* interfaceCtx = &play->interfaceCtx;
     GraphicsContext* gfxCtx = play->state.gfxCtx;
     Vtx* sp154 = interfaceCtx->beatingHeartVtx;
-    s32 curHeartFraction = gSaveContext.health % 0x10;
-    s16 totalHeartCount = gSaveContext.healthCapacity / 0x10;
-    s16 fullHeartCount = gSaveContext.health / 0x10;
+    s16 totalHeartCount = gSaveContext.healthCapacity2 / heartUnits;
+    s16 fullHeartCount = gSaveContext.health / heartUnits;
+    f32 heartUnit = (f32)gSaveContext.health / heartUnits * 16 - fullHeartCount * 16;
+    heartUnit = heartUnit > 0.0f && heartUnit < 1.0f ? 1.0f : heartUnit;
+    s32 curHeartFraction = (s32)heartUnit % 0x10;
     s32 pad2;
     f32 sp144 = interfaceCtx->unk_22A * 0.1f;
     s32 curCombineModeSet = 0;
@@ -410,7 +417,7 @@ void HealthMeter_Draw(PlayState* play) {
 
     OPEN_DISPS(gfxCtx);
 
-    if (!(gSaveContext.health % 0x10)) {
+    if (!(gSaveContext.health % heartUnits)) {
         fullHeartCount--;
     }
 
@@ -631,13 +638,57 @@ void HealthMeter_Draw(PlayState* play) {
         }
 
         offsetX += 10.0f;
-        s32 lineLength = CVarGetInteger(CVAR_COSMETIC("HUD.Hearts.LineLength"), 10);
+        s32 lineLength = CVarGetInteger(CVAR_COSMETIC("HUD.Hearts.LineLength"), 15);
         if (lineLength != 0 && (i + 1) % lineLength == 0) {
             offsetX = PosX_anchor;
             offsetY += 10.0f;
         }
 
         FrameInterpolation_RecordCloseChild();
+    }
+    
+    // Draw Health Numbers
+    u32 healthNumbersType = CVarGetInteger("gLeveled.HUD.HealthNumbersType", 0);
+    s32 lineLength = CVarGetInteger(CVAR_COSMETIC("HUD.Hearts.LineLength"), 15);
+    s32 numberOffsetX = CLAMP(totalHeartCount, 0, lineLength) * 5;
+    s32 numberPosX = PosX_anchor + numberOffsetX;
+    s32 numberPosY = getHealthMeterYOffset() + 13;
+
+    if (healthNumbersType == 0) {
+        gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
+                          PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
+        if (HealthMeter_IsCritical()) {
+            Leveled_OverlayValueNumberDraw(play, numberPosX + 21, numberPosY, gSaveContext.health, 2, (u16)(255.0 * (1 - sp144 * 0.5)), (u16)(127.0 * (1 - sp144 * 0.5)), 0, (u8)interfaceCtx->magicAlpha);
+        } else {
+            Leveled_OverlayValueNumberDraw(play, numberPosX + 21, numberPosY, gSaveContext.health, 2, 255, 255, 255, (u8)interfaceCtx->magicAlpha);
+        }
+
+        Leveled_OverlayValueNumberDraw(play, numberPosX + 28, numberPosY, gSaveContext.healthCapacity2, 0, 255, 255, 255, (u8)interfaceCtx->magicAlpha);
+
+        extern const char* fontTbl[];
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, interfaceCtx->magicAlpha);
+
+        gDPLoadTextureBlock_4b(OVERLAY_DISP++, fontTbl[15], G_IM_FMT_I, 16, 16, 0, G_TX_NOMIRROR | G_TX_WRAP,
+                               G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+        gSPWideTextureRectangle(OVERLAY_DISP++, numberPosX + 22 << 2, numberPosY << 2, (numberPosX + 22 + 8) << 2,
+                                (numberPosY + 16) << 2, G_TX_RENDERTILE, 0, 0, 16 << 7, 16 << 7);
+
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
+
+        gDPLoadTextureBlock_4b(OVERLAY_DISP++, fontTbl[15], G_IM_FMT_I, 16, 16, 0,
+                            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
+                            G_TX_NOLOD);
+        gSPWideTextureRectangle(OVERLAY_DISP++, numberPosX + 22 << 2, numberPosY << 2, (numberPosX + 22 + 8) << 2,
+                                (numberPosY + 16) << 2, G_TX_RENDERTILE, 0, 0, 16 << 7, 16 << 7);
+    } else if (healthNumbersType == 1) {
+
+        gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
+                          PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
+        if (HealthMeter_IsCritical()) {
+            Leveled_OverlayValueNumberDraw(play, numberPosX + 24, numberPosY, gSaveContext.health, 1, (u16)(255.0 * (1 - sp144 * 0.5)), (u16)(127.0 * (1 - sp144 * 0.5)), 0, (u8)interfaceCtx->magicAlpha);
+        } else {
+            Leveled_OverlayValueNumberDraw(play, numberPosX + 24, numberPosY, gSaveContext.health, 1, 255, 255, 255, (u8)interfaceCtx->magicAlpha);
+        }
     }
 
     CLOSE_DISPS(gfxCtx);
@@ -669,15 +720,9 @@ void HealthMeter_HandleCriticalAlarm(PlayState* play) {
 u32 HealthMeter_IsCritical(void) {
     s32 var;
 
-    if (gSaveContext.healthCapacity <= 0x50) {
-        var = 0x10;
-    } else if (gSaveContext.healthCapacity <= 0xA0) {
-        var = 0x18;
-    } else if (gSaveContext.healthCapacity <= 0xF0) {
-        var = 0x20;
-    } else {
-        var = 0x2C;
-    }
+    s32 heartValue = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
+
+    var = (s32)(heartValue + (f32)(((gSaveContext.healthCapacity2 / heartValue) - 3) * heartValue) * 0.103f);
 
     if (GameInteractor_Should(VB_HEALTH_METER_BE_CRITICAL, var >= gSaveContext.health && gSaveContext.health > 0)) {
         return true;

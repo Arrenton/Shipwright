@@ -189,7 +189,7 @@ void ModifyGravity::_Remove() {
 GameInteractionEffectQueryResult ModifyHealth::CanBeApplied() {
     if (!GameInteractor::IsSaveLoaded()) {
         return GameInteractionEffectQueryResult::TemporarilyNotPossible;
-    } else if ((parameters[0] > 0 && gSaveContext.health == gSaveContext.healthCapacity) ||
+    } else if ((parameters[0] > 0 && gSaveContext.health == gSaveContext.healthCapacity2) ||
                (parameters[0] < 0 && (gSaveContext.health + (16 * parameters[0]) <= 0))) {
         return GameInteractionEffectQueryResult::NotPossible;
     }
