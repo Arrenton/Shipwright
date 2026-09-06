@@ -10,6 +10,7 @@
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "soh/frame_interpolation.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/ObjectExtension/ActorMaximumHealth.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -153,12 +154,23 @@ s32 EnFw_CheckCollider(EnFw* this, PlayState* play) {
             this->lastDmgHook = false;
         }
         this->collider.base.acFlags &= ~AC_HIT;
+
+        u16 extraDamage = GetActorMaximumHealth(&this->actor) / 9;
+
+        if (this->actor.colChkInfo.damage + extraDamage >= this->actor.colChkInfo.health) {
+            this->actor.colChkInfo.health = 0;
+        } else {
+            this->actor.colChkInfo.health -= this->actor.colChkInfo.damage + extraDamage;
+        }
+
+        ActorDamageNumber_New(&this->actor, this->actor.colChkInfo.damage + extraDamage);
+
         if (Actor_ApplyDamage(&this->actor) <= 0) {
-            if (this->actor.parent->colChkInfo.health <= 8) {
+            if (this->actor.parent->colChkInfo.health <= GetActorMaximumHealth(&this->actor)) {
                 Enemy_StartFinishingBlow(play, &this->actor);
                 this->actor.parent->colChkInfo.health = 0;
             } else {
-                this->actor.parent->colChkInfo.health -= 8;
+                this->actor.parent->colChkInfo.health -= GetActorMaximumHealth(&this->actor);
             }
             this->returnToParentTimer = 0;
         }

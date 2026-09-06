@@ -335,6 +335,7 @@ void EnRr_SetupReleasePlayer(EnRr* this, PlayState* play) {
         EnRr_SetupDamage(this);
     } else {
         EnRr_SetupDeath(this);
+        Player_GainExperience(play, this->actor.exp);
     }
 }
 
@@ -462,6 +463,7 @@ void EnRr_CollisionCheck(EnRr* this, PlayState* play) {
                         EnRr_SetupDamage(this);
                     } else {
                         this->dropType = dropType;
+                        Player_GainExperience(play, this->actor.exp);
                         EnRr_SetupDeath(this);
                     }
                     return;
@@ -756,6 +758,7 @@ void EnRr_Stunned(EnRr* this, PlayState* play) {
             this->actionFunc = EnRr_Approach;
         } else {
             EnRr_SetupDeath(this);
+            Player_GainExperience(play, this->actor.exp);
         }
     }
 }

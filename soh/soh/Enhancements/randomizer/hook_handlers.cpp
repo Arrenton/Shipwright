@@ -491,14 +491,17 @@ void RandomizerOnItemReceiveHandler(GetItemEntry receivedItemEntry) {
         }
     }
 
+    s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
+
     if (receivedItemEntry.modIndex == MOD_NONE &&
         (receivedItemEntry.itemId == ITEM_HEART_PIECE || receivedItemEntry.itemId == ITEM_HEART_PIECE_2 ||
          receivedItemEntry.itemId == ITEM_HEART_CONTAINER)) {
-        gSaveContext.healthAccumulator = MAX_HEALTH; // Refill 20 hearts
+        gSaveContext.healthAccumulator = heartUnits * 30; // Refill 20 hearts
         if ((s32)(gSaveContext.inventory.questItems & 0xF0000000) == 0x40000000) {
             gSaveContext.inventory.questItems ^= 0x40000000;
             gSaveContext.healthCapacity += FULL_HEART_HEALTH;
-            gSaveContext.health += FULL_HEART_HEALTH;
+            gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+            gSaveContext.health += heartUnits;
         }
     }
 
