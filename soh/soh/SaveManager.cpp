@@ -580,6 +580,13 @@ void SaveManager::StartupCheckAndInitMeta(int fileNum) {
     SohUtils::CopyStringToCharArray(fileMetaInfo[fileNum].buildVersion,
                                     metaSaveBlock["sections"]["sohStats"]["data"]["buildVersion"],
                                     ARRAY_COUNT(fileMetaInfo[fileNum].buildVersion));
+    if (baseBlock["experience"] > 999999) {
+        baseBlock["experience"] = 999999;
+    }
+    fileMetaInfo[fileNum].level = 0;
+    while (GetActorStat_NextLevelExp(fileMetaInfo[fileNum].level, baseBlock["experience"]) <= 0 && fileMetaInfo[fileNum].level < 99) {
+        fileMetaInfo[fileNum].level += 1;
+    }
 }
 
 void SaveManager::InitMeta(int fileNum) {
@@ -608,12 +615,6 @@ void SaveManager::InitMeta(int fileNum) {
     fileMetaInfo[fileNum].hasFishingRod = Flags_GetRandomizerInf(RAND_INF_FISHING_POLE_FOUND) || !IS_RANDO;
     fileMetaInfo[fileNum].defense = gSaveContext.inventory.defenseHearts;
     fileMetaInfo[fileNum].health = gSaveContext.health;
-    fileMetaInfo[fileNum].level = 0;
-
-    while (GetActorStat_NextLevelExp(fileMetaInfo[fileNum].level, gSaveContext.experience) <= 0 &&
-           fileMetaInfo[fileNum].level < 99) {
-        fileMetaInfo[fileNum].level += 1;
-           }
     auto randoContext = Rando::Context::GetInstance();
 
     fileMetaInfo[fileNum].maxTriforcePieces = IS_RANDO && (bool)randoContext->GetOption(RSK_TRIFORCE_HUNT)
@@ -675,7 +676,7 @@ void SaveManager::InitFileNormal() {
             (gSaveContext.language == LANGUAGE_JPN) ? NAME_LANGUAGE_NTSC_JPN : NAME_LANGUAGE_NTSC_ENG;
     }
     gSaveContext.healthCapacity2 = 9999;
-    gSaveContext.magicUnits = 9999;
+    gSaveContext.magicUnits = 255;
     gSaveContext.experience = 0;
     gSaveContext.showNeededExpTimer = 0;
     gSaveContext.healthCapacity = STARTING_HEALTH;

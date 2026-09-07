@@ -753,16 +753,16 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     } else {
         Leveled_ValueNumberDraw(play, statX + 8, statY, gSaveContext.health, 255, 255, 255);
     }
-    Leveled_DrawTexI4(play, dgMsgChar2FSolidusTex, 16, 16, statX + 18 + healthValX, statY - 1, 12, 9, 255, 255, 255);
-    Leveled_ValueNumberDraw(play, statX + 24 + healthValX, statY, gSaveContext.healthCapacity2, 120, 255, 0);
+    Leveled_DrawTexI4(play, dgMsgChar2FSolidusTex, 16, 16, statX + 19 + healthValX, statY - 1, 12, 9, 255, 255, 255);
+    Leveled_ValueNumberDraw(play, statX + 25 + healthValX, statY, gSaveContext.healthCapacity2, 120, 255, 0);
     statY += 8;
     // Magic
     if (gSaveContext.magicCapacity > 0) {
         healthValX = gSaveContext.magicCapacity >= 100 ? 6 : 0;
         Leveled_DrawTex32(play, dgQuestIconMagicJarBigTex, 24, 24, statX, statY, 14, 14);
         Leveled_ValueNumberDraw(play, statX + 8, statY, gSaveContext.magic, 255, 255, 255);
-        Leveled_DrawTexI4(play, dgMsgChar2FSolidusTex, 16, 16, statX + 18 + healthValX, statY - 1, 12, 9, 255, 255, 255);
-        Leveled_ValueNumberDraw(play, statX + 24 + healthValX, statY, gSaveContext.magicCapacity, 120, 255, 0);
+        Leveled_DrawTexI4(play, dgMsgChar2FSolidusTex, 16, 16, statX + 19 + healthValX, statY - 1, 12, 9, 255, 255, 255);
+        Leveled_ValueNumberDraw(play, statX + 25 + healthValX, statY, gSaveContext.magicCapacity, 120, 255, 0);
         
     }
     statX = 88;

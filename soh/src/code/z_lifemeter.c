@@ -398,7 +398,7 @@ void HealthMeter_Draw(PlayState* play) {
     InterfaceContext* interfaceCtx = &play->interfaceCtx;
     GraphicsContext* gfxCtx = play->state.gfxCtx;
     Vtx* sp154 = interfaceCtx->beatingHeartVtx;
-    s16 totalHeartCount = gSaveContext.healthCapacity / heartUnits;
+    s16 totalHeartCount = gSaveContext.healthCapacity2 / heartUnits;
     s16 fullHeartCount = gSaveContext.health / heartUnits;
     f32 heartUnit = (f32)gSaveContext.health / heartUnits * 16 - fullHeartCount * 16;
     heartUnit = heartUnit > 0.0f && heartUnit < 1.0f ? 1.0f : heartUnit;
