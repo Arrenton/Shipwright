@@ -9893,7 +9893,7 @@ void Player_Action_80844A44(Player* this, PlayState* play) {
     Math_StepToF(&this->linearVelocity, 0.0f, 0.05f);
 
     if (this->actor.bgCheckFlags & 1) {
-        this->actor.colChkInfo.damage = 0x10  << CVarGetInteger(CVAR_ENHANCEMENT("DamageMult"), 0);
+        this->actor.colChkInfo.damage = 0x10 << CVarGetInteger(CVAR_ENHANCEMENT("DamageMult"), 0);
         func_80837C0C(play, this, PLAYER_HIT_RESPONSE_KNOCKBACK_LARGE, 4.0f, 5.0f, this->actor.shape.rot.y, 20);
     }
 }
