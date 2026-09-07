@@ -2322,7 +2322,8 @@ u8 Item_Give(PlayState* play, u8 item) {
     } else if (item == ITEM_HEART_CONTAINER) {
         if (GameInteractor_Should(VB_HEARTS_INCREASE_WITH_CONTAINERS, true)) {
             gSaveContext.healthCapacity += FULL_HEART_HEALTH;
-            gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+            gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity,
+                                                                                   GET_PLAYER(gPlayState)->actor.level);
             gSaveContext.health += LEVELED_HEART_UNITS;
         }
         gSaveContext.ship.stats.heartContainers++;
@@ -3520,10 +3521,11 @@ void Interface_DrawMagicBar(PlayState* play) {
                 PosX_MidEnd = -9999;
                 rMagicFillX = -9999;
             } else if (CVarGetInteger(CVAR_COSMETIC("HUD.MagicBar.PosType"), 0) == ANCHOR_TO_LIFE_METER) {
-                magicBarY =
-                    R_MAGIC_BAR_SMALL_Y - 2 +
-                    magicDrop * (lineLength == 0 ? 0 : (gSaveContext.healthCapacity2 - 1) / (LEVELED_HEART_UNITS * lineLength)) +
-                    CVarGetInteger(CVAR_COSMETIC("HUD.MagicBar.PosY"), 0) + getHealthMeterYOffset();
+                magicBarY = R_MAGIC_BAR_SMALL_Y - 2 +
+                            magicDrop * (lineLength == 0 ? 0
+                                                         : (gSaveContext.healthCapacity2 - 1) /
+                                                               (LEVELED_HEART_UNITS * lineLength)) +
+                            CVarGetInteger(CVAR_COSMETIC("HUD.MagicBar.PosY"), 0) + getHealthMeterYOffset();
                 s16 xPushover =
                     CVarGetInteger(CVAR_COSMETIC("HUD.MagicBar.PosX"), 0) + getHealthMeterXOffset() + R_MAGIC_BAR_X - 1;
                 PosX_Start = xPushover;
@@ -3536,7 +3538,9 @@ void Interface_DrawMagicBar(PlayState* play) {
             if ((gSaveContext.healthCapacity2 - 1) / LEVELED_HEART_UNITS >= lineLength && lineLength != 0) {
                 magicBarY =
                     magicBarY_original_l +
-                    magicDrop * (lineLength == 0 ? 0 : ((gSaveContext.healthCapacity2 - 1) / (LEVELED_HEART_UNITS * lineLength) - 1));
+                    magicDrop * (lineLength == 0
+                                     ? 0
+                                     : ((gSaveContext.healthCapacity2 - 1) / (LEVELED_HEART_UNITS * lineLength) - 1));
             } else {
                 magicBarY = magicBarY_original_s;
             }
@@ -3624,24 +3628,32 @@ void Interface_DrawMagicBar(PlayState* play) {
         if (magicNumbersType == 0) {
             gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
                               PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
-            Leveled_OverlayValueNumberDraw(play, rMagicFillX + (gSaveContext.magicCapacity >> 1) - 3, magicBarY + 1, gSaveContext.magic, 2, sMagicBorder.r, sMagicBorder.g, sMagicBorder.b, (u8)interfaceCtx->magicAlpha);
-            Leveled_OverlayValueNumberDraw(play, rMagicFillX + (gSaveContext.magicCapacity >> 1) + 3, magicBarY + 1, gSaveContext.magicCapacity, 0, sMagicBorder.r, sMagicBorder.g, sMagicBorder.b, (u8)interfaceCtx->magicAlpha);
+            Leveled_OverlayValueNumberDraw(play, rMagicFillX + (gSaveContext.magicCapacity >> 1) - 3, magicBarY + 1,
+                                           gSaveContext.magic, 2, sMagicBorder.r, sMagicBorder.g, sMagicBorder.b,
+                                           (u8)interfaceCtx->magicAlpha);
+            Leveled_OverlayValueNumberDraw(play, rMagicFillX + (gSaveContext.magicCapacity >> 1) + 3, magicBarY + 1,
+                                           gSaveContext.magicCapacity, 0, sMagicBorder.r, sMagicBorder.g,
+                                           sMagicBorder.b, (u8)interfaceCtx->magicAlpha);
 
             extern const char* fontTbl[];
             gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, interfaceCtx->magicAlpha);
 
             OVERLAY_DISP =
-                Gfx_TextureI8(OVERLAY_DISP, fontTbl[15], 8, 16, rMagicFillX + (gSaveContext.magicCapacity >> 1) - 2, magicBarY + 1, 8, 16, 8 << 7, 16 << 7);
+                Gfx_TextureI8(OVERLAY_DISP, fontTbl[15], 8, 16, rMagicFillX + (gSaveContext.magicCapacity >> 1) - 2,
+                              magicBarY + 1, 8, 16, 8 << 7, 16 << 7);
 
             gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
 
             OVERLAY_DISP =
-                Gfx_TextureI8(OVERLAY_DISP, fontTbl[15], 8, 16, rMagicFillX + (gSaveContext.magicCapacity >> 1) - 2, magicBarY + 1, 8, 16, 8 << 7, 16 << 7);
+                Gfx_TextureI8(OVERLAY_DISP, fontTbl[15], 8, 16, rMagicFillX + (gSaveContext.magicCapacity >> 1) - 2,
+                              magicBarY + 1, 8, 16, 8 << 7, 16 << 7);
         } else if (magicNumbersType == 1) {
             gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
                               PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
 
-            Leveled_OverlayValueNumberDraw(play, rMagicFillX + (gSaveContext.magicCapacity >> 1), magicBarY + 1, gSaveContext.magic, 1, sMagicBorder.r, sMagicBorder.g, sMagicBorder.b, (u8)interfaceCtx->magicAlpha);
+            Leveled_OverlayValueNumberDraw(play, rMagicFillX + (gSaveContext.magicCapacity >> 1), magicBarY + 1,
+                                           gSaveContext.magic, 1, sMagicBorder.r, sMagicBorder.g, sMagicBorder.b,
+                                           (u8)interfaceCtx->magicAlpha);
         }
     }
 
@@ -5458,7 +5470,6 @@ void Interface_Draw(PlayState* play) {
                           G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
             }
 
-
             // Draw Damage
             Actor* currAct = play->actorCtx.actorLists[ACTORCAT_ENEMY].head;
             if (currAct != NULL) {
@@ -6041,7 +6052,7 @@ void Interface_Draw(PlayState* play) {
                 case TIMER_STATE_ENV_HAZARD_INIT:
                     sTimerStateTimer = 20;
                     sTimerNextSecondTimer = 20;
-                    gSaveContext.timerSeconds = (s16)((f32)gSaveContext.health / (LEVELED_HEART_UNITS) * 8);
+                    gSaveContext.timerSeconds = (s16)((f32)gSaveContext.health / (LEVELED_HEART_UNITS)*8);
                     gSaveContext.timerState = TIMER_STATE_ENV_HAZARD_PREVIEW;
                     break;
                 case TIMER_STATE_ENV_HAZARD_PREVIEW:

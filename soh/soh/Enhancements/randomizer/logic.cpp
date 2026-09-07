@@ -1943,12 +1943,14 @@ void Logic::ApplyItemEffect(Item& item, bool state) {
                 case RG_HEART_CONTAINER:
                     mSaveContext->healthCapacity += (!state ? -16 : 16);
                     if (gPlayState != nullptr)
-                        mSaveContext->healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+                        mSaveContext->healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(
+                            gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
                     break;
                 case RG_PIECE_OF_HEART:
                     mSaveContext->healthCapacity += (!state ? -4 : 4);
                     if (gPlayState != nullptr)
-                        mSaveContext->healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+                        mSaveContext->healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(
+                            gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
                     break;
                 case RG_BOOMERANG:
                 case RG_LENS_OF_TRUTH:

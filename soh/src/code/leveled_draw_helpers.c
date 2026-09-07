@@ -10,9 +10,8 @@
 
 #include "soh/ShipUtils.h"
 
-
 Gfx* Gfx_Texture32(Gfx* displayListHead, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
-                    s16 rectWidth, s16 rectHeight, u16 dsdx, u16 dtdy) {
+                   s16 rectWidth, s16 rectHeight, u16 dsdx, u16 dtdy) {
     gDPLoadTextureBlock(displayListHead++, texture, G_IM_FMT_RGBA, G_IM_SIZ_32b, textureWidth, textureHeight, 0,
                         G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
                         G_TX_NOLOD);
@@ -24,7 +23,7 @@ Gfx* Gfx_Texture32(Gfx* displayListHead, void* texture, s16 textureWidth, s16 te
 }
 
 Gfx* Gfx_TextureIA4(Gfx* displayListHead, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
-                   s16 rectWidth, s16 rectHeight, u16 dsdx, u16 dtdy) {
+                    s16 rectWidth, s16 rectHeight, u16 dsdx, u16 dtdy) {
     gDPLoadTextureBlock_4b(displayListHead++, texture, G_IM_FMT_IA, textureWidth, textureHeight, 0,
                            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
                            G_TX_NOLOD);
@@ -36,7 +35,7 @@ Gfx* Gfx_TextureIA4(Gfx* displayListHead, void* texture, s16 textureWidth, s16 t
 }
 
 Gfx* Gfx_TextureI4(Gfx* displayListHead, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
-                    s16 rectWidth, s16 rectHeight, u16 dsdx, u16 dtdy) {
+                   s16 rectWidth, s16 rectHeight, u16 dsdx, u16 dtdy) {
     gDPLoadTextureBlock_4b(displayListHead++, texture, G_IM_FMT_I, textureWidth, textureHeight, 0,
                            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
                            G_TX_NOLOD);
@@ -47,8 +46,8 @@ Gfx* Gfx_TextureI4(Gfx* displayListHead, void* texture, s16 textureWidth, s16 te
     return displayListHead;
 }
 
-void Leveled_DrawTexI8(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft,
-                       s16 rectTop, s16 rectWidth, s16 rectHeight, u8 r, u8 g, u8 b) {
+void Leveled_DrawTexI8(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
+                       s16 rectWidth, s16 rectHeight, u8 r, u8 g, u8 b) {
 
     OPEN_DISPS(play->state.gfxCtx);
     gDPPipeSync(POLY_OPA_DISP++);
@@ -57,26 +56,12 @@ void Leveled_DrawTexI8(PlayState* play, void* texture, s16 textureWidth, s16 tex
 
     POLY_OPA_DISP = Gfx_TextureI8(POLY_OPA_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, textureWidth,
                                   textureHeight, (s32)(1024 * (f32)textureWidth / rectWidth),
-                                   (s32)(1024 * (f32)textureHeight / rectHeight));
+                                  (s32)(1024 * (f32)textureHeight / rectHeight));
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
-void Leveled_DrawTexIA8(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft,
-                        s16 rectTop, s16 rectWidth, s16 rectHeight, u8 r, u8 g, u8 b) {
-
-    OPEN_DISPS(play->state.gfxCtx);
-    gDPPipeSync(POLY_OPA_DISP++);
-    gDPSetTextureFilter(POLY_OPA_DISP++, G_TF_AVERAGE);
-    gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, r, g, b, play->pauseCtx.alpha);
-
-    POLY_OPA_DISP = Gfx_TextureIA8(POLY_OPA_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, textureWidth, textureHeight, (s32)(1024 * (f32)textureWidth / rectWidth),
-                                   (s32)(1024 * (f32)textureHeight / rectHeight));
-
-    CLOSE_DISPS(play->state.gfxCtx);
-}
-
-void Leveled_DrawTexI4(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
+void Leveled_DrawTexIA8(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
                         s16 rectWidth, s16 rectHeight, u8 r, u8 g, u8 b) {
 
     OPEN_DISPS(play->state.gfxCtx);
@@ -84,43 +69,60 @@ void Leveled_DrawTexI4(PlayState* play, void* texture, s16 textureWidth, s16 tex
     gDPSetTextureFilter(POLY_OPA_DISP++, G_TF_AVERAGE);
     gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, r, g, b, play->pauseCtx.alpha);
 
-    POLY_OPA_DISP = Gfx_TextureI4(POLY_OPA_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, textureWidth,
+    POLY_OPA_DISP = Gfx_TextureIA8(POLY_OPA_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, textureWidth,
                                    textureHeight, (s32)(1024 * (f32)textureWidth / rectWidth),
                                    (s32)(1024 * (f32)textureHeight / rectHeight));
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
-void Leveled_DrawTex32(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft,
-                       s16 rectTop, s16 rectWidth, s16 rectHeight) {
+void Leveled_DrawTexI4(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
+                       s16 rectWidth, s16 rectHeight, u8 r, u8 g, u8 b) {
+
+    OPEN_DISPS(play->state.gfxCtx);
+    gDPPipeSync(POLY_OPA_DISP++);
+    gDPSetTextureFilter(POLY_OPA_DISP++, G_TF_AVERAGE);
+    gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, r, g, b, play->pauseCtx.alpha);
+
+    POLY_OPA_DISP = Gfx_TextureI4(POLY_OPA_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, textureWidth,
+                                  textureHeight, (s32)(1024 * (f32)textureWidth / rectWidth),
+                                  (s32)(1024 * (f32)textureHeight / rectHeight));
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+void Leveled_DrawTex32(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
+                       s16 rectWidth, s16 rectHeight) {
 
     OPEN_DISPS(play->state.gfxCtx);
     gDPPipeSync(POLY_OPA_DISP++);
     gDPSetTextureFilter(POLY_OPA_DISP++, G_TF_AVERAGE);
     gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, 255, 255, 255, play->pauseCtx.alpha);
 
-    POLY_OPA_DISP = Gfx_Texture32(POLY_OPA_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, textureWidth, textureHeight, (s32)(2048 * (f32)textureWidth / rectWidth),
+    POLY_OPA_DISP = Gfx_Texture32(POLY_OPA_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, textureWidth,
+                                  textureHeight, (s32)(2048 * (f32)textureWidth / rectWidth),
                                   (s32)(2048 * (f32)textureHeight / rectHeight));
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
-void Leveled_DrawTex4b(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft,
-                       s16 rectTop, s16 rectWidth, s16 rectHeight) {
+void Leveled_DrawTex4b(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft, s16 rectTop,
+                       s16 rectWidth, s16 rectHeight) {
 
     OPEN_DISPS(play->state.gfxCtx);
     gDPPipeSync(POLY_OPA_DISP++);
     gDPSetTextureFilter(POLY_OPA_DISP++, G_TF_AVERAGE);
     gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, 255, 255, 255, play->pauseCtx.alpha);
 
-    POLY_OPA_DISP = Gfx_TextureIA4(POLY_OPA_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, textureWidth, textureHeight, (s32)(2048 * (f32)textureWidth / rectWidth),
-                                  (s32)(2048 * (f32)textureHeight / rectHeight));
+    POLY_OPA_DISP = Gfx_TextureIA4(POLY_OPA_DISP, texture, textureWidth, textureHeight, rectLeft, rectTop, textureWidth,
+                                   textureHeight, (s32)(2048 * (f32)textureWidth / rectWidth),
+                                   (s32)(2048 * (f32)textureHeight / rectHeight));
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
 void Leveled_OverlayDrawTex4b(PlayState* play, void* texture, s16 textureWidth, s16 textureHeight, s16 rectLeft,
-                       s16 rectTop, s16 rectWidth, s16 rectHeight, u16 alpha) {
+                              s16 rectTop, s16 rectWidth, s16 rectHeight, u16 alpha) {
 
     OPEN_DISPS(play->state.gfxCtx);
     gDPPipeSync(OVERLAY_DISP++);
@@ -134,7 +136,9 @@ void Leveled_OverlayDrawTex4b(PlayState* play, void* texture, s16 textureWidth, 
 }
 
 void ActorDamageNumber_New(Actor* actor, u16 damage) {
-    if (damage == 0 || (actor->category == ACTORCAT_PLAYER && !CVarGetInteger("gLeveled.HUD.FloatingNumbers.PlayerDamage", 1)) || (actor->category != ACTORCAT_PLAYER && !CVarGetInteger("gLeveled.HUD.FloatingNumbers.EnemyDamage", 1)))
+    if (damage == 0 ||
+        (actor->category == ACTORCAT_PLAYER && !CVarGetInteger("gLeveled.HUD.FloatingNumbers.PlayerDamage", 1)) ||
+        (actor->category != ACTORCAT_PLAYER && !CVarGetInteger("gLeveled.HUD.FloatingNumbers.EnemyDamage", 1)))
         return;
 
     Vec2f position = { 0, 0 };
@@ -149,7 +153,6 @@ void ActorDamageNumber_New(Actor* actor, u16 damage) {
 void ActorExperienceNumber_New(Actor* actor, u16 experience) {
     if (experience == 0 || !CVarGetInteger("gLeveled.HUD.FloatingNumbers.ExpGain", 1))
         return;
-
 
     Vec2f position = { 0, 0 };
     Vec2f velocity = { 0, -6 };
@@ -287,8 +290,8 @@ void ActorExperienceNumber_Draw(PlayState* play, Actor* actor) {
 
     // Draw
     for (u8 i = 0; i < digits; i++) {
-            OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16, (s16)spBC.x - i * width, (s16)spBC.y,
-                                         8, 16, 1 << 10, 1 << 10);
+        OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16, (s16)spBC.x - i * width,
+                                     (s16)spBC.y, 8, 16, 1 << 10, 1 << 10);
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
@@ -360,7 +363,8 @@ void ActorDamageNumber_Draw(PlayState* play, Actor* actor) {
     // Position
     func_8002BE04(play, &actor->focus.pos, &projActorCenter, &projActorCappedInvW);
 
-    projActorCenter.x = (SCREEN_WIDTH / 2) * (projActorCenter.x * projActorCappedInvW) + actor->floatingNumberPosition[0].x - (digits - 1) * textureWidth / 2;
+    projActorCenter.x = (SCREEN_WIDTH / 2) * (projActorCenter.x * projActorCappedInvW) +
+                        actor->floatingNumberPosition[0].x - (digits - 1) * textureWidth / 2;
     projActorCenter.x = projActorCenter.x * (CVarGetInteger(CVAR_ENHANCEMENT("MirroredWorld"), 0) ? -1 : 1);
     projActorCenter.x = CLAMP(projActorCenter.x, (-SCREEN_WIDTH / 2), (SCREEN_WIDTH / 2));
 
@@ -388,7 +392,8 @@ void ActorDamageNumber_Draw(PlayState* play, Actor* actor) {
                       ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
 
     for (u8 i = 0; i < digits; i++) {
-        Ship_CreateQuadVertexGroup(&sLeveledDamageNumberVtx[4 * i], -textureWidth * i, 0, textureWidth, textureHeight, 0);
+        Ship_CreateQuadVertexGroup(&sLeveledDamageNumberVtx[4 * i], -textureWidth * i, 0, textureWidth, textureHeight,
+                                   0);
 
         gDPPipeSync(OVERLAY_DISP++);
 
@@ -452,28 +457,37 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
             spBC.x = 160 + actor->floatingNumberPosition[i].x - 24;
             spBC.y = 200 + actor->floatingNumberPosition[i].y;
         }
-        
+
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, 255);
         gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
                           PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
         if (i == 2) {
 
             for (u8 j = 0; j < 3; j++) {
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar4CLatinCapitalLetterLTex, 8, 16, (s16)spBC.x, (s16)spBC.y, 8, 16, 2048, 2048);
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar45LatinCapitalLetterETex, 8, 16, (s16)spBC.x + 5, (s16)spBC.y, 8, 16, 2048, 2048);
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar56LatinCapitalLetterVTex, 8, 16, (s16)spBC.x + 10, (s16)spBC.y, 8, 16, 2048, 2048);
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar45LatinCapitalLetterETex, 8, 16, (s16)spBC.x + 15, (s16)spBC.y, 8, 16, 2048, 2048);
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar4CLatinCapitalLetterLTex, 8, 16, (s16)spBC.x + 20, (s16)spBC.y, 8, 16, 2048, 2048);
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar55LatinCapitalLetterUTex, 8, 16, (s16)spBC.x + 30, (s16)spBC.y, 8, 16, 2048, 2048);
-                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar50LatinCapitalLetterPTex, 8, 16, (s16)spBC.x + 35, (s16)spBC.y, 8, 16, 2048, 2048);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar4CLatinCapitalLetterLTex, 8, 16, (s16)spBC.x,
+                                             (s16)spBC.y, 8, 16, 2048, 2048);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar45LatinCapitalLetterETex, 8, 16, (s16)spBC.x + 5,
+                                             (s16)spBC.y, 8, 16, 2048, 2048);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar56LatinCapitalLetterVTex, 8, 16, (s16)spBC.x + 10,
+                                             (s16)spBC.y, 8, 16, 2048, 2048);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar45LatinCapitalLetterETex, 8, 16, (s16)spBC.x + 15,
+                                             (s16)spBC.y, 8, 16, 2048, 2048);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar4CLatinCapitalLetterLTex, 8, 16, (s16)spBC.x + 20,
+                                             (s16)spBC.y, 8, 16, 2048, 2048);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar55LatinCapitalLetterUTex, 8, 16, (s16)spBC.x + 30,
+                                             (s16)spBC.y, 8, 16, 2048, 2048);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, dgMsgChar50LatinCapitalLetterPTex, 8, 16, (s16)spBC.x + 35,
+                                             (s16)spBC.y, 8, 16, 2048, 2048);
             }
         }
-        
-        if (i == 3) { 
-            OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, dgItemIconSilverGauntletsTex, 32, 32, (s16)spBC.x, (s16)spBC.y, 32, 32, 4098, 4098);
+
+        if (i == 3) {
+            OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, dgItemIconSilverGauntletsTex, 32, 32, (s16)spBC.x, (s16)spBC.y,
+                                         32, 32, 4098, 4098);
         }
         if (i == 4) {
-            OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, dgItemIconShieldHylianTex, 32, 32, (s16)spBC.x, (s16)spBC.y, 32, 32, 4098, 4098);
+            OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, dgItemIconShieldHylianTex, 32, 32, (s16)spBC.x, (s16)spBC.y, 32,
+                                         32, 4098, 4098);
         }
         if (i == 5) {
 
@@ -481,11 +495,13 @@ void Actor_LevelUpDraw(PlayState* play, Actor* actor) {
             gDPSetTextureFilter(OVERLAY_DISP++, G_TF_AVERAGE);
             gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 70, 0, 255);
 
-            OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, dgHeartFullTex, 16, 16, (s16)spBC.x, (s16)spBC.y, 16, 16, 2048, 2048);
+            OVERLAY_DISP =
+                Gfx_TextureIA8(OVERLAY_DISP, dgHeartFullTex, 16, 16, (s16)spBC.x, (s16)spBC.y, 16, 16, 2048, 2048);
         }
-        
+
         if (i == 6) {
-            OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, dgQuestIconMagicJarBigTex, 24, 24, (s16)spBC.x, (s16)spBC.y, 24, 24, 3072, 3072); 
+            OVERLAY_DISP = Gfx_Texture32(OVERLAY_DISP, dgQuestIconMagicJarBigTex, 24, 24, (s16)spBC.x, (s16)spBC.y, 24,
+                                         24, 3072, 3072);
         }
 
         CLOSE_DISPS(play->state.gfxCtx);
@@ -504,8 +520,8 @@ void Leveled_ValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, u8 
 
     val = value;
 
-        if (val > 999999)
-            val = 999999;
+    if (val > 999999)
+        val = 999999;
 
     if (val < 0)
         val = 0;
@@ -555,9 +571,8 @@ void Leveled_ValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, u8 
     gDPPipeSync(POLY_OPA_DISP++);
 
     for (s8 i = 0; i < digits; i++) {
-        POLY_OPA_DISP =
-            Gfx_TextureIA8(POLY_OPA_DISP, (u8*)_gAmmoDigit0Tex[digit[i]], 8, 8, x - i * 6 + 6 * (digits - 1), y, 8,
-                                     8, 1 << 10, 1 << 10);
+        POLY_OPA_DISP = Gfx_TextureIA8(POLY_OPA_DISP, (u8*)_gAmmoDigit0Tex[digit[i]], 8, 8,
+                                       x - i * 6 + 6 * (digits - 1), y, 8, 8, 1 << 10, 1 << 10);
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
@@ -632,8 +647,8 @@ void Leveled_OverlayValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8
     gDPPipeSync(OVERLAY_DISP++);
 
     for (s8 i = 0; i < digits; i++) {
-        OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, (u8*)_gAmmoDigit0Tex[digit[i]], 8, 8,
-                                       x - i * 6 + 6 * (digits - 1), y, 8, 8, 1 << 10, 1 << 10);
+        OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, (u8*)_gAmmoDigit0Tex[digit[i]], 8, 8, x - i * 6 + 6 * (digits - 1),
+                                      y, 8, 8, 1 << 10, 1 << 10);
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
@@ -653,8 +668,8 @@ void Leveled_BigValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, 
 
     val = value;
 
-        if (val > 999999)
-            val = 999999;
+    if (val > 999999)
+        val = 999999;
 
     if (val < 0)
         val = 0;
@@ -707,11 +722,14 @@ void Leveled_BigValueNumberDraw(PlayState* play, u16 x, u16 y, u32 value, u8 r, 
         gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, 0, 0, 0, 255);
 
         for (j = 0; j < 4; j++) {
-            POLY_OPA_DISP = Gfx_TextureI8(POLY_OPA_DISP, (u8*)digitTextures[digit[i]], 8, 16, x - i * width + width * (digits - 1) + (j % 2) * 2 - 1, y + (j / 2) * 2 - 1, 8, 16, 1 << 10, 1 << 10);
+            POLY_OPA_DISP = Gfx_TextureI8(POLY_OPA_DISP, (u8*)digitTextures[digit[i]], 8, 16,
+                                          x - i * width + width * (digits - 1) + (j % 2) * 2 - 1, y + (j / 2) * 2 - 1,
+                                          8, 16, 1 << 10, 1 << 10);
         }
 
         gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, 255, 255, 255, 255);
-        POLY_OPA_DISP = Gfx_TextureI8(POLY_OPA_DISP, (u8*)digitTextures[digit[i]], 8, 16, x - i * width + width * (digits - 1), y, 8, 16, 1 << 10, 1 << 10);
+        POLY_OPA_DISP = Gfx_TextureI8(POLY_OPA_DISP, (u8*)digitTextures[digit[i]], 8, 16,
+                                      x - i * width + width * (digits - 1), y, 8, 16, 1 << 10, 1 << 10);
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
@@ -722,7 +740,7 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
     Player* player = GET_PLAYER(play);
     u16 statX = 88;
     u16 statY = 70;
-    u8 attack = 1; 
+    u8 attack = 1;
     Color_RGBA8 textColor = { 255, 255, 255, 255 };
 
     if (CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD) == 1)
@@ -761,9 +779,9 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
         healthValX = gSaveContext.magicCapacity >= 100 ? 6 : 0;
         Leveled_DrawTex32(play, dgQuestIconMagicJarBigTex, 24, 24, statX, statY, 14, 14);
         Leveled_ValueNumberDraw(play, statX + 8, statY, gSaveContext.magic, 255, 255, 255);
-        Leveled_DrawTexI4(play, dgMsgChar2FSolidusTex, 16, 16, statX + 19 + healthValX, statY - 1, 12, 9, 255, 255, 255);
+        Leveled_DrawTexI4(play, dgMsgChar2FSolidusTex, 16, 16, statX + 19 + healthValX, statY - 1, 12, 9, 255, 255,
+                          255);
         Leveled_ValueNumberDraw(play, statX + 25 + healthValX, statY, gSaveContext.magicCapacity, 120, 255, 0);
-        
     }
     statX = 88;
     statY = 84;
@@ -778,7 +796,8 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
         textColor.b = 0;
     }
     Leveled_DrawTex32(play, dgItemIconSilverGauntletsTex, 32, 32, statX + 2, statY, 16, 16);
-    Leveled_ValueNumberDraw(play, statX + 10, statY, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255), textColor.r, textColor.g, textColor.b);
+    Leveled_ValueNumberDraw(play, statX + 10, statY, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255),
+                            textColor.r, textColor.g, textColor.b);
     statX += 22;
     // Courage
     if (player->actor.courageModifier > 0) {
@@ -795,15 +814,18 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
         textColor.b = 255;
     }
     Leveled_DrawTex32(play, dgItemIconShieldHylianTex, 32, 32, statX + 2, statY, 16, 16);
-    Leveled_ValueNumberDraw(play, statX + 10, statY, CLAMP(player->actor.courage + player->actor.courageModifier, 0, 255), textColor.r, textColor.g, textColor.b);
+    Leveled_ValueNumberDraw(play, statX + 10, statY,
+                            CLAMP(player->actor.courage + player->actor.courageModifier, 0, 255), textColor.r,
+                            textColor.g, textColor.b);
     statX += 22;
     // Attack
     Leveled_DrawTex32(play, dgItemIconSwordKokiriTex, 32, 32, statX, statY - 1, 22, 20);
-    Leveled_ValueNumberDraw(play, statX + 9, statY, GetActorStat_Attack(attack, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255)), 255, 255, 255);
+    Leveled_ValueNumberDraw(
+        play, statX + 9, statY,
+        GetActorStat_Attack(attack, CLAMP(player->actor.power + player->actor.powerModifier, 0, 255)), 255, 255, 255);
     statX = 86;
     statY = 170;
-    
-    
+
     // EXP
     Leveled_DrawTex32(play, dgItemIconGoronsBraceletTex, 32, 32, statX + 4, statY, 13, 16);
     Leveled_ValueNumberDraw(play, statX + 10, statY, gSaveContext.experience, 255, 255, 255);
@@ -815,7 +837,7 @@ void Leveled_KaleidoEquip_Stats(PlayState* play) {
 }
 
 void Leveled_Interface_DrawNextLevel(PlayState* play) {
-    if (gSaveContext.showNeededExpTimer > 0){
+    if (gSaveContext.showNeededExpTimer > 0) {
         gSaveContext.showNeededExpTimer--;
     } else {
         return;
@@ -833,8 +855,10 @@ void Leveled_Interface_DrawNextLevel(PlayState* play) {
     u8 width = 8;
     s32 j;
 
-    Leveled_OverlayDrawTex4b(play, dgNextDoActionENGTex, 48, 16, -192, -268, 48, 16, 255 - play->pauseCtx.alpha); // Load texture
-    Leveled_OverlayDrawTex4b(play, dgNextDoActionENGTex, 48, 16, posX, posY, 48, 16, 255 - play->pauseCtx.alpha); // Draw texture
+    Leveled_OverlayDrawTex4b(play, dgNextDoActionENGTex, 48, 16, -192, -268, 48, 16,
+                             255 - play->pauseCtx.alpha); // Load texture
+    Leveled_OverlayDrawTex4b(play, dgNextDoActionENGTex, 48, 16, posX, posY, 48, 16,
+                             255 - play->pauseCtx.alpha); // Draw texture
 
     OPEN_DISPS(play->state.gfxCtx);
 
@@ -893,19 +917,23 @@ void Leveled_Interface_DrawNextLevel(PlayState* play) {
             for (u8 k = 0; k < 3; k++) {
                 if (j == 1 && k == 1)
                     continue;
-        OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16,
-                                         posX - i * width + width * (digits - 1) + numbersPosX - 1 + k, posY - 1 + j, 8, 16, 1024, 1024);
+                OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16,
+                                             posX - i * width + width * (digits - 1) + numbersPosX - 1 + k,
+                                             posY - 1 + j, 8, 16, 1024, 1024);
             }
         }
 
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, 255 - play->pauseCtx.alpha);
-        OVERLAY_DISP = Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16, posX - i * width + width * (digits - 1) + numbersPosX, posY, 8, 16, 1 << 10, 1 << 10);
+        OVERLAY_DISP =
+            Gfx_TextureI8(OVERLAY_DISP, (u8*)digitTextures[digit[i]], 8, 16,
+                          posX - i * width + width * (digits - 1) + numbersPosX, posY, 8, 16, 1 << 10, 1 << 10);
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
-void Leveled_LifeMeter_DrawHealthNumbers(PlayState* play, InterfaceContext* interfaceCtx, s32 numberOffsetX, s32 numberPosX, s32 numberPosY, f32 heartScale) {
+void Leveled_LifeMeter_DrawHealthNumbers(PlayState* play, InterfaceContext* interfaceCtx, s32 numberOffsetX,
+                                         s32 numberPosX, s32 numberPosY, f32 heartScale) {
     u32 healthNumbersType = CVarGetInteger("gLeveled.HUD.HealthNumbersType", 0);
 
     OPEN_DISPS(play->state.gfxCtx);
@@ -913,12 +941,16 @@ void Leveled_LifeMeter_DrawHealthNumbers(PlayState* play, InterfaceContext* inte
         gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
                           PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
         if (HealthMeter_IsCritical()) {
-            Leveled_OverlayValueNumberDraw(play, numberPosX + 21, numberPosY, gSaveContext.health, 2, (u16)(255.0 * (1 - heartScale * 0.5)), (u16)(127.0 * (1 - heartScale * 0.5)), 0, (u8)interfaceCtx->magicAlpha);
+            Leveled_OverlayValueNumberDraw(play, numberPosX + 21, numberPosY, gSaveContext.health, 2,
+                                           (u16)(255.0 * (1 - heartScale * 0.5)), (u16)(127.0 * (1 - heartScale * 0.5)),
+                                           0, (u8)interfaceCtx->magicAlpha);
         } else {
-            Leveled_OverlayValueNumberDraw(play, numberPosX + 21, numberPosY, gSaveContext.health, 2, 255, 255, 255, (u8)interfaceCtx->magicAlpha);
+            Leveled_OverlayValueNumberDraw(play, numberPosX + 21, numberPosY, gSaveContext.health, 2, 255, 255, 255,
+                                           (u8)interfaceCtx->magicAlpha);
         }
 
-        Leveled_OverlayValueNumberDraw(play, numberPosX + 28, numberPosY, gSaveContext.healthCapacity2, 0, 255, 255, 255, (u8)interfaceCtx->magicAlpha);
+        Leveled_OverlayValueNumberDraw(play, numberPosX + 28, numberPosY, gSaveContext.healthCapacity2, 0, 255, 255,
+                                       255, (u8)interfaceCtx->magicAlpha);
 
         extern const char* fontTbl[];
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, interfaceCtx->magicAlpha);
@@ -930,9 +962,8 @@ void Leveled_LifeMeter_DrawHealthNumbers(PlayState* play, InterfaceContext* inte
 
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
 
-        gDPLoadTextureBlock_4b(OVERLAY_DISP++, fontTbl[15], G_IM_FMT_I, 16, 16, 0,
-                            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
-                            G_TX_NOLOD);
+        gDPLoadTextureBlock_4b(OVERLAY_DISP++, fontTbl[15], G_IM_FMT_I, 16, 16, 0, G_TX_NOMIRROR | G_TX_WRAP,
+                               G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
         gSPWideTextureRectangle(OVERLAY_DISP++, numberPosX + 22 << 2, numberPosY << 2, (numberPosX + 22 + 8) << 2,
                                 (numberPosY + 16) << 2, G_TX_RENDERTILE, 0, 0, 16 << 7, 16 << 7);
     } else if (healthNumbersType == 1) {
@@ -940,9 +971,12 @@ void Leveled_LifeMeter_DrawHealthNumbers(PlayState* play, InterfaceContext* inte
         gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
                           PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
         if (HealthMeter_IsCritical()) {
-            Leveled_OverlayValueNumberDraw(play, numberPosX + 24, numberPosY, gSaveContext.health, 1, (u16)(255.0 * (1 - heartScale * 0.5)), (u16)(127.0 * (1 - heartScale * 0.5)), 0, (u8)interfaceCtx->magicAlpha);
+            Leveled_OverlayValueNumberDraw(play, numberPosX + 24, numberPosY, gSaveContext.health, 1,
+                                           (u16)(255.0 * (1 - heartScale * 0.5)), (u16)(127.0 * (1 - heartScale * 0.5)),
+                                           0, (u8)interfaceCtx->magicAlpha);
         } else {
-            Leveled_OverlayValueNumberDraw(play, numberPosX + 24, numberPosY, gSaveContext.health, 1, 255, 255, 255, (u8)interfaceCtx->magicAlpha);
+            Leveled_OverlayValueNumberDraw(play, numberPosX + 24, numberPosY, gSaveContext.health, 1, 255, 255, 255,
+                                           (u8)interfaceCtx->magicAlpha);
         }
     }
     CLOSE_DISPS(play->state.gfxCtx);

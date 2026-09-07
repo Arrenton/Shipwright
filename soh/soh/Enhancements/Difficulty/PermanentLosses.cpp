@@ -39,7 +39,8 @@ static void UpdatePermanentHeartLossState() {
 
     uint8_t newCapacity = startingHealth + (heartContainers * 16) + ((heartPieces - (heartPieces % 4)) * 4);
     gSaveContext.healthCapacity = MAX(newCapacity, gSaveContext.healthCapacity);
-    gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+    gSaveContext.healthCapacity2 =
+        GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
     gSaveContext.health = MIN(gSaveContext.health, gSaveContext.healthCapacity2);
     hasAffectedHealth = false;
 }
@@ -52,7 +53,8 @@ static void UpdateHealthCapacity() {
     s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
     if (gSaveContext.healthCapacity > 16 && gSaveContext.healthCapacity2 - gSaveContext.health >= 16) {
         gSaveContext.healthCapacity -= 16;
-        gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+        gSaveContext.healthCapacity2 =
+            GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
         gSaveContext.health = MIN(gSaveContext.health, gSaveContext.healthCapacity2);
         hasAffectedHealth = true;
     }

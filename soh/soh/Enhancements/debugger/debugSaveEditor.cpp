@@ -311,7 +311,8 @@ void DrawInfoTab() {
         gSaveContext.isMagicAcquired = gSaveContext.magicLevel > 0;
         gSaveContext.isDoubleMagicAcquired = gSaveContext.magicLevel == 2;
     }
-    gSaveContext.magicCapacity = gSaveContext.magicLevel * gSaveContext.magicUnits; // Set to get the bar drawn in the UI
+    gSaveContext.magicCapacity =
+        gSaveContext.magicLevel * gSaveContext.magicUnits; // Set to get the bar drawn in the UI
     if (gSaveContext.magic > gSaveContext.magicCapacity) {
         gSaveContext.magic = gSaveContext.magicCapacity; // Clamp magic to new max
     }

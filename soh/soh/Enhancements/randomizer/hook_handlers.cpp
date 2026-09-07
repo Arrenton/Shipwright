@@ -500,7 +500,8 @@ void RandomizerOnItemReceiveHandler(GetItemEntry receivedItemEntry) {
         if ((s32)(gSaveContext.inventory.questItems & 0xF0000000) == 0x40000000) {
             gSaveContext.inventory.questItems ^= 0x40000000;
             gSaveContext.healthCapacity += FULL_HEART_HEALTH;
-            gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+            gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity,
+                                                                                   GET_PLAYER(gPlayState)->actor.level);
             gSaveContext.health += heartUnits;
         }
     }

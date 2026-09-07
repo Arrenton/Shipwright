@@ -1791,7 +1791,8 @@ void BossMo_CoreCollisionCheck(BossMo* this, PlayState* play) {
                 this->work[MO_TENT_ACTION_STATE] = MO_CORE_STUNNED;
                 this->timers[0] = 25;
 
-                damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, damage * Leveled_GetHealthAttackMultiplier());
+                damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor,
+                                              damage * Leveled_GetHealthAttackMultiplier());
                 ActorDamageNumber_New(&this->actor, damage);
 
                 this->actor.speedXZ = 15.0f;

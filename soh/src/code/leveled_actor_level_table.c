@@ -14,7 +14,7 @@ void Leveled_Gohma(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) {
     actor->exp = 120;
     levelEntry->levelModifier = 3;
     levelEntry->experienceRate = 3000;
-    
+
     if (actor->category == ACTORCAT_ENEMY) { // Larva
         actor->level = 5;
         levelEntry->levelModifier = 1;
@@ -54,7 +54,7 @@ void Leveled_PhantomGanon(PlayState* play, Actor* actor, SceneLevelEntry* levelE
     levelEntry->levelModifier = 5;
     if (actor->params == 1)
         actor->exp = 1400;
-        levelEntry->experienceRate = 6000;
+    levelEntry->experienceRate = 6000;
 }
 
 void Leveled_Volvagia(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) {
@@ -62,7 +62,7 @@ void Leveled_Volvagia(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry
     levelEntry->levelModifier = 5;
     if (actor->id == ACTOR_BOSS_FD2)
         actor->exp = 2475;
-        levelEntry->experienceRate = 6300;
+    levelEntry->experienceRate = 6300;
 }
 
 void Leveled_Morpha(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) {
@@ -84,7 +84,7 @@ void Leveled_Twinrova(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry
     levelEntry->levelModifier = 6;
     if (actor->params == 2)
         actor->exp = 6000;
-        levelEntry->experienceRate = 7000;
+    levelEntry->experienceRate = 7000;
 }
 
 void Leveled_Ganondorf(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) {
@@ -144,7 +144,7 @@ void Leveled_IronKnuckle(PlayState* play, Actor* actor, SceneLevelEntry* levelEn
         actor->level = 52;
         actor->exp = 3100;
         levelEntry->levelModifier = 6;
-    } 
+    }
     if (play->sceneNum == SCENE_INSIDE_GANONS_CASTLE || play->sceneNum == SCENE_GANONS_TOWER) {
         actor->level = 55;
         actor->exp = 2850;
@@ -191,8 +191,7 @@ void Leveled_Skulltula(PlayState* play, Actor* actor, SceneLevelEntry* levelEntr
         actor->level = 21;
         actor->exp = 19;
     }
-    if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL ||
-        play->sceneNum == SCENE_SHADOW_TEMPLE) {
+    if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL || play->sceneNum == SCENE_SHADOW_TEMPLE) {
         actor->level = 38;
         actor->exp = 30;
     } else if (play->sceneNum == SCENE_SPIRIT_TEMPLE) {
@@ -329,8 +328,7 @@ void Leveled_Keese(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) {
         } else if (play->sceneNum == SCENE_SPIRIT_TEMPLE) {
             actor->level = 42;
             actor->exp = 36;
-        } else if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL ||
-            play->sceneNum == SCENE_SHADOW_TEMPLE) {
+        } else if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL || play->sceneNum == SCENE_SHADOW_TEMPLE) {
             actor->level = 38;
             actor->exp = 33;
         } else if (play->sceneNum == SCENE_INSIDE_GANONS_CASTLE || play->sceneNum == SCENE_GANONS_TOWER) {
@@ -384,7 +382,8 @@ void Leveled_ReDead(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) 
         if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL || play->sceneNum == SCENE_SHADOW_TEMPLE) {
             actor->level = 42;
             actor->exp = 171;
-        } else if (play->sceneNum == SCENE_GANONS_TOWER_COLLAPSE_INTERIOR || play->sceneNum == SCENE_INSIDE_GANONS_CASTLE_COLLAPSE) {
+        } else if (play->sceneNum == SCENE_GANONS_TOWER_COLLAPSE_INTERIOR ||
+                   play->sceneNum == SCENE_INSIDE_GANONS_CASTLE_COLLAPSE) {
             actor->level = 50;
             actor->exp = 230;
         }
@@ -460,8 +459,7 @@ void Leveled_Beamos(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) 
         actor->exp = 17;
         levelEntry->levelModifier = 0;
         levelEntry->experienceRate = 150;
-        if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL ||
-            play->sceneNum == SCENE_SHADOW_TEMPLE) {
+        if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL || play->sceneNum == SCENE_SHADOW_TEMPLE) {
             actor->level = 43;
             actor->exp = 80;
         } else if (play->sceneNum == SCENE_SPIRIT_TEMPLE) {
@@ -563,7 +561,7 @@ void Leveled_Bubble(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) 
         actor->exp = 47;
         levelEntry->levelModifier = 1;
         levelEntry->experienceRate = 110;
-        if ( play->sceneNum == SCENE_SHADOW_TEMPLE) {
+        if (play->sceneNum == SCENE_SHADOW_TEMPLE) {
             actor->level = 40;
             actor->exp = 75;
         }
@@ -582,8 +580,7 @@ void Leveled_Bubble(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) 
         actor->exp = 31;
         levelEntry->levelModifier = 3;
         levelEntry->experienceRate = 93;
-        if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL ||
-            play->sceneNum == SCENE_SHADOW_TEMPLE) {
+        if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL || play->sceneNum == SCENE_SHADOW_TEMPLE) {
             actor->level = 41;
             actor->exp = 70;
         } else if (play->sceneNum == SCENE_SPIRIT_TEMPLE) {
@@ -610,7 +607,7 @@ void Leveled_Stalfos(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry)
         actor->ignoreExpReward = true;
         actor->exp = 250;
         levelEntry->experienceRate = 800;
-    }else if (play->sceneNum == SCENE_SHADOW_TEMPLE) {
+    } else if (play->sceneNum == SCENE_SHADOW_TEMPLE) {
         actor->level = 43;
         actor->exp = 214;
     } else if (play->sceneNum == SCENE_SPIRIT_TEMPLE) {
@@ -633,8 +630,7 @@ void Leveled_Floormaster(PlayState* play, Actor* actor, SceneLevelEntry* levelEn
     levelEntry->levelModifier = 2;
     levelEntry->experienceRate = 170;
     actor->ignoreExpReward = true;
-    if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL ||
-        play->sceneNum == SCENE_SHADOW_TEMPLE) {
+    if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL || play->sceneNum == SCENE_SHADOW_TEMPLE) {
         actor->level = 42;
         actor->exp = 140;
     } else if (play->sceneNum == SCENE_SPIRIT_TEMPLE) {
@@ -648,8 +644,7 @@ void Leveled_Wallmaster(PlayState* play, Actor* actor, SceneLevelEntry* levelEnt
     actor->exp = 44;
     levelEntry->levelModifier = 2;
     levelEntry->experienceRate = 175;
-    if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL ||
-        play->sceneNum == SCENE_SHADOW_TEMPLE) {
+    if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL || play->sceneNum == SCENE_SHADOW_TEMPLE) {
         actor->level = 41;
         actor->exp = 129;
     } else if (play->sceneNum == SCENE_SPIRIT_TEMPLE) {
@@ -676,8 +671,7 @@ void Leveled_LikeLike(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry
     if (play->sceneNum == SCENE_WATER_TEMPLE) {
         actor->level = 38;
         actor->exp = 142;
-    } else if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL ||
-               play->sceneNum == SCENE_SHADOW_TEMPLE) {
+    } else if (play->sceneNum == SCENE_BOTTOM_OF_THE_WELL || play->sceneNum == SCENE_SHADOW_TEMPLE) {
         actor->level = 43;
         actor->exp = 161;
     } else if (play->sceneNum == SCENE_SPIRIT_TEMPLE) {
@@ -686,7 +680,7 @@ void Leveled_LikeLike(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry
     } else if (play->sceneNum == SCENE_INSIDE_GANONS_CASTLE || play->sceneNum == SCENE_GANONS_TOWER) {
         actor->level = 50;
         actor->exp = 190;
-    } else    if (play->sceneNum == SCENE_GERUDO_TRAINING_GROUND) {
+    } else if (play->sceneNum == SCENE_GERUDO_TRAINING_GROUND) {
         actor->level = 47;
         actor->exp = 375;
     }
@@ -770,7 +764,6 @@ void Leveled_Arwing(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) 
     levelEntry->levelModifier = 3;
     levelEntry->experienceRate = 215;
 }
-
 
 void Actor_GetLevelAndExperience(PlayState* play, Actor* actor, u16 actorIdOverride) {
     SceneLevelEntry levelEntry;
@@ -964,7 +957,9 @@ void Actor_GetLevelAndExperience(PlayState* play, Actor* actor, u16 actorIdOverr
 
     s8 sceneLevel = Leveled_GetSceneLevel(play->sceneNum);
     if (!levelEntry.ignoreEntry && sceneLevel >= 0) {
-        actor->level = (u8)CLAMP((f32)(sceneLevel + levelEntry.levelModifier) * (f32)CVarGetFloat("gLeveled.Difficulty.Enemy.LevelScale", 1.0f), 1, 99);
+        actor->level = (u8)CLAMP((f32)(sceneLevel + levelEntry.levelModifier) *
+                                     (f32)CVarGetFloat("gLeveled.Difficulty.Enemy.LevelScale", 1.0f),
+                                 1, 99);
         actor->exp = GetEnemyExperienceReward(actor->level, levelEntry.experienceRate);
     }
 }

@@ -3105,11 +3105,13 @@ void BossTw_TwinrovaUpdate(Actor* thisx, PlayState* play2) {
                 swordDamage = true;
             }
 
-            damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, damage * Leveled_GetHealthAttackMultiplier());
+            damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor,
+                                          damage * Leveled_GetHealthAttackMultiplier());
             ActorDamageNumber_New(&this->actor, damage);
 
             if (!(info->toucher.dmgFlags & DMG_HOOKSHOT)) {
-                if ((this->actor.colChkInfo.health < GetActorStat_EnemyMaxHealth(3, this->actor.level)) && !swordDamage) {
+                if ((this->actor.colChkInfo.health < GetActorStat_EnemyMaxHealth(3, this->actor.level)) &&
+                    !swordDamage) {
                     damage = 0;
                 }
 

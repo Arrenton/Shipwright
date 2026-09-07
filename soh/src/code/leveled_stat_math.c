@@ -52,35 +52,38 @@ u8 GetActorStat_PlayerCourage(u8 level) {
     return 3 + (u8)(84 * level / 99.0f);
 }
 
-u16 GetActorStat_EnemyMaxHealth(u16 baseHealth, u8 level){ 
-    return (u16)(CLAMP((f32)GetActorStat_Attack(baseHealth * Leveled_GetHealthAttackMultiplier(), GetActorStat_PlayerPower(level)) * CVarGetFloat("gLeveled.Difficulty.Enemy.HPPercent", 1.0f), 1, 0xffff));
+u16 GetActorStat_EnemyMaxHealth(u16 baseHealth, u8 level) {
+    return (u16)(CLAMP(
+        (f32)GetActorStat_Attack(baseHealth * Leveled_GetHealthAttackMultiplier(), GetActorStat_PlayerPower(level)) *
+            CVarGetFloat("gLeveled.Difficulty.Enemy.HPPercent", 1.0f),
+        1, 0xffff));
 }
 
-u8 GetPlayerStat_BonusHearts(u8 level){
-    if (CVarGetInteger("gLeveled.Player.Enhancements.HeartsWithLevelUp", 1) == 0){
+u8 GetPlayerStat_BonusHearts(u8 level) {
+    if (CVarGetInteger("gLeveled.Player.Enhancements.HeartsWithLevelUp", 1) == 0) {
         return 0;
     }
 
     u8 bonusHearts = (level + 1) / 8;
-    if (bonusHearts > 10){
+    if (bonusHearts > 10) {
         bonusHearts = 10;
     }
     return bonusHearts;
 }
 
-u8 GetPlayerStat_MagicUnits(u8 level){
-    if (CVarGetInteger("gLeveled.Player.Enhancements.MagicWithLevelUp", 1) == 0){
+u8 GetPlayerStat_MagicUnits(u8 level) {
+    if (CVarGetInteger("gLeveled.Player.Enhancements.MagicWithLevelUp", 1) == 0) {
         return 48;
     }
 
     u8 maximumMagic = 12 + (u8)((f32)level / 2.8f) * 2;
-    if (maximumMagic > 72){
+    if (maximumMagic > 72) {
         maximumMagic = 72;
     }
     return maximumMagic;
 }
 
-s16 GetPlayerStat_GetModifiedHealthCapacity(u16 baseHealth, u8 level){
+s16 GetPlayerStat_GetModifiedHealthCapacity(u16 baseHealth, u8 level) {
     const s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
     const u16 baseHearts = baseHealth / 16;
     return (baseHearts + GetPlayerStat_BonusHearts(level)) * heartUnits;
@@ -108,7 +111,10 @@ u16 GetEnemyExperienceReward(u8 level, u16 expRate) {
     if (expRate == 0)
         return 0;
 
-    return CLAMP(round((3 + CLAMP_MAX(floor(level / 6) * 4, 4) + (level - 1) * ((0.1 + (level / 95.0)) + pow(CLAMP_MIN(level - 8, 0), 1.25) / 80.0)) * expRate / 100.0), 1, 9999);
+    return CLAMP(round((3 + CLAMP_MAX(floor(level / 6) * 4, 4) +
+                        (level - 1) * ((0.1 + (level / 95.0)) + pow(CLAMP_MIN(level - 8, 0), 1.25) / 80.0)) *
+                       expRate / 100.0),
+                 1, 9999);
 }
 
 f32 Leveled_DamageFormula(f32 attack, u8 power, u8 courage) {
@@ -127,8 +133,8 @@ f32 Leveled_DamageFormula(f32 attack, u8 power, u8 courage) {
 
 f32 Leveled_DamageFormulaOnPlayer(f32 attack, u8 power, u8 courage) {
     f32 damage = attack;
-    
-    if (CVarGetInteger("gLeveled.Enemy.Enhancements.AttackScalesWithLevel", 1) == 1){
+
+    if (CVarGetInteger("gLeveled.Enemy.Enhancements.AttackScalesWithLevel", 1) == 1) {
         damage = GetActorStat_EnemyAttack(attack, power);
 
         if (power >= courage) {
@@ -158,13 +164,15 @@ f32 Leveled_DamageFormulaOnPlayer(f32 attack, u8 power, u8 courage) {
 u16 Leveled_DamageModify(Actor* actor, Actor* attackingActor, f32 attack) {
     f32 damage;
     if (actor->category == ACTORCAT_PLAYER) {
-        damage = Leveled_DamageFormulaOnPlayer(attack, CLAMP(attackingActor->power + attackingActor->powerModifier, 0, 255), CLAMP(actor->courage + actor->courageModifier, 0, 255));
+        damage =
+            Leveled_DamageFormulaOnPlayer(attack, CLAMP(attackingActor->power + attackingActor->powerModifier, 0, 255),
+                                          CLAMP(actor->courage + actor->courageModifier, 0, 255));
     } else {
-        damage = Leveled_DamageFormula(attack, CLAMP(attackingActor->power + attackingActor->powerModifier, 0, 255), CLAMP(actor->courage + actor->courageModifier, 0, 255));
+        damage = Leveled_DamageFormula(attack, CLAMP(attackingActor->power + attackingActor->powerModifier, 0, 255),
+                                       CLAMP(actor->courage + actor->courageModifier, 0, 255));
     }
 
-        
-    if (damage >= 1.25f) 
+    if (damage >= 1.25f)
         damage += Rand_ZeroOne() - 0.2f;
 
     if (damage >= 6)
@@ -192,14 +200,14 @@ void Leveled_SetPlayerModifiedStats(Player* player) {
     s8 powerModifier = 0;
     s8 courageModifier = 0;
 
-    if (CVarGetInteger("gLeveled.Player.Enhancements.EquipmentStats", 1) == 1){
-        switch (CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD)){
+    if (CVarGetInteger("gLeveled.Player.Enhancements.EquipmentStats", 1) == 1) {
+        switch (CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD)) {
             case PLAYER_SWORD_MASTER:
                 courageModifier += 1;
                 break;
 
             case PLAYER_SWORD_BIGGORON:
-                if (gBitFlags[3] & gSaveContext.inventory.equipment){
+                if (gBitFlags[3] & gSaveContext.inventory.equipment) {
                     powerModifier -= 7;
                     courageModifier -= 12;
                 } else {
@@ -211,13 +219,13 @@ void Leveled_SetPlayerModifiedStats(Player* player) {
             default:
                 break;
         }
-        
-        switch (CUR_EQUIP_VALUE(EQUIP_TYPE_TUNIC) - 1){
+
+        switch (CUR_EQUIP_VALUE(EQUIP_TYPE_TUNIC) - 1) {
             case PLAYER_TUNIC_GORON:
                 powerModifier += 3;
                 courageModifier -= 3;
                 break;
-            
+
             case PLAYER_TUNIC_ZORA:
                 powerModifier -= 3;
                 courageModifier += 3;
@@ -226,8 +234,8 @@ void Leveled_SetPlayerModifiedStats(Player* player) {
             default:
                 break;
         }
-        
-        switch (CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD)){
+
+        switch (CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD)) {
             case PLAYER_SHIELD_DEKU:
                 courageModifier += 1;
                 break;
@@ -235,7 +243,7 @@ void Leveled_SetPlayerModifiedStats(Player* player) {
             case PLAYER_SHIELD_HYLIAN:
                 courageModifier += 2;
                 break;
-            
+
             case PLAYER_SHIELD_MIRROR:
                 powerModifier -= 2;
                 courageModifier += 3;
@@ -244,13 +252,13 @@ void Leveled_SetPlayerModifiedStats(Player* player) {
             default:
                 break;
         }
-        
-        switch (CUR_EQUIP_VALUE(EQUIP_TYPE_BOOTS) - 1){
+
+        switch (CUR_EQUIP_VALUE(EQUIP_TYPE_BOOTS) - 1) {
             case PLAYER_BOOTS_IRON:
                 powerModifier += 2;
                 courageModifier += 1;
                 break;
-            
+
             case PLAYER_BOOTS_HOVER:
                 courageModifier -= 1;
                 break;

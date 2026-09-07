@@ -4694,7 +4694,8 @@ void Message_Update(PlayState* play) {
                 gSaveContext.inventory.questItems ^= 0x40000000;
                 if (GameInteractor_Should(VB_HEARTS_INCREASE_WITH_CONTAINERS, true)) {
                     gSaveContext.healthCapacity += FULL_HEART_HEALTH;
-                    gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+                    gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(
+                        gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
                     gSaveContext.health += LEVELED_HEART_UNITS;
                 }
             }

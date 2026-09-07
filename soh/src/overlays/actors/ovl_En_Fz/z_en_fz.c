@@ -722,7 +722,9 @@ void EnFz_Draw(Actor* thisx, PlayState* play) {
     s32 pad;
     s32 index;
 
-    index = (6 - (u8)CLAMP(((f32)this->actor.colChkInfo.health / GetActorMaximumHealth(&this->actor) * 5 + 0.99999f), 0, 6)) >> 1;
+    index = (6 - (u8)CLAMP(((f32)this->actor.colChkInfo.health / GetActorMaximumHealth(&this->actor) * 5 + 0.99999f), 0,
+                           6)) >>
+            1;
 
     // SOH [Enhancement] - With enemy health scaling, the Freezards health could cause an index out of bounds for the
     // displayLists, so we need to recompute the index based on the scaled health (using the maximum health value) and

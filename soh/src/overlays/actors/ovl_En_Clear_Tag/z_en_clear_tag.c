@@ -372,7 +372,8 @@ void EnClearTag_Update(Actor* thisx, PlayState* play2) {
                     this->acceleration.z = Rand_CenteredFloat(15.0f);
 
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_FANTOM_THUNDER_GND);
-                    u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, Leveled_GetHealthAttackMultiplier());
+                    u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor,
+                                                      Leveled_GetHealthAttackMultiplier());
                     if (damage <= this->actor.colChkInfo.health) {
                         this->actor.colChkInfo.health -= damage;
                     } else {

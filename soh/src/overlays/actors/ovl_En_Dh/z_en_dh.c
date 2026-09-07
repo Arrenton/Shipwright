@@ -499,7 +499,7 @@ void EnDh_CollisionCheck(EnDh* this, PlayState* play) {
                     ((lastHealth >= healthCheck) && (this->actor.colChkInfo.health < healthCheck))) {
 
                     this->retreat++;
-                    }
+                }
                 EnDh_SetupDamage(this);
             }
         }

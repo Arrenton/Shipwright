@@ -1961,7 +1961,8 @@ void func_80902524(BossGanon2* this, PlayState* play) {
                     this->unk_342 = 5;
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_MGANON_DAMAGE);
                     Audio_StopSfxById(NA_SE_EN_MGANON_UNARI);
-                    u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, 2 * Leveled_GetHealthAttackMultiplier());
+                    u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor,
+                                                      2 * Leveled_GetHealthAttackMultiplier());
                     if (this->actor.colChkInfo.health >= damage) {
                         this->actor.colChkInfo.health -= damage;
                     } else {
@@ -1969,7 +1970,8 @@ void func_80902524(BossGanon2* this, PlayState* play) {
                     }
                     ActorDamageNumber_New(&this->actor, damage);
                     temp_v0_4 = this->actor.colChkInfo.health;
-                    if (temp_v0_4 < (u16)(GetActorMaximumHealth(&this->actor) * (21.0f / 30.0f)) && this->unk_334 == 0) {
+                    if (temp_v0_4 < (u16)(GetActorMaximumHealth(&this->actor) * (21.0f / 30.0f)) &&
+                        this->unk_334 == 0) {
                         func_80900818(this, play);
                     } else {
                         if (temp_v0_4 <= 0) {
@@ -2002,7 +2004,8 @@ void func_80902524(BossGanon2* this, PlayState* play) {
                 }
             }
             u8 baseDamage = phi_v1_2;
-            phi_v1_2 = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, phi_v1_2 * Leveled_GetHealthAttackMultiplier());
+            phi_v1_2 = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor,
+                                            phi_v1_2 * Leveled_GetHealthAttackMultiplier());
             if (phi_v1_2 <= this->actor.colChkInfo.health) {
                 this->actor.colChkInfo.health -= phi_v1_2;
             } else {

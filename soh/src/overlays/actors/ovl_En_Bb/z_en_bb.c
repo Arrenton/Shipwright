@@ -1189,7 +1189,8 @@ void EnBb_CollisionCheck(EnBb* this, PlayState* play) {
                     if ((this->action != BB_DOWN) || (this->timer < 190)) {
                         Actor_ApplyDamage(&this->actor);
                     }
-                    if ((this->action != BB_DOWN) && (this->actor.params != ENBB_WHITE) && (this->actor.params > ENBB_GREEN)) {
+                    if ((this->action != BB_DOWN) && (this->actor.params != ENBB_WHITE) &&
+                        (this->actor.params > ENBB_GREEN)) {
                         EnBb_SetupDown(this);
                     }
                 } else {
@@ -1212,7 +1213,8 @@ void EnBb_CollisionCheck(EnBb* this, PlayState* play) {
                     //! EnBb_Death doesn't kill the bubble on the next frame like it should. This combines with
                     //! the bug in EnBb_Draw below to crash the game.
                 } else if ((this->actor.params == ENBB_WHITE) &&
-                           ((this->action == BB_WHITE) || (this->action == BB_STUNNED)) || (this->actor.params <= ENBB_GREEN)) {
+                               ((this->action == BB_WHITE) || (this->action == BB_STUNNED)) ||
+                           (this->actor.params <= ENBB_GREEN)) {
                     Actor_SetColorFilter(&this->actor, 0x4000, 0xFF, 0, 0xC);
                     this->actor.speedXZ = -8.0f;
                     this->maxSpeed = 0.0f;

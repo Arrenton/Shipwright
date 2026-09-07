@@ -1837,7 +1837,8 @@ void BossGoma_UpdateHit(BossGoma* this, PlayState* play) {
                 Audio_PlayActorSound2(&this->actor, NA_SE_EN_GOMA_DAM2);
             } else if (this->actionFunc == BossGoma_FloorStunned &&
                        (damage = CollisionCheck_GetSwordDamage(acHitInfo->toucher.dmgFlags, play)) != 0) {
-                damage = Leveled_DamageModify(&this->actor, this->collider.elements[0].info.acHit->actor, damage * Leveled_GetHealthAttackMultiplier());
+                damage = Leveled_DamageModify(&this->actor, this->collider.elements[0].info.acHit->actor,
+                                              damage * Leveled_GetHealthAttackMultiplier());
                 if (damage <= this->actor.colChkInfo.health) {
                     this->actor.colChkInfo.health -= damage;
                 } else {

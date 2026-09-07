@@ -736,7 +736,8 @@ void BossDodongo_Explode(BossDodongo* this, PlayState* play) {
         Audio_PlayActorSound2(&this->actor, NA_SE_IT_BOMB_EXPLOSION);
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_DODO_K_DAMAGE);
         func_80033E88(&this->actor, play, 4, 10);
-        u16 damage = Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, 2 * Leveled_GetHealthAttackMultiplier());
+        u16 damage =
+            Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, 2 * Leveled_GetHealthAttackMultiplier());
         this->health -= damage;
 
         // make sure not to die from the bomb explosion
@@ -1513,7 +1514,8 @@ void BossDodongo_UpdateDamage(BossDodongo* this, PlayState* play) {
             item1 = this->collider.elements[0].info.acHitInfo;
             if ((this->actionFunc == BossDodongo_Vulnerable) || (this->actionFunc == BossDodongo_LayDown)) {
                 swordDamage = damage = CollisionCheck_GetSwordDamage(item1->toucher.dmgFlags, play);
-                swordDamage = Leveled_DamageModify(&this->actor, this->collider.base.actor, swordDamage * Leveled_GetHealthAttackMultiplier());
+                swordDamage = Leveled_DamageModify(&this->actor, this->collider.base.actor,
+                                                   swordDamage * Leveled_GetHealthAttackMultiplier());
 
                 if (damage != 0) {
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_DODO_K_DAMAGE);

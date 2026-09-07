@@ -18,7 +18,8 @@ extern PlayState* gPlayState;
 
 void GameInteractor::RawAction::AddOrRemoveHealthContainers(int16_t amount) {
     gSaveContext.healthCapacity += amount * FULL_HEART_HEALTH;
-    gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+    gSaveContext.healthCapacity2 =
+        GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
 }
 
 void GameInteractor::RawAction::AddOrRemoveMagic(int8_t amount) {

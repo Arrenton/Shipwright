@@ -195,7 +195,9 @@ GameInteractionEffectQueryResult ModifyHealth::CanBeApplied() {
     if (!GameInteractor::IsSaveLoaded(true)) {
         return GameInteractionEffectQueryResult::TemporarilyNotPossible;
     } else if ((parameters[0] > 0 && gSaveContext.health == gSaveContext.healthCapacity2) ||
-               (parameters[0] < 0 && (gSaveContext.health + (CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2 * parameters[0]) <= 0))) {
+               (parameters[0] < 0 &&
+                (gSaveContext.health + (CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2 * parameters[0]) <=
+                 0))) {
         return GameInteractionEffectQueryResult::NotPossible;
     }
 

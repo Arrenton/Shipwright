@@ -584,7 +584,8 @@ void SaveManager::StartupCheckAndInitMeta(int fileNum) {
         baseBlock["experience"] = 999999;
     }
     fileMetaInfo[fileNum].level = 0;
-    while (GetActorStat_NextLevelExp(fileMetaInfo[fileNum].level, baseBlock["experience"]) <= 0 && fileMetaInfo[fileNum].level < 99) {
+    while (GetActorStat_NextLevelExp(fileMetaInfo[fileNum].level, baseBlock["experience"]) <= 0 &&
+           fileMetaInfo[fileNum].level < 99) {
         fileMetaInfo[fileNum].level += 1;
     }
 }

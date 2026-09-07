@@ -658,7 +658,8 @@ void EnGoma_UpdateHit(EnGoma* this, PlayState* play) {
                     } else {
                         swordDamage = 1;
                     }
-                    swordDamage = Leveled_DamageModify(&this->actor, &player->actor, swordDamage * Leveled_GetHealthAttackMultiplier());
+                    swordDamage = Leveled_DamageModify(&this->actor, &player->actor,
+                                                       swordDamage * Leveled_GetHealthAttackMultiplier());
                     if (swordDamage <= this->actor.colChkInfo.health) {
                         this->actor.colChkInfo.health -= swordDamage;
                     } else {

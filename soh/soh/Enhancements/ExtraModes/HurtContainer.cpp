@@ -25,7 +25,8 @@ static void UpdateHurtContainerModeState() {
     } else {
         gSaveContext.healthCapacity = STARTING_HEALTH + healthCapacityMod;
     }
-    gSaveContext.healthCapacity2 = GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
+    gSaveContext.healthCapacity2 =
+        GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
 }
 
 static void RegisterHurtContainer() {
