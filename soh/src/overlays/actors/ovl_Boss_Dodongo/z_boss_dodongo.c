@@ -738,7 +738,12 @@ void BossDodongo_Explode(BossDodongo* this, PlayState* play) {
         func_80033E88(&this->actor, play, 4, 10);
         u16 damage =
             Leveled_DamageModify(&this->actor, &GET_PLAYER(play)->actor, 2 * Leveled_GetHealthAttackMultiplier());
-        this->health -= damage;
+        if (this->health >= damage) {
+            this->health -= damage;
+        } else {
+            this->health = 0;
+        }
+        ActorDamageNumber_New(&this->actor, damage);
 
         // make sure not to die from the bomb explosion
         if (this->health <= 0) {
@@ -1521,7 +1526,11 @@ void BossDodongo_UpdateDamage(BossDodongo* this, PlayState* play) {
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_DODO_K_DAMAGE);
                     BossDodongo_SetupDamaged(this);
                     this->unk_1C0 = 5;
-                    this->health -= swordDamage;
+                    if (this->health >= swordDamage) {
+                        this->health -= swordDamage;
+                    } else {
+                        this->health = 0;
+                    }
                     ActorDamageNumber_New(&this->actor, swordDamage);
                 }
             }

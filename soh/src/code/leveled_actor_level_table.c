@@ -444,8 +444,8 @@ void Leveled_Tailpasaran(PlayState* play, Actor* actor, SceneLevelEntry* levelEn
 void Leveled_Stalchild(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) {
     actor->level = 6 + (u16)(play, actor->params / 2);
     actor->exp = 3 + (u16)(play, actor->params / 2.5);
-    levelEntry->levelModifier = 1 + (u16)(play, actor->params / 2);
-    levelEntry->experienceRate = 45 + (u16)(play, actor->params * 5);
+    levelEntry->levelModifier = 1 + (u16)(play, actor->params / 4);
+    levelEntry->experienceRate = 45 + (u16)(play, actor->params * 3);
 }
 
 void Leveled_Beamos(PlayState* play, Actor* actor, SceneLevelEntry* levelEntry) {

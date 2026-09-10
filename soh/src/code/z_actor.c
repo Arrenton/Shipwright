@@ -2677,6 +2677,11 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
                         actor->init(actor, play);
                         actor->init = NULL;
 
+                        if (actor->category != ACTORCAT_PLAYER) {
+                            Actor_GetLevelAndExperience(play, actor, 0);
+                            actor->colChkInfo.health = GetActorStat_EnemyMaxHealth(actor->colChkInfo.health, actor->level);
+                        }
+
                         GameInteractor_ExecuteOnActorInit(actor);
                     } else {
                         actor->init = NULL;
