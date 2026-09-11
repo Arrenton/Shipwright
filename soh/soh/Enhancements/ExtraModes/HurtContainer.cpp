@@ -3,7 +3,9 @@
 
 extern "C" {
 #include "variables.h"
-extern SaveContext gSaveContext;
+#include "leveled_stat_math.h"
+#include "macros.h"
+extern PlayState* gPlayState;
 }
 
 static constexpr int32_t CVAR_HURT_CONTAINER_DEFAULT = 0;
@@ -23,6 +25,8 @@ static void UpdateHurtContainerModeState() {
     } else {
         gSaveContext.healthCapacity = STARTING_HEALTH + healthCapacityMod;
     }
+    gSaveContext.healthCapacity2 =
+        GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);
 }
 
 static void RegisterHurtContainer() {

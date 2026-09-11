@@ -1763,7 +1763,7 @@ s32 Camera_Normal1(Camera* camera) {
 
         // crit wiggle
         if (!CVarGetInteger(CVAR_ENHANCEMENT("DisableCritWiggle"), 0)) {
-            if (gSaveContext.health <= 16 && ((camera->play->state.frames % 256) == 0)) {
+            if (gSaveContext.health <= LEVELED_HEART_UNITS && ((camera->play->state.frames % 256) == 0)) {
                 wiggleAdj = Rand_ZeroOne() * 10000.0f;
                 camera->inputDir.y = wiggleAdj + camera->inputDir.y;
             }
