@@ -50,8 +50,8 @@ static void UpdateHealthCapacity() {
     if (!GameInteractor::IsSaveLoaded()) {
         return;
     }
-    s32 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
-    if (gSaveContext.healthCapacity > 16 && gSaveContext.healthCapacity2 - gSaveContext.health >= 16) {
+    s32 heartUnits = LEVELED_HEART_UNITS;
+    if (gSaveContext.healthCapacity > 16 && gSaveContext.healthCapacity2 - gSaveContext.health >= heartUnits) {
         gSaveContext.healthCapacity -= 16;
         gSaveContext.healthCapacity2 =
             GetPlayerStat_GetModifiedHealthCapacity(gSaveContext.healthCapacity, GET_PLAYER(gPlayState)->actor.level);

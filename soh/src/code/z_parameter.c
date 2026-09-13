@@ -6733,11 +6733,11 @@ void Interface_Update(PlayState* play) {
     Map_Update(play);
 
     if (gSaveContext.healthAccumulator != 0) {
-        const s32 heartUnits = LEVELED_HEART_UNITS;
+        const s16 heartUnits = LEVELED_HEART_UNITS;
         gSaveContext.healthAccumulator -= heartUnits >> 2;
         gSaveContext.health += heartUnits >> 2;
 
-        if ((gSaveContext.health & heartUnits) < heartUnits >> 2) {
+        if ((gSaveContext.health % heartUnits) < heartUnits >> 2) {
             Audio_PlaySoundGeneral(NA_SE_SY_HP_RECOVER, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
                                    &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
         }
