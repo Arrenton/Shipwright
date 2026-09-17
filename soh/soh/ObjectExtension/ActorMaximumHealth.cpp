@@ -20,7 +20,7 @@ void SetActorMaximumHealth(const Actor* actor, u16 maximumHealth) {
 static void ActorMaximumHealth_Register() {
     COND_HOOK(OnActorInit, true, [](void* ptr) {
         Actor* actor = static_cast<Actor*>(ptr);
-        if (actor->category == ACTORCAT_ENEMY) {
+        if (actor->category != ACTORCAT_PLAYER) {
             SetActorMaximumHealth(actor, actor->colChkInfo.health);
         }
     });
