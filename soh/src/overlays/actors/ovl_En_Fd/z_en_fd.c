@@ -10,6 +10,7 @@
 #include "soh/frame_interpolation.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/ObjectExtension/ActorMaximumHealth.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -226,8 +227,18 @@ s32 EnFd_SpawnCore(EnFd* this, PlayState* play) {
 
     this->actor.child->colChkInfo.health = this->actor.colChkInfo.health % 8;
 
+    u16 maxHealth = GetActorMaximumHealth(&this->actor);
+    u16 coreMaximumHealth = maxHealth / 3;
+    if (coreMaximumHealth * 3 != maxHealth) {
+        this->actor.colChkInfo.health = coreMaximumHealth * 3;
+        maxHealth = this->actor.colChkInfo.health;
+    }
+
+    this->actor.child->colChkInfo.health = this->actor.colChkInfo.health % coreMaximumHealth;
+    SetActorMaximumHealth(this->actor.child, coreMaximumHealth);
+
     if (this->actor.child->colChkInfo.health == 0) {
-        this->actor.child->colChkInfo.health = 8;
+        this->actor.child->colChkInfo.health = coreMaximumHealth;
     }
 
     if (CHECK_FLAG_ALL(this->actor.flags, ACTOR_FLAG_HOOKSHOT_ATTACHED)) {
@@ -781,7 +792,7 @@ void EnFd_Draw(Actor* thisx, PlayState* play) {
     Matrix_Pop();
     if (this->actionFunc != EnFd_Reappear && !(this->fadeAlpha < 0.9f)) {
         Gfx_SetupDL_25Xlu(play->state.gfxCtx);
-        clampedHealth = CLAMP(thisx->colChkInfo.health - 1, 0, 23);
+        clampedHealth = CLAMP((s32)((f32)thisx->colChkInfo.health / GetActorMaximumHealth(thisx) * 23), 0, 23);
         gDPSetPrimColor(POLY_XLU_DISP++, 0, 128, primColors[clampedHealth / 8].r, primColors[clampedHealth / 8].g,
                         primColors[clampedHealth / 8].b, (u8)this->fadeAlpha);
         gDPSetEnvColor(POLY_XLU_DISP++, envColors[clampedHealth / 8].r, envColors[clampedHealth / 8].g,

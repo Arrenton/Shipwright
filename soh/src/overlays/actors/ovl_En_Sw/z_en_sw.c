@@ -334,6 +334,11 @@ s32 func_80B0C9F0(EnSw* this, PlayState* play) {
             Actor_SetColorFilter(&this->actor, 0x4000, 0xC8, 0, this->unk_392);
             if (Actor_ApplyDamage(&this->actor) != 0) {
                 Audio_PlayActorSound2(&this->actor, NA_SE_EN_STALTU_DAMAGE);
+                if (((this->actor.params & 0xE000) >> 0xD) != 0) {
+                    if (this->actor.colChkInfo.health > 1) {
+                        this->actor.colChkInfo.health >>= 1;
+                    }
+                }
                 return true;
             }
             Enemy_StartFinishingBlow(play, &this->actor);

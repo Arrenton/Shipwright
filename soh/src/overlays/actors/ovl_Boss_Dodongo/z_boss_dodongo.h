@@ -24,7 +24,7 @@ typedef struct BossDodongo {
     /* 0x0000 */ Actor actor;
     /* 0x014C */ SkelAnime skelAnime;
     /* 0x0190 */ BossDodongoActionFunc actionFunc;
-    /* 0x0194 */ s16 health;
+    /* 0x0194 */ u16 health;
     /* 0x0196 */ s16 unk_196;
     /* 0x0198 */ s16 unk_198;
     /* 0x019A */ s16 unk_19A;

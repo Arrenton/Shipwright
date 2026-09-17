@@ -1763,7 +1763,7 @@ s32 Camera_Normal1(Camera* camera) {
 
         // crit wiggle
         if (!CVarGetInteger(CVAR_ENHANCEMENT("DisableCritWiggle"), 0)) {
-            if (gSaveContext.health <= 16 && ((camera->play->state.frames % 256) == 0)) {
+            if (gSaveContext.health <= LEVELED_HEART_UNITS && ((camera->play->state.frames % 256) == 0)) {
                 wiggleAdj = Rand_ZeroOne() * 10000.0f;
                 camera->inputDir.y = wiggleAdj + camera->inputDir.y;
             }
@@ -1775,7 +1775,7 @@ s32 Camera_Normal1(Camera* camera) {
         *eye = *eyeNext;
     }
 
-    spA0 = (gSaveContext.health <= 16 ? 0.8f : 1.0f);
+    spA0 = (gSaveContext.health <= LEVELED_HEART_UNITS ? 0.8f : 1.0f);
     camera->fov = Camera_LERPCeilF(norm1->fovTarget * spA0, camera->fov, camera->fovUpdateRate, 1.0f);
     camera->roll = Camera_LERPCeilS(0, camera->roll, 0.5f, 0xA);
     camera->atLERPStepScale = Camera_ClampLERPScale(camera, norm1->atLERPScaleMax);
@@ -3097,7 +3097,7 @@ s32 Camera_Battle1(Camera* camera) {
     anim->roll += (((OREG(36) * camera->speedRatio) * (1.0f - distRatio)) - anim->roll) * PCT(OREG(37));
     camera->roll = DEGF_TO_BINANG(anim->roll);
     camera->fov = Camera_LERPCeilF((player->meleeWeaponState != 0 ? 0.8f
-                                    : gSaveContext.health <= 0x10 ? 0.8f
+                                    : gSaveContext.health <= LEVELED_HEART_UNITS ? 0.8f
                                                                   : 1.0f) *
                                        (fov - ((fov * 0.05f) * distRatio)),
                                    camera->fov, camera->fovUpdateRate, 1.0f);

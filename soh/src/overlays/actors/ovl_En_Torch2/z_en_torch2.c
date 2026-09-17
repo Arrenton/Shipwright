@@ -198,7 +198,7 @@ s32 EnTorch2_SwingSword(PlayState* play, Input* input, Player* this) {
     if ((this->linearVelocity < 0.0f) || (player->linearVelocity < 0.0f)) {
         return 0;
     }
-    if (gSaveContext.health < 0x50) {
+    if (gSaveContext.health < LEVELED_HEART_UNITS * 5) {
         attackDelay = 15;
         noAttackChance += 0.3f;
     }
@@ -312,7 +312,7 @@ void EnTorch2_Update(Actor* thisx, PlayState* play2) {
                  *  creating a hole in his defenses. This also makes Dark Link harder at low
                  *  health, while the other health checks are intended to make him easier.
                  */
-                if ((gSaveContext.health < 0x50) && (sCounterState != 0)) {
+                if ((gSaveContext.health < LEVELED_HEART_UNITS * 5) && (sCounterState != 0)) {
                     sCounterState = 0;
                     sStaggerTimer = 50;
                 }
@@ -689,7 +689,7 @@ void EnTorch2_Update(Actor* thisx, PlayState* play2) {
      */
     if (this->linearVelocity == -18.0f) {
         staggerThreshold = (u32)Rand_CenteredFloat(2.0f) + 6;
-        if (gSaveContext.health < 0x50) {
+        if (gSaveContext.health < LEVELED_HEART_UNITS * 5) {
             staggerThreshold = (u32)Rand_CenteredFloat(2.0f) + 3;
         }
         if (this->actor.xzDistToPlayer > 80.0f) {

@@ -194,8 +194,10 @@ void ModifyGravity::_Remove() {
 GameInteractionEffectQueryResult ModifyHealth::CanBeApplied() {
     if (!GameInteractor::IsSaveLoaded(true)) {
         return GameInteractionEffectQueryResult::TemporarilyNotPossible;
-    } else if ((parameters[0] > 0 && gSaveContext.health == gSaveContext.healthCapacity) ||
-               (parameters[0] < 0 && (gSaveContext.health + (16 * parameters[0]) <= 0))) {
+    } else if ((parameters[0] > 0 && gSaveContext.health == gSaveContext.healthCapacity2) ||
+               (parameters[0] < 0 &&
+                (gSaveContext.health + (CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2 * parameters[0]) <=
+                 0))) {
         return GameInteractionEffectQueryResult::NotPossible;
     }
 

@@ -636,7 +636,7 @@ void func_80A0329C(EnElf* this, PlayState* play) {
         if ((heightDiff > 0.0f) && (heightDiff < 60.0f)) {
             if (!func_80A01F90(&this->actor.world.pos, &refActor->actor.world.pos, 10.0f)) {
                 if (GameInteractor_Should(VB_FAIRY_HEAL, true, this)) {
-                    Health_ChangeBy(play, 128);
+                    Health_ChangeBy(play, (CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2) << 3);
                 }
                 if (this->fairyFlags & FAIRY_FLAG_BIG) {
                     Magic_Fill(play);
