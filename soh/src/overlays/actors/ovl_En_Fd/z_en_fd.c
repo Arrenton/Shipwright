@@ -225,8 +225,6 @@ s32 EnFd_SpawnCore(EnFd* this, PlayState* play) {
         return false;
     }
 
-    this->actor.child->colChkInfo.health = this->actor.colChkInfo.health % 8;
-
     u16 maxHealth = GetActorMaximumHealth(&this->actor);
     u16 coreMaximumHealth = maxHealth / 3;
     if (coreMaximumHealth * 3 != maxHealth) {
