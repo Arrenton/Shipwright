@@ -917,7 +917,7 @@ typedef struct Player {
     /* 0x089A */ s16 floorPitchAlt; // the calculation for this value is bugged and doesn't represent anything meaningful
     /* 0x089C */ s16 unk_89C;
     /* 0x089E */ u16 floorSfxOffset;
-    /* 0x08A0 */ u8 knockbackDamage;
+    /* 0x08A0 */ u16 knockbackDamage;
     /* 0x08A1 */ u8 knockbackType;
     /* 0x08A2 */ s16 knockbackRot;
     /* 0x08A4 */ f32 knockbackSpeed;

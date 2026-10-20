@@ -7,8 +7,8 @@ extern "C" {
 #endif
 
 // Max health value for use with health bars, set on actor init
-u8 GetActorMaximumHealth(const Actor* actor);
-void SetActorMaximumHealth(const Actor* actor, u8 maximumHealth);
+u16 GetActorMaximumHealth(const Actor* actor);
+void SetActorMaximumHealth(const Actor* actor, u16 maximumHealth);
 
 #ifdef __cplusplus
 }

@@ -3830,7 +3830,7 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
     switch (item) {
         case RG_MAGIC_SINGLE:
             gSaveContext.isMagicAcquired = true;
-            gSaveContext.magicFillTarget = MAGIC_NORMAL_METER;
+            gSaveContext.magicFillTarget = gSaveContext.magicUnits;
             Magic_Fill(play);
             break;
         case RG_MAGIC_DOUBLE:
@@ -3838,7 +3838,7 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
                 gSaveContext.isMagicAcquired = true;
             }
             gSaveContext.isDoubleMagicAcquired = true;
-            gSaveContext.magicFillTarget = MAGIC_DOUBLE_METER;
+            gSaveContext.magicFillTarget = gSaveContext.magicUnits * 2;
             gSaveContext.magicLevel = 0;
             Magic_Fill(play);
             break;
@@ -3851,7 +3851,7 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
         case RG_DOUBLE_DEFENSE:
             gSaveContext.isDoubleDefenseAcquired = true;
             gSaveContext.inventory.defenseHearts = 20;
-            gSaveContext.healthAccumulator = MAX_HEALTH;
+            gSaveContext.healthAccumulator = gSaveContext.healthCapacity2;
             break;
         case RG_TYCOON_WALLET:
             Inventory_ChangeUpgrade(UPG_WALLET, 3);

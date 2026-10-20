@@ -390,12 +390,19 @@ void HealthMeter_Draw(PlayState* play) {
     f32 temp2;
     f32 temp3;
     f32 temp4;
+    u8 heartUnits = CVarGetInteger("gLeveled.Difficulty.HeartUnits", 4) << 2;
+    if (heartUnits < 4) {
+        heartUnits = 4;
+        CVarSetInteger("gLeveled.Difficulty.HeartUnits", 1);
+    }
     InterfaceContext* interfaceCtx = &play->interfaceCtx;
     GraphicsContext* gfxCtx = play->state.gfxCtx;
     Vtx* sp154 = interfaceCtx->beatingHeartVtx;
-    s32 curHeartFraction = gSaveContext.health % FULL_HEART_HEALTH;
-    s16 totalHeartCount = gSaveContext.healthCapacity / FULL_HEART_HEALTH;
-    s16 fullHeartCount = gSaveContext.health / FULL_HEART_HEALTH;
+    s16 totalHeartCount = gSaveContext.healthCapacity2 / heartUnits;
+    s16 fullHeartCount = gSaveContext.health / heartUnits;
+    f32 heartUnit = (f32)gSaveContext.health / heartUnits * 16 - fullHeartCount * 16;
+    heartUnit = heartUnit > 0.0f && heartUnit < 1.0f ? 1.0f : heartUnit;
+    s32 curHeartFraction = (s32)heartUnit % 0x10;
     s32 pad2;
     f32 sp144 = interfaceCtx->unk_22A * 0.1f;
     s32 curCombineModeSet = 0;
@@ -410,7 +417,7 @@ void HealthMeter_Draw(PlayState* play) {
 
     OPEN_DISPS(gfxCtx);
 
-    if (!(gSaveContext.health % FULL_HEART_HEALTH)) {
+    if (!(gSaveContext.health % heartUnits)) {
         fullHeartCount--;
     }
 
@@ -631,7 +638,7 @@ void HealthMeter_Draw(PlayState* play) {
         }
 
         offsetX += 10.0f;
-        s32 lineLength = CVarGetInteger(CVAR_COSMETIC("HUD.Hearts.LineLength"), 10);
+        s32 lineLength = CVarGetInteger(CVAR_COSMETIC("HUD.Hearts.LineLength"), 15);
         if (lineLength != 0 && (i + 1) % lineLength == 0) {
             offsetX = PosX_anchor;
             offsetY += 10.0f;
@@ -639,6 +646,14 @@ void HealthMeter_Draw(PlayState* play) {
 
         FrameInterpolation_RecordCloseChild();
     }
+
+    // Draw Health Numbers
+    s32 lineLength = CVarGetInteger(CVAR_COSMETIC("HUD.Hearts.LineLength"), 15);
+    s32 numberOffsetX = CLAMP(totalHeartCount, 0, lineLength) * 5;
+    s32 numberPosX = PosX_anchor + numberOffsetX;
+    s32 numberPosY = getHealthMeterYOffset() + 13;
+
+    Leveled_LifeMeter_DrawHealthNumbers(play, interfaceCtx, numberOffsetX, numberPosX, numberPosY, sp144);
 
     CLOSE_DISPS(gfxCtx);
 }
@@ -669,15 +684,9 @@ void HealthMeter_HandleCriticalAlarm(PlayState* play) {
 u32 HealthMeter_IsCritical(void) {
     s32 var;
 
-    if (gSaveContext.healthCapacity <= 0x50) {
-        var = 0x10;
-    } else if (gSaveContext.healthCapacity <= 0xA0) {
-        var = 0x18;
-    } else if (gSaveContext.healthCapacity <= 0xF0) {
-        var = 0x20;
-    } else {
-        var = 0x2C;
-    }
+    s32 heartValue = LEVELED_HEART_UNITS;
+
+    var = heartValue + (s32)(((f32)gSaveContext.healthCapacity2 / heartValue - 3) * (f32)heartValue * 0.103f);
 
     if (GameInteractor_Should(VB_HEALTH_METER_BE_CRITICAL, var >= gSaveContext.health && gSaveContext.health > 0)) {
         return true;

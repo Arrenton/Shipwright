@@ -180,7 +180,7 @@ void KaleidoScope_DrawDebugEditor(PlayState* play) {
 
     // Health
     spD8[2] = 0;
-    spD8[3] = gSaveContext.health / FULL_HEART_HEALTH;
+    spD8[3] = gSaveContext.health / LEVELED_HEART_UNITS;
     while (spD8[3] >= 10) {
         spD8[2]++;
         spD8[3] -= 10;
@@ -372,12 +372,14 @@ void KaleidoScope_DrawDebugEditor(PlayState* play) {
                 if (gSaveContext.healthCapacity < STARTING_HEALTH) {
                     gSaveContext.healthCapacity = STARTING_HEALTH;
                 }
+                Actor_RefreshLeveledStats(&GET_PLAYER(play)->actor, GET_PLAYER(play));
             } else if (CHECK_BTN_ALL(input->press.button, BTN_CDOWN) ||
                        CHECK_BTN_ALL(input->press.button, BTN_CRIGHT)) {
                 gSaveContext.healthCapacity += FULL_HEART_HEALTH;
                 if (gSaveContext.healthCapacity >= MAX_HEALTH) {
                     gSaveContext.healthCapacity = MAX_HEALTH;
                 }
+                Actor_RefreshLeveledStats(&GET_PLAYER(play)->actor, GET_PLAYER(play));
             }
             break;
 

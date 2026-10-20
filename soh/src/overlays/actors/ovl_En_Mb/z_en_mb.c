@@ -625,6 +625,7 @@ void EnMb_Stunned(EnMb* this, PlayState* play) {
         if (this->actor.params == ENMB_TYPE_CLUB) {
             if (this->actor.colChkInfo.health == 0) {
                 EnMb_SetupClubDead(this);
+                Player_GainExperience(play, this->actor.exp);
             } else if (this->state == ENMB_STATE_CLUB_KNEELING) {
                 /* dead code: the setup for this action sets state to something else */
                 EnMb_SetupClubDamagedWhileKneeling(this);
@@ -634,6 +635,7 @@ void EnMb_Stunned(EnMb* this, PlayState* play) {
         } else {
             if (this->actor.colChkInfo.health == 0) {
                 EnMb_SetupSpearDead(this);
+                Player_GainExperience(play, this->actor.exp);
             } else {
                 EnMb_SetupSpearDamaged(this);
             }
@@ -1446,6 +1448,7 @@ void EnMb_CheckColliding(EnMb* this, PlayState* play) {
                 if (this->actor.params == ENMB_TYPE_CLUB) {
                     if (this->actor.colChkInfo.health == 0) {
                         EnMb_SetupClubDead(this);
+                        Player_GainExperience(play, this->actor.exp);
                         GameInteractor_ExecuteOnEnemyDefeat(&this->actor);
                     } else if (this->state != ENMB_STATE_CLUB_KNEELING) {
                         EnMb_SetupClubDamaged(this);
@@ -1453,6 +1456,7 @@ void EnMb_CheckColliding(EnMb* this, PlayState* play) {
                 } else {
                     if (this->actor.colChkInfo.health == 0) {
                         EnMb_SetupSpearDead(this);
+                        Player_GainExperience(play, this->actor.exp);
                         GameInteractor_ExecuteOnEnemyDefeat(&this->actor);
                     } else {
                         EnMb_SetupSpearDamaged(this);

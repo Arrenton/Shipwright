@@ -967,6 +967,10 @@ void ActorViewerWindow::DrawElement() {
                         ImGui::Text("Name: %s", ActorDB::Instance->RetrieveEntry(display->id).name.c_str());
                         ImGui::Text("Description: %s", GetActorDescription(display->id).c_str());
                         ImGui::Text("Category: %s", acMapping[display->category]);
+                        if (display->category == ACTORCAT_BOSS || display->category == ACTORCAT_ENEMY) {
+                            ImGui::Text("Level: %d", display->level);
+                            ImGui::Text("EXP: %d", display->exp);
+                        }
                         ImGui::Text("ID: %d", display->id);
                         ImGui::Text("Parameters: %d", display->params);
                         ImGui::Text("Actor List Index: %d", GetActorListIndex(display));
@@ -1003,7 +1007,7 @@ void ActorViewerWindow::DrawElement() {
 
                 if (display->category == ACTORCAT_BOSS || display->category == ACTORCAT_ENEMY) {
                     PushStyleInput(THEME_COLOR);
-                    ImGui::InputScalar("Enemy Health", ImGuiDataType_U8, &display->colChkInfo.health);
+                    ImGui::InputScalar("Enemy Health", ImGuiDataType_U16, &display->colChkInfo.health);
                     PopStyleInput();
                     UIWidgets::InsertHelpHoverText("Some actors might not use this!");
                 }

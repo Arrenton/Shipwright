@@ -1564,7 +1564,7 @@ s16 func_8001F404(s16 dropId) {
     }
     // clang-format on
 
-    if (dropId == ITEM00_HEART && gSaveContext.healthCapacity == gSaveContext.health) {
+    if (dropId == ITEM00_HEART && gSaveContext.healthCapacity2 == gSaveContext.health) {
         return ITEM00_RUPEE_GREEN;
     }
 
@@ -1713,12 +1713,12 @@ void Item_DropCollectibleRandom(PlayState* play, Actor* fromActor, Vec3f* spawnP
             EffectSsDeadSound_SpawnStationary(play, spawnPos, NA_SE_EV_BUTTERFRY_TO_FAIRY, true,
                                               DEADSOUND_REPEAT_MODE_OFF, 40);
             return;
-        } else if (gSaveContext.health <= 0x30 &&
+        } else if (gSaveContext.health <= LEVELED_HEART_UNITS * 3 &&
                    !CVarGetInteger(CVAR_ENHANCEMENT("NoHeartDrops"), 0)) { // 3 hearts or less
             params = 0xB * 0x10;
             dropTableIndex = 0x0;
             dropId = ITEM00_HEART;
-        } else if (gSaveContext.health <= 0x50 &&
+        } else if (gSaveContext.health <= LEVELED_HEART_UNITS * 5 &&
                    !CVarGetInteger(CVAR_ENHANCEMENT("NoHeartDrops"), 0)) { // 5 hearts or less
             params = 0xA * 0x10;
             dropTableIndex = 0x0;

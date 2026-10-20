@@ -2,6 +2,7 @@
 #include "objects/object_fz/object_fz.h"
 #include "soh/frame_interpolation.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/ObjectExtension/ActorMaximumHealth.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -365,6 +366,7 @@ void EnFz_ApplyDamage(EnFz* this, PlayState* play) {
                         vec.z = this->actor.world.pos.z;
                         EnFz_Damaged(this, play, &vec, 30, 10.0f);
                         EnFz_SetupDespawn(this, play);
+                        Player_GainExperience(play, this->actor.exp);
                         GameInteractor_ExecuteOnEnemyDefeat(&this->actor);
                     }
                 }
@@ -373,6 +375,7 @@ void EnFz_ApplyDamage(EnFz* this, PlayState* play) {
                 Actor_SetColorFilter(&this->actor, 0x4000, 0xFF, 0x2000, 8);
                 if (this->actor.colChkInfo.health == 0) {
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_FREEZAD_DEAD);
+                    Player_GainExperience(play, this->actor.exp);
                     EnFz_SetupMelt(this);
                 } else {
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_FREEZAD_DAMAGE);
@@ -719,7 +722,9 @@ void EnFz_Draw(Actor* thisx, PlayState* play) {
     s32 pad;
     s32 index;
 
-    index = (6 - this->actor.colChkInfo.health) >> 1;
+    index = (6 - (u8)CLAMP(((f32)this->actor.colChkInfo.health / GetActorMaximumHealth(&this->actor) * 5 + 0.99999f), 0,
+                           6)) >>
+            1;
 
     // SOH [Enhancement] - With enemy health scaling, the Freezards health could cause an index out of bounds for the
     // displayLists, so we need to recompute the index based on the scaled health (using the maximum health value) and

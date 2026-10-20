@@ -36,6 +36,7 @@ typedef struct {
     u8 maxTriforcePieces;
     bool hasFishingRod;
     bool fishingPoleShuffled;
+    u8 level;
 } SaveFileMetaInfo;
 
 typedef enum {
